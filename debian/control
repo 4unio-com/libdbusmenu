@@ -1,0 +1,23 @@
+Source: ubuntu-desktop-testing
+Section: utils
+Priority: optional
+XSBC-Original-Maintainer: Ara Pulido <apulido@gmail.com>
+Maintainer: Ubuntu MOTU Developers <ubuntu-motu@lists.ubuntu.com>
+Standards-Version: 3.7.3
+XS-Python-Version: current
+Build-Depends: cdbs (>= 0.4.43), debhelper (>= 5.0.37.2), python-central, python-dev (>= 2.4), python-distutils-extra
+Vcs-Bzr: https://code.launchpad.net/~hardware-certification/hwtest/trunk
+
+Package: ubuntu-desktop-tests
+Architecture: all
+Depends: ${misc:Depends}, ${python:Depends}, ldtp, python-ldtp, desktop-testing-library
+XB-Python-Version: ${python:Versions}
+Description: Ubuntu Desktop Tests
+ Desktop tests.
+
+Package: desktop-testing-library
+Architecture: all
+Depends: ${misc:Depends}, ${python:Depends}, ldtp, python-ldtp
+XB-Python-Version: ${python:Versions}
+Description: Desktop Testing library
+ Library for desktop testing.

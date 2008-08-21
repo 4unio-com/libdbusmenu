@@ -1,0 +1,35 @@
+This package was debianized by Ara Pulido <ara.pulido@canonical.com>
+Thu Jul 31 07:41:17 EDT 2008
+
+It was downloaded from http://launchpad.net/ubuntu-tests
+
+Upstream Authors:
+    Ara Pulido <ara.pulido@ubuntu.com>
+
+Copyright:
+    Copyright (c) 2008 Canonical
+
+License:
+
+    This package is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+On Debian systems, the complete text of the GNU General
+Public License can be found in `/usr/share/common-licenses/GPL'.
+
+The entire code base may be distributed under the terms of the GNU General
+Public License (GPL), which appears immediately below.  Alternatively, all
+of the source code as any code derived from that code may instead be
+distributed under the GNU Lesser General Public License (LGPL), at the
+choice of the distributor. The complete text of the LGPL appears at the
+bottom of this file.

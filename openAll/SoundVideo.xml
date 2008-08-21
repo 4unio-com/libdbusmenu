@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<ldtp>
+  <logfileoverwrite>1</logfileoverwrite>
+  <logfile>temp_log.xml</logfile>
+  <group>
+    <testcaseid>mnuAudioCDExtractorTestCase</testcaseid>
+    <script>
+      <testcase>OpenmnuAudioCDExtractor</testcase>
+      <name>open_app.py</name>
+      <data>app_data/audiocdextractor.xml</data>
+    </script>
+  </group>
+  <group>
+    <testcaseid>mnuBraseroDiscBurningTestCase</testcaseid>
+    <script>
+      <testcase>OpenmnuBraseroDiscBurning</testcase>
+      <name>open_app.py</name>
+      <data>app_data/brasero.xml</data>
+    </script>
+  </group>
+  <group>
+    <testcaseid>mnuMoviePlayerTestCase</testcaseid>
+    <script>
+      <testcase>OpenmnuMoviePlayer</testcase>
+      <name>open_app.py</name>
+      <data>app_data/totem.xml</data>
+    </script>
+  </group>
+  <group>
+    <testcaseid>mnuRhythmboxMusicPlayerTestCase</testcaseid>
+    <script>
+      <testcase>OpenmnuRhythmboxMusicPlayer</testcase>
+      <name>open_app.py</name>
+      <data>app_data/rhythmbox.xml</data>
+    </script>
+  </group>
+</ldtp>
