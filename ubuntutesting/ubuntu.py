@@ -548,11 +548,11 @@ class UpdateManager(Application):
         checkButton.click()
  
         # Administrative permissions
-        polKit.wait()
-        polKit.set_password()
+        if polKit.wait():
+            polKit.set_password()
         
         # HACK to wait for repositories
-        wait(10)
+        wait(20)
 
     def install_updates(self):
         """
@@ -725,8 +725,10 @@ class PolicyKit(Application):
     def wait(self):
         """
         Wait for the pop up window asking for the password to appear.
+
+        @return 1, if the gksu window exists, 0 otherwise.
         """
-        waittillguiexist(ubuntu_constants.SU_WINDOW)
+        return waittillguiexist(ubuntu_constants.SU_WINDOW)
         
     def set_password(self):
         """
