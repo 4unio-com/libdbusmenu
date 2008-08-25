@@ -11,6 +11,7 @@ Vcs-Bzr: https://code.launchpad.net/~hardware-certification/hwtest/trunk
 Package: ubuntu-desktop-tests
 Architecture: all
 Depends: ${misc:Depends}, ${python:Depends}, ldtp, python-ldtp, desktop-testing-library
+Recommends: xsltproc, firefox
 XB-Python-Version: ${python:Versions}
 Description: Ubuntu Desktop Tests
  Desktop tests.
