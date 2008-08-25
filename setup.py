@@ -46,17 +46,17 @@ setup(
     version = changelog_version(),
     author = "Ara Pulido",
     author_email = "ara.pulido@canonical.com",
-    license = "GPL",
+    license = "LGPL",
     description = "Ubuntu Desktop Testing",
     long_description = """
 This project provides a library and scripts for desktop testing.
 """,
     data_files = [
-        ("share/ubuntu-tests/gedit", ["gedit/*.*"]),
-        ("share/ubuntu-tests/gedit/app_data", ["gedit/app_data/*"]),
-        ("share/ubuntu-tests/openAll", ["openAll/*.*"]),
-        ("share/ubuntu-tests/openAll/app_data", ["openAll/app_data/*"]),
-        ("share/ubuntu-tests/updateSystem", ["updateSystem/*"])],
+        ("share/ubuntu-desktop-tests/gedit", ["gedit/*.*"]),
+        ("share/ubuntu-desktop-tests/gedit/app_data", ["gedit/app_data/*"]),
+        ("share/ubuntu-desktop-tests/openAll", ["openAll/*.*"]),
+        ("share/ubuntu-desktop-tests/openAll/app_data", ["openAll/app_data/*"]),
+        ("share/ubuntu-desktop-tests/updateSystem", ["updateSystem/*"])],
     packages = ["ubuntutesting"],
     cmdclass = {
         "install_data": testing_install_data,
