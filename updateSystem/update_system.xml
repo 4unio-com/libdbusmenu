@@ -12,6 +12,14 @@
   <group>
     <testcaseid>UpdateManagerTestCase</testcaseid>
     <script>
+      <testcase>UpdateManagerInstallFirst</testcase>
+      <name>update_first.py</name>
+      <data>update_manager_data.xml</data>
+    </script>
+  </group>
+  <group>
+    <testcaseid>UpdateManagerTestCase</testcaseid>
+    <script>
       <testcase>UpdateManagerInstall</testcase>
       <name>update_system.py</name>
       <data>update_manager_data.xml</data>
