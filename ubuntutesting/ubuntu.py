@@ -549,6 +549,8 @@ class UpdateManager(Application):
  
         # Administrative permissions
         if polKit.wait():
+            # HACK
+            wait(2)
             polKit.set_password()
         
         # HACK to wait for repositories
