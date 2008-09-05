@@ -16,7 +16,7 @@ try:
     
     # Open the update manager and check the repositories
     updateManager.open()
-    updateManger.check_updates()
+    updateManager.check_updates()
     list = updateManager.get_available_updates()
 
     # If there is any update, select the first one
