@@ -581,7 +581,11 @@ class UpdateManager(Application):
             
             if btnInstall.stateenabled():
                 btnInstall.click()
-                # Administrative permissions
+
+                # We will need administrative permission
+                polKit = PolicyKit(self.password)
+
+               # Administrative permissions
                 if polKit.wait():
                     # HACK
                     wait(2)
