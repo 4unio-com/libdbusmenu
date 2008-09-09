@@ -434,13 +434,16 @@ class UpdateManager(Application):
             table  = updateManager.getchild(ubuntu_constants.UM_TBL_UPDATES, role = 'table')
             updates_table = table[0]
 
-            # Hack to avoid dependencies to be checked again
-            for i in range(0, updates_table.getrowcount(), 1):
-                updates_table.uncheckrow(i)
-                wait(1)
-            for i in range(0, updates_table.getrowcount(), 1):
-                updates_table.uncheckrow(i)
-                wait(1)
+            # TODO: When table admits right click, use the context menu
+            self.remap()
+            size_updates = self.download_size()
+            while size_updates > 0:
+                for i in range(0, updates_table.getrowcount(), 1):
+                    updates_table.uncheckrow(i)
+                    wait(1)
+                self.remap()
+                size_updates = self.download_size()
+ 
         except LdtpExecutionError, msg:
             raise LdtpExecutionError, "Error getting the updates table: " + str(msg)
 

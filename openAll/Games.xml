@@ -42,14 +42,14 @@
       <data>app_data/fourinarow.xml</data>
     </script>
   </group>
-  <group>
+  <!--  <group>
     <testcaseid>FreeCellsolitaireTestCase</testcaseid>
     <script>
       <testcase>OpenFreeCellsolitaire</testcase>
       <name>open_app.py</name>
       <data>app_data/freecell.xml</data>
     </script>
-  </group>
+</group> -->
   <group>
     <testcaseid>GnometrisTestCase</testcaseid>
     <script>
@@ -58,14 +58,14 @@
       <data>app_data/tetris.xml</data>
     </script>
   </group>
-  <group>
+  <!--  <group>
     <testcaseid>lagnoTestCase</testcaseid>
     <script>
       <testcase>Openlagno</testcase>
       <name>open_app.py</name>
       <data>app_data/lagno.xml</data>
     </script>
-  </group>
+</group> -->
   <group>
     <testcaseid>KlotskiTestCase</testcaseid>
     <script>
