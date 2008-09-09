@@ -581,7 +581,12 @@ class UpdateManager(Application):
             
             if btnInstall.stateenabled():
                 btnInstall.click()
-            
+                # Administrative permissions
+                if polKit.wait():
+                    # HACK
+                    wait(2)
+                    polKit.set_password()
+        
         # Wait for the the close button to be ready
         try:
             btnClose = updateManager.getchild(ubuntu_constants.UM_BTN_CLOSE)
