@@ -3,14 +3,6 @@
   <logfileoverwrite>1</logfileoverwrite>
   <logfile>temp_log.xml</logfile>
   <group>
-    <testcaseid>mnuAudioCDExtractorTestCase</testcaseid>
-    <script>
-      <testcase>OpenmnuAudioCDExtractor</testcase>
-      <name>open_app.py</name>
-      <data>app_data/audiocdextractor.xml</data>
-    </script>
-  </group>
-  <group>
     <testcaseid>mnuBraseroDiscBurningTestCase</testcaseid>
     <script>
       <testcase>OpenmnuBraseroDiscBurning</testcase>
