@@ -298,13 +298,22 @@ class UpdateManager(Application):
         Application.__init__(self, ubuntu_constants.UM_WINDOW)
         self.password = password
         
-    def open(self):
+    def open(self, dist_upgrade=False):
         """
         It opens the update-manager application and raises an error if the application
         didn't start properly.
 
         """
-        open_and_check_menu_item(ubuntu_constants.UM_MNU_ITEM, ubuntu_constants.UM_WINDOW)
+
+        if dist_upgrade:
+            launchapp('update-manager', ['-d'], 0)
+            response = waittillguiexist(ubuntu_constants.UM_WINDOW, '', 20)
+    
+            if response == 0:
+                raise LdtpExecutionError, "The " + ubuntu_constants.UM_WINDOW + " window was not found."    
+
+        else:
+            open_and_check_menu_item(ubuntu_constants.UM_MNU_ITEM, ubuntu_constants.UM_WINDOW)
 
         # Wait the population of the list
         updateManager = context(ubuntu_constants.UM_WINDOW)
