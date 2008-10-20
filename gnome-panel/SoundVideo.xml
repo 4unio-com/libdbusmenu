@@ -1,29 +1,28 @@
 <?xml version="1.0"?>
 <ldtp>
-  <logfileoverwrite>1</logfileoverwrite>
-  <logfile>temp_log.xml</logfile>
+  <logfile>/dev/null</logfile>
   <group>
     <testcaseid>mnuBraseroDiscBurningTestCase</testcaseid>
     <script>
       <testcase>OpenmnuBraseroDiscBurning</testcase>
-      <name>open_app.py</name>
-      <data>app_data/brasero.xml</data>
+      <name>./gnome-panel/open_app.py</name>
+      <data>./gnome-panel/data/brasero.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>mnuMoviePlayerTestCase</testcaseid>
     <script>
       <testcase>OpenmnuMoviePlayer</testcase>
-      <name>open_app.py</name>
-      <data>app_data/totem.xml</data>
+      <name>./gnome-panel/open_app.py</name>
+      <data>./gnome-panel/data/totem.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>mnuRhythmboxMusicPlayerTestCase</testcaseid>
     <script>
       <testcase>OpenmnuRhythmboxMusicPlayer</testcase>
-      <name>open_app.py</name>
-      <data>app_data/rhythmbox.xml</data>
+      <name>./gnome-panel/open_app.py</name>
+      <data>./gnome-panel/data/rhythmbox.xml</data>
     </script>
   </group>
 </ldtp>

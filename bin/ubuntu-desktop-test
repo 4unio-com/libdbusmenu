@@ -1,0 +1,202 @@
+#!/usr/bin/env python
+
+import os
+import re
+import sys
+import logging
+
+from logging import StreamHandler, FileHandler, Formatter
+from optparse import OptionParser
+from stat import ST_MODE, S_IMODE
+
+
+def safe_change_mode(path, mode):
+    if not os.path.exists(path):
+        raise Exception, "Path does not exist: %s" % path
+
+    old_mode = os.stat(path)[ST_MODE]
+    if mode != S_IMODE(old_mode):
+        os.chmod(path, mode)
+
+def safe_make_directory(path, mode=0755):
+    if os.path.exists(path):
+        if not os.path.isdir(path):
+            raise Exception, "Path is not a directory: %s" % path
+
+        safe_change_mode(path, mode)
+    else:
+        logging.debug("Creating directory: %s", path)
+        os.makedirs(path, mode)
+
+def is_valid_application_directory(application_directory, applications):
+    application = os.path.basename(application_directory)
+    if applications is not None and application not in applications:
+        logging.debug("Application name `%s' not in specified options: %s",
+            application, ", ".join(applications))
+        return False
+
+    pattern = r"[a-z0-9][-_a-z0-9+.]*"
+    if not re.match(pattern, application, re.I):
+        logging.debug("Application name `%s' does not match pattern: %s",
+            application, pattern)
+        return False
+
+    if not os.path.isdir(application_directory):
+        logging.debug("Application directory `%s' is not a directory",
+            application_directory)
+        return False
+
+    return True
+
+def is_valid_suite_file(suite_file, suites):
+    # Support specifying suites with or without the extension
+    if suites is not None:
+        suites = [os.path.splitext(s)[0] + ".xml" for s in suites]
+
+    suite = os.path.basename(suite_file)
+    if suites is not None and suite not in suites:
+        logging.debug("Suite name `%s' not in specified options: %s",
+            suite, ", ".join(suites))
+        return False
+
+    pattern = r"[a-z0-9][-_a-z0-9+.]*.xml"
+    if not re.match(pattern, suite, re.I):
+        logging.debug("Suite name `%s' does not match pattern: %s",
+            suite, pattern)
+        return False
+
+    if not os.path.isfile(suite_file):
+        logging.debug("Suite file `%s' is not a file",
+            suite_file)
+        return False
+
+    return True
+
+def filter_suite_files(project_directory, applications, suites):
+    suite_files = []
+
+    # Filter applications
+    for application in os.listdir(project_directory):
+        application_directory = os.path.join(project_directory, application)
+        if not is_valid_application_directory(application_directory, applications):
+            continue
+
+        # Filter suites
+        for suite in os.listdir(application_directory):
+            suite_file = os.path.join(application_directory, suite)
+            if not is_valid_suite_file(suite_file, suites):
+                continue
+
+            suite_files.append(suite_file)
+
+    return suite_files
+
+def run_suite_files(target_directory, conf_file, suite_files):
+    # Make sure all paths are absolute because we change directories
+#    target_directory = os.path.abspath(target_directory)
+#    suite_files = [os.path.abspath(s) for s in suite_files]
+
+    for suite_file in suite_files:
+        application_name = os.path.basename(os.path.dirname(suite_file))
+        application_target = os.path.join(target_directory, application_name)
+        safe_make_directory(application_target)
+
+        suite_name = os.path.basename(suite_file)
+        suite_target = os.path.join(application_target,
+            suite_name.replace(".xml", ".log"))
+
+        command = "ldtprunner --conf=%s %s > %s" \
+            % (conf_file, suite_file, suite_target)
+        logging.info("About to run command: %s" % command)
+        os.system(command)
+
+def main(args=sys.argv):
+    usage = "%prog [OPTIONS]"
+    parser = OptionParser(usage=usage)
+
+    project_name = "ubuntu-desktop-tests"
+
+    default_project = os.path.join("/usr/share", project_name)
+    default_conffile = "$project/conffile.ini"
+    default_target = "~/.%s" % project_name
+    default_log_level = "critical"
+
+    parser.add_option("-l", "--log",
+                      metavar="FILE",
+                      help="The file to write the log to.")
+    parser.add_option("--log-level",
+                      default=default_log_level,
+                      help="One of debug, info, warning, error or critical.")
+    parser.add_option("-c", "--conffile",
+                      metavar="FILE",
+                      dest="conf_file",
+                      default=default_conffile,
+                      help="Configuration file for LDTP logging.")
+    parser.add_option("-a", "--application",
+                      action="append",
+                      dest="applications",
+                      type="string",
+                      default=None,
+                      help="Application name to test.")
+    parser.add_option("-s", "--suite",
+                      action="append",
+                      dest="suites",
+                      type="string",
+                      default=None,
+                      help="Suite name to test within an application.")
+    parser.add_option("-p", "--project",
+                      metavar="FILE",
+                      default=default_project,
+                      help="Project directory where applications are stored.")
+    parser.add_option("-t", "--target",
+                      metavar="FILE",
+                      default=default_target,
+                      help="Target directory where results are stored.")
+
+    (options, args) = parser.parse_args(args[1:])
+
+    # Set logging early
+    log_level = logging.getLevelName(options.log_level.upper())
+    log_handlers = []
+    log_handlers.append(StreamHandler())
+    if options.log:
+        log_filename = options.log
+        log_handlers.append(FileHandler(log_filename))
+
+    format = ("%(asctime)s %(levelname)-8s %(message)s")
+    if log_handlers:
+        for handler in log_handlers:
+            handler.setFormatter(Formatter(format))
+            logging.getLogger().addHandler(handler)
+        if log_level:
+            logging.getLogger().setLevel(log_level)
+    elif not logging.getLogger().handlers:
+        logging.disable(logging.CRITICAL)
+
+    # Expand and validate directories provided in options
+    options.project = os.path.expanduser(options.project)
+    if not os.path.isdir(options.project):
+        parser.error("Project directory `%s' is not a directory.",
+            options.project)
+
+    options.target = os.path.expanduser(options.target)
+    if os.path.exists(options.project) and not os.path.isdir(options.project):
+        parser.error("Target directory `%s' exists but is not a directory.",
+            options.project)
+
+    options.conf_file = options.conf_file.replace("$project", options.project)
+    if not os.path.exists(options.conf_file):
+        parser.error("Configuration file `%s' does not exist.",
+            options.conf_file)
+
+    # Filter suite files from project directory
+    suite_files = filter_suite_files(options.project, options.applications,
+        options.suites)
+
+    # Run filtered suite file
+    run_suite_files(options.target, options.conf_file, suite_files)
+
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main())
