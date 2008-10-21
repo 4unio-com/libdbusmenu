@@ -8,6 +8,7 @@ from tempfile import mkstemp
 from distutils.core import setup
 
 from distutils.command.install_data import install_data
+from distutils.command.install_scripts import install_scripts
 from DistUtilsExtra.command.build_extra import build_extra
 
 
@@ -68,6 +69,19 @@ class testing_install_data(install_data, object):
                 ">.": ">%s" % sharedir})
             os.rename(tmpfile, xmlfile)
 
+class testing_install_scripts(install_scripts, object):
+
+    def run(self):
+        """Run substitutions on files."""
+        super(testing_install_scripts, self).run()
+
+        # Substitute directory in defaults.py
+        for outfile in self.outfiles:
+            infile = os.path.join("bin", os.path.basename(outfile))
+            substitute_variables(infile, outfile, {
+                'TESTS_SHARE = "."':
+                'TESTS_SHARE = "/usr/share/ubuntu-desktop-tests"'})
+
 
 setup(
     name = "ubuntu-desktop-testing",
@@ -87,9 +101,10 @@ This project provides a library and scripts for desktop testing.
         ("share/ubuntu-desktop-tests/gnome-panel/data", ["gnome-panel/data/*"]),
         ("share/ubuntu-desktop-tests/update-manager", ["update-manager/*.*"]),
         ("share/ubuntu-desktop-tests/update-manager/data", ["update-manager/data/*"])],
-    scripts = ["bin/ubuntu-desktop-test", "bin/ubuntu-desktop-report"],
+    scripts = ["bin/ubuntu-desktop-test"],
     packages = ["ubuntutesting"],
     cmdclass = {
         "install_data": testing_install_data,
+        "install_scripts": testing_install_scripts,
         "build" : build_extra }
 )

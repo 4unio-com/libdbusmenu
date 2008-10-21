@@ -8,11 +8,21 @@ import logging
 from logging import StreamHandler, FileHandler, Formatter
 from optparse import OptionParser
 from stat import ST_MODE, S_IMODE
+from subprocess import Popen, PIPE
 
+
+# Globals
+TESTS_SHARE = "."
+
+
+def error(message, *args):
+    message = "Error: %s\n" % message
+    sys.stderr.write(message % args)
+    sys.exit(1)
 
 def safe_change_mode(path, mode):
     if not os.path.exists(path):
-        raise Exception, "Path does not exist: %s" % path
+        error("Path does not exist: %s", path)
 
     old_mode = os.stat(path)[ST_MODE]
     if mode != S_IMODE(old_mode):
@@ -21,12 +31,21 @@ def safe_change_mode(path, mode):
 def safe_make_directory(path, mode=0755):
     if os.path.exists(path):
         if not os.path.isdir(path):
-            raise Exception, "Path is not a directory: %s" % path
+            error("Path is not a directory: %s", path)
 
         safe_change_mode(path, mode)
     else:
         logging.debug("Creating directory: %s", path)
         os.makedirs(path, mode)
+
+def safe_run_command(command):
+    logging.debug("Running command: %s" % command)
+    p = Popen(command, stdout=PIPE, shell=True)
+    (pid, status) = os.waitpid(p.pid, 0)
+    if status:
+        error("Command failed: %s", command)
+
+    return p.stdout.read()
 
 def is_valid_application_directory(application_directory, applications):
     application = os.path.basename(application_directory)
@@ -72,12 +91,14 @@ def is_valid_suite_file(suite_file, suites):
 
     return True
 
-def filter_suite_files(project_directory, applications, suites):
-    suite_files = []
+def filter_suite_files(applications, suites):
+    if not os.path.isdir(TESTS_SHARE):
+        error("Share directory `%s' is not a directory.", TESTS_SHARE)
 
     # Filter applications
-    for application in os.listdir(project_directory):
-        application_directory = os.path.join(project_directory, application)
+    suite_files = []
+    for application in os.listdir(TESTS_SHARE):
+        application_directory = os.path.join(TESTS_SHARE, application)
         if not is_valid_application_directory(application_directory, applications):
             continue
 
@@ -91,34 +112,42 @@ def filter_suite_files(project_directory, applications, suites):
 
     return suite_files
 
-def run_suite_files(target_directory, conf_file, suite_files):
-    # Make sure all paths are absolute because we change directories
-#    target_directory = os.path.abspath(target_directory)
-#    suite_files = [os.path.abspath(s) for s in suite_files]
+def run_suite_file(suite_file, log_file):
+    conf_file = os.path.join(TESTS_SHARE, "conffile.ini")
+    if not os.path.exists(conf_file):
+        error("Configuration file `%s' does not exist.", conf_file)
 
-    for suite_file in suite_files:
-        application_name = os.path.basename(os.path.dirname(suite_file))
-        application_target = os.path.join(target_directory, application_name)
-        safe_make_directory(application_target)
+    command = "ldtprunner --conf=%s %s > %s" \
+        % (conf_file, suite_file, log_file)
+    safe_run_command(command)
 
-        suite_name = os.path.basename(suite_file)
-        suite_target = os.path.join(application_target,
-            suite_name.replace(".xml", ".log"))
+def convert_log_file(log_file, html_file):
+    xsl_file = os.path.join(TESTS_SHARE, "report.xsl")
+    if not os.path.exists(xsl_file):
+        error("XSL file `%s' does not exist.", xsl_file)
 
-        command = "ldtprunner --conf=%s %s > %s" \
-            % (conf_file, suite_file, suite_target)
-        logging.info("About to run command: %s" % command)
-        os.system(command)
+    command = "xsltproc -o %s %s %s" \
+        % (html_file, xsl_file, log_file)
+    safe_run_command(command)
+
+def process_suite_file(suite_file, target_directory):
+    application_name = os.path.basename(os.path.dirname(suite_file))
+    application_target = os.path.join(target_directory, application_name)
+    safe_make_directory(application_target)
+
+    suite_name = os.path.basename(suite_file)
+    log_file = os.path.join(application_target,
+        suite_name.replace(".xml", ".log"))
+    run_suite_file(suite_file, log_file)
+
+    html_file = log_file.replace(".log", ".html")
+    convert_log_file(log_file, html_file)
 
 def main(args=sys.argv):
     usage = "%prog [OPTIONS]"
     parser = OptionParser(usage=usage)
 
-    project_name = "ubuntu-desktop-tests"
-
-    default_project = os.path.join("/usr/share", project_name)
-    default_conffile = "$project/conffile.ini"
-    default_target = "~/.%s" % project_name
+    default_target = "~/.ubuntu-desktop-tests"
     default_log_level = "critical"
 
     parser.add_option("-l", "--log",
@@ -127,31 +156,23 @@ def main(args=sys.argv):
     parser.add_option("--log-level",
                       default=default_log_level,
                       help="One of debug, info, warning, error or critical.")
-    parser.add_option("-c", "--conffile",
-                      metavar="FILE",
-                      dest="conf_file",
-                      default=default_conffile,
-                      help="Configuration file for LDTP logging.")
     parser.add_option("-a", "--application",
                       action="append",
-                      dest="applications",
                       type="string",
                       default=None,
-                      help="Application name to test.")
+                      help="Application name to test. Option can be repeated "
+                           "and defaults to all applications")
     parser.add_option("-s", "--suite",
                       action="append",
-                      dest="suites",
                       type="string",
                       default=None,
-                      help="Suite name to test within an application.")
-    parser.add_option("-p", "--project",
-                      metavar="FILE",
-                      default=default_project,
-                      help="Project directory where applications are stored.")
+                      help="Suite name to test within applications. Option "
+                           "can be repeated and default to all suites")
     parser.add_option("-t", "--target",
                       metavar="FILE",
                       default=default_target,
-                      help="Target directory where results are stored.")
+                      help="Target directory for logs and reports. Defaults "
+                           "to: %default")
 
     (options, args) = parser.parse_args(args[1:])
 
@@ -173,28 +194,17 @@ def main(args=sys.argv):
     elif not logging.getLogger().handlers:
         logging.disable(logging.CRITICAL)
 
-    # Expand and validate directories provided in options
-    options.project = os.path.expanduser(options.project)
-    if not os.path.isdir(options.project):
-        parser.error("Project directory `%s' is not a directory.",
-            options.project)
-
     options.target = os.path.expanduser(options.target)
-    if os.path.exists(options.project) and not os.path.isdir(options.project):
+    if os.path.exists(options.target) and not os.path.isdir(options.target):
         parser.error("Target directory `%s' exists but is not a directory.",
-            options.project)
-
-    options.conf_file = options.conf_file.replace("$project", options.project)
-    if not os.path.exists(options.conf_file):
-        parser.error("Configuration file `%s' does not exist.",
-            options.conf_file)
+            options.target)
 
     # Filter suite files from project directory
-    suite_files = filter_suite_files(options.project, options.applications,
-        options.suites)
+    suite_files = filter_suite_files(options.application, options.suite)
 
     # Run filtered suite file
-    run_suite_files(options.target, options.conf_file, suite_files)
+    for suite_file in suite_files:
+        process_suite_file(suite_file, options.target)
 
     return 0
 
