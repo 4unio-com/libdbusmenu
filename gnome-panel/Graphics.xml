@@ -1,37 +1,36 @@
 <?xml version="1.0"?>
 <ldtp>
-  <logfileoverwrite>1</logfileoverwrite>
-  <logfile>temp_log.xml</logfile>
+  <logfile>/dev/null</logfile>
   <group>
     <testcaseid>mnuF-SpotPhotoManagerTestCase</testcaseid>
     <script>
       <testcase>OpenmnuF-SpotPhotoManager</testcase>
-      <name>open_app.py</name>
-      <data>app_data/fspot.xml</data>
+      <name>./gnome-panel/open_app.py</name>
+      <data>./gnome-panel/data/fspot.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>mnuGIMPImageEditorTestCase</testcaseid>
     <script>
       <testcase>OpenmnuGIMPImageEditor</testcase>
-      <name>open_app.py</name>
-      <data>app_data/gimp.xml</data>
+      <name>./gnome-panel/open_app.py</name>
+      <data>./gnome-panel/data/gimp.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>mnuOpenOffice.orgDrawingTestCase</testcaseid>
     <script>
       <testcase>OpenmnuOpenOffice.orgDrawing</testcase>
-      <name>open_app.py</name>
-      <data>app_data/oodraw.xml</data>
+      <name>./gnome-panel/open_app.py</name>
+      <data>./gnome-panel/data/oodraw.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>mnuXSaneImageScannerTestCase</testcaseid>
     <script>
       <testcase>OpenmnuXSaneImageScanner</testcase>
-      <name>open_app.py</name>
-      <data>app_data/xsane.xml</data>
+      <name>./gnome-panel/open_app.py</name>
+      <data>./gnome-panel/data/xsane.xml</data>
     </script>
   </group>
 </ldtp>

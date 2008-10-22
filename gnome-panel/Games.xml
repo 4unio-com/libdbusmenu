@@ -1,133 +1,116 @@
 <?xml version="1.0"?>
 <ldtp>
-  <logfileoverwrite>1</logfileoverwrite>
-  <logfile>temp_log.xml</logfile>
+  <logfile>/dev/null</logfile>
   <group>
     <testcaseid>AisleRiotSolitaireTestCase</testcaseid>
     <script>
       <testcase>OpenAisleRiotSolitaire</testcase>
-      <name>open_app.py</name>
-      <data>app_data/solitaire.xml</data>
+      <name>./gnome-panel/open_app.py</name>
+      <data>./gnome-panel/data/solitaire.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>BlackjackTestCase</testcaseid>
     <script>
       <testcase>OpenBlackjack</testcase>
-      <name>open_app.py</name>
-      <data>app_data/blackjack.xml</data>
+      <name>./gnome-panel/open_app.py</name>
+      <data>./gnome-panel/data/blackjack.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>ChessTestCase</testcaseid>
     <script>
       <testcase>OpenChess</testcase>
-      <name>open_app.py</name>
-      <data>app_data/chess.xml</data>
+      <name>./gnome-panel/open_app.py</name>
+      <data>./gnome-panel/data/chess.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>FiveormoreTestCase</testcaseid>
     <script>
       <testcase>OpenFiveormore</testcase>
-      <name>open_app.py</name>
-      <data>app_data/fiveormore.xml</data>
+      <name>./gnome-panel/open_app.py</name>
+      <data>./gnome-panel/data/fiveormore.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>Four-in-a-rowTestCase</testcaseid>
     <script>
       <testcase>OpenFour-in-a-row</testcase>
-      <name>open_app.py</name>
-      <data>app_data/fourinarow.xml</data>
+      <name>./gnome-panel/open_app.py</name>
+      <data>./gnome-panel/data/fourinarow.xml</data>
     </script>
   </group>
-  <!--  <group>
-    <testcaseid>FreeCellsolitaireTestCase</testcaseid>
-    <script>
-      <testcase>OpenFreeCellsolitaire</testcase>
-      <name>open_app.py</name>
-      <data>app_data/freecell.xml</data>
-    </script>
-</group> -->
   <group>
     <testcaseid>GnometrisTestCase</testcaseid>
     <script>
       <testcase>OpenGnometris</testcase>
-      <name>open_app.py</name>
-      <data>app_data/tetris.xml</data>
+      <name>./gnome-panel/open_app.py</name>
+      <data>./gnome-panel/data/tetris.xml</data>
     </script>
   </group>
-  <!--  <group>
-    <testcaseid>lagnoTestCase</testcaseid>
-    <script>
-      <testcase>Openlagno</testcase>
-      <name>open_app.py</name>
-      <data>app_data/lagno.xml</data>
-    </script>
-</group> -->
   <group>
     <testcaseid>KlotskiTestCase</testcaseid>
     <script>
       <testcase>OpenKlotski</testcase>
-      <name>open_app.py</name>
-      <data>app_data/klotski.xml</data>
+      <name>./gnome-panel/open_app.py</name>
+      <data>./gnome-panel/data/klotski.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>MahjonggTestCase</testcaseid>
     <script>
       <testcase>OpenMahjongg</testcase>
-      <name>open_app.py</name>
-      <data>app_data/mahjongg.xml</data>
+      <name>./gnome-panel/open_app.py</name>
+      <data>./gnome-panel/data/mahjongg.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>MinesTestCase</testcaseid>
     <script>
       <testcase>OpenMines</testcase>
-      <name>open_app.py</name>
-      <data>app_data/mines.xml</data>
+      <name>./gnome-panel/open_app.py</name>
+      <data>./gnome-panel/data/mines.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>NibblesTestCase</testcaseid>
     <script>
       <testcase>OpenNibbles</testcase>
-      <name>open_app.py</name>
-      <data>app_data/nibbles.xml</data>
+      <name>./gnome-panel/open_app.py</name>
+      <data>./gnome-panel/data/nibbles.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>SamegNOMETestCase</testcaseid>
     <script>
       <testcase>OpenSamegNOME</testcase>
-      <name>open_app.py</name>
-      <data>app_data/samegnome.xml</data>
+      <name>./gnome-panel/open_app.py</name>
+      <data>./gnome-panel/data/samegnome.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>SudokuTestCase</testcaseid>
     <script>
       <testcase>OpenSudoku</testcase>
-      <name>open_app.py</name>
-      <data>app_data/sudoku.xml</data>
+      <name>./gnome-panel/open_app.py</name>
+      <data>./gnome-panel/data/sudoku.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>TaliTestCase</testcaseid>
     <script>
       <testcase>OpenTali</testcase>
-      <name>open_app.py</name>
-      <data>app_data/tali.xml</data>
+      <name>./gnome-panel/open_app.py</name>
+      <data>./gnome-panel/data/tali.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>TetravexTestCase</testcaseid>
     <script>
       <testcase>OpenTetravex</testcase>
-      <name>open_app.py</name>
-      <data>app_data/tetravex.xml</data>
+      <name>./gnome-panel/open_app.py</name>
+      <data>./gnome-panel/data/tetravex.xml</data>
     </script>
   </group>
 </ldtp>

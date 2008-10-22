@@ -1,61 +1,60 @@
 <?xml version="1.0"?>
 <ldtp>
-  <logfileoverwrite>1</logfileoverwrite>
-  <logfile>temp_log.xml</logfile>
+  <logfile>/dev/null</logfile>
   <group>
     <testcaseid>mnuEkigaSoftphoneTestCase</testcaseid>
     <script>
       <testcase>OpenmnuEkigaSoftphone</testcase>
-      <name>open_app.py</name>
-      <data>app_data/ekiga.xml</data>
+      <name>./gnome-panel/open_app.py</name>
+      <data>./gnome-panel/data/ekiga.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>mnuEvolutionMailTestCase</testcaseid>
     <script>
       <testcase>OpenmnuEvolutionMail</testcase>
-      <name>open_app.py</name>
-      <data>app_data/evolution1.xml</data>
+      <name>./gnome-panel/open_app.py</name>
+      <data>./gnome-panel/data/evolution1.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>mnuFirefoxWebBrowserTestCase</testcaseid>
     <script>
       <testcase>OpenmnuFirefoxWebBrowser</testcase>
-      <name>open_app.py</name>
-      <data>app_data/firefox.xml</data>
+      <name>./gnome-panel/open_app.py</name>
+      <data>./gnome-panel/data/firefox.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>mnuPidginInternetMessengerTestCase</testcaseid>
     <script>
       <testcase>OpenmnuPidginInternetMessenger</testcase>
-      <name>open_app.py</name>
-      <data>app_data/pidgin.xml</data>
+      <name>./gnome-panel/open_app.py</name>
+      <data>./gnome-panel/data/pidgin.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>mnuRemoteDesktopViewerTestCase</testcaseid>
     <script>
       <testcase>OpenmnuRemoteDesktopViewer</testcase>
-      <name>open_app.py</name>
-      <data>app_data/remotedesktop.xml</data>
+      <name>./gnome-panel/open_app.py</name>
+      <data>./gnome-panel/data/remotedesktop.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>mnuTerminalServerClientTestCase</testcaseid>
     <script>
       <testcase>OpenmnuTerminalServerClient</testcase>
-      <name>open_app.py</name>
-      <data>app_data/terminal.xml</data>
+      <name>./gnome-panel/open_app.py</name>
+      <data>./gnome-panel/data/terminal.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>mnuTransmissionBitTorrentClientTestCase</testcaseid>
     <script>
       <testcase>OpenmnuTransmissionBitTorrentClient</testcase>
-      <name>open_app.py</name>
-      <data>app_data/transmission.xml</data>
+      <name>./gnome-panel/open_app.py</name>
+      <data>./gnome-panel/data/transmission.xml</data>
     </script>
   </group>
 </ldtp>

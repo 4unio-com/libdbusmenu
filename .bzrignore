@@ -1,0 +1,10 @@
+build
+debian/tmp
+debian/files
+debian/*.debhelper
+debian/*.debhelper.log
+debian/*.substvars
+debian/desktop-testing-library
+debian/stamp-patched
+debian/ubuntu-desktop-tests
+python-build-stamp-2.5

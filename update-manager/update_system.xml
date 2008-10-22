@@ -1,36 +1,35 @@
 <?xml version="1.0"?>
 <ldtp>
-  <logfileoverwrite>1</logfileoverwrite>
-  <logfile>temp_log.xml</logfile>
+  <logfile>/dev/null</logfile>
   <group>
     <testcaseid>UpdateManagerTestCase</testcaseid>
     <script>
       <testcase>UpdateManagerUnselect</testcase>
-      <name>unselect_all.py</name>
+      <name>./update-manager/unselect_all.py</name>
     </script>
   </group>
   <group>
     <testcaseid>UpdateManagerTestCase</testcaseid>
     <script>
       <testcase>UpdateManagerInstallNone</testcase>
-      <name>update_none.py</name>
-      <data>update_manager_data.xml</data>
+      <name>./update-manager/update_none.py</name>
+      <data>./update-manager/data/update_manager_data.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>UpdateManagerTestCase</testcaseid>
     <script>
       <testcase>UpdateManagerInstallFirst</testcase>
-      <name>update_first.py</name>
-      <data>update_manager_data.xml</data>
+      <name>./update-manager/update_first.py</name>
+      <data>./update-manager/data/update_manager_data.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>UpdateManagerTestCase</testcaseid>
     <script>
       <testcase>UpdateManagerInstall</testcase>
-      <name>update_system.py</name>
-      <data>update_manager_data.xml</data>
+      <name>./update-manager/update_system.py</name>
+      <data>./update-manager/data/update_manager_data.xml</data>
     </script>
   </group>
 </ldtp>

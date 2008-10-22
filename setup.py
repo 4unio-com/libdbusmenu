@@ -3,9 +3,9 @@
 import os
 import re
 from glob import glob
+from tempfile import mkstemp
 
 from distutils.core import setup
-from distutils.util import change_root, convert_path
 
 from distutils.command.install_data import install_data
 from distutils.command.install_scripts import install_scripts
@@ -21,6 +21,14 @@ def changelog_version(changelog="debian/changelog"):
             version = match.group(1)
 
     return version
+
+def substitute_variables(infile, outfile, variables={}):
+    descriptor_in = open(infile, "r")
+    descriptor_out = open(outfile, "w")
+    for line in descriptor_in.readlines():
+        for key, value in variables.items():
+            line = line.replace(key, value)
+        descriptor_out.write(line)
 
 class testing_install_data(install_data, object):
 
@@ -40,6 +48,40 @@ class testing_install_data(install_data, object):
                         i -= 1
                     i += 1
 
+    def run(self):
+        """Run substitutions on files."""
+        super(testing_install_data, self).run()
+
+        xmlfiles = [o for o in self.outfiles if o.endswith(".xml")]
+        if not xmlfiles:
+            return
+
+        # Determine absolute path to share directory
+        xslfile = [o for o in self.outfiles
+            if os.path.basename(o) == "report.xsl"][0]
+        sharedir = os.path.dirname(xslfile)
+        if self.root:
+            sharedir = sharedir.replace(self.root, os.sep)
+
+        for xmlfile in xmlfiles:
+            tmpfile = mkstemp()[1]
+            substitute_variables(xmlfile, tmpfile, {
+                ">.": ">%s" % sharedir})
+            os.rename(tmpfile, xmlfile)
+
+class testing_install_scripts(install_scripts, object):
+
+    def run(self):
+        """Run substitutions on files."""
+        super(testing_install_scripts, self).run()
+
+        # Substitute directory in defaults.py
+        for outfile in self.outfiles:
+            infile = os.path.join("bin", os.path.basename(outfile))
+            substitute_variables(infile, outfile, {
+                'TESTS_SHARE = "."':
+                'TESTS_SHARE = "/usr/share/ubuntu-desktop-tests"'})
+
 
 setup(
     name = "ubuntu-desktop-testing",
@@ -52,13 +94,17 @@ setup(
 This project provides a library and scripts for desktop testing.
 """,
     data_files = [
+        ("share/ubuntu-desktop-tests", ["report.xsl", "conffile.ini"]),
         ("share/ubuntu-desktop-tests/gedit", ["gedit/*.*"]),
-        ("share/ubuntu-desktop-tests/gedit/app_data", ["gedit/app_data/*"]),
-        ("share/ubuntu-desktop-tests/openAll", ["openAll/*.*"]),
-        ("share/ubuntu-desktop-tests/openAll/app_data", ["openAll/app_data/*"]),
-        ("share/ubuntu-desktop-tests/updateSystem", ["updateSystem/*"])],
+        ("share/ubuntu-desktop-tests/gedit/data", ["gedit/data/*"]),
+        ("share/ubuntu-desktop-tests/gnome-panel", ["gnome-panel/*.*"]),
+        ("share/ubuntu-desktop-tests/gnome-panel/data", ["gnome-panel/data/*"]),
+        ("share/ubuntu-desktop-tests/update-manager", ["update-manager/*.*"]),
+        ("share/ubuntu-desktop-tests/update-manager/data", ["update-manager/data/*"])],
+    scripts = ["bin/ubuntu-desktop-test"],
     packages = ["ubuntutesting"],
     cmdclass = {
         "install_data": testing_install_data,
+        "install_scripts": testing_install_scripts,
         "build" : build_extra }
 )

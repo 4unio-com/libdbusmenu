@@ -76,7 +76,7 @@
 					<td style="padding: 3px;" align="right"><xsl:value-of select="substring-after(COMMENT, 'elapsed_time:')"/></td>
 					<td>
 						<table>
-                            <xsl:for-each select="child::CAUSE">
+							<xsl:for-each select="child::CAUSE">
 								<tr>
 									<td><xsl:value-of select="text()"/></td>
 								</tr>
