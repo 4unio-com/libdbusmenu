@@ -11,7 +11,7 @@ try:
     dataXml = LdtpDataFileParser(datafilename)    
     mnuItem = dataXml.gettagvalue("menuitem")[0]
     wName = dataXml.gettagvalue("windowname")[0]
-    
+
     start_time = time()
     
     open_and_check_menu_item(mnuItem, wName)
@@ -26,7 +26,13 @@ try:
     try:
         wait(2)
         app = Application(wName)
-        app.exit()
+
+        close_type = dataXml.gettagvalue("closetype")
+        close_name = dataXml.gettagvalue("closename")
+        if len(close_type) > 0 and len(close_name) > 0:
+            app.exit(close_type[0], close_name[0])
+        else:
+            app.exit()
     except:
         pass
             

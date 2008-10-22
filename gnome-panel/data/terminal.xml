@@ -2,4 +2,6 @@
 <data>
   <menuitem>mnuTerminalServerClient</menuitem>
   <windowname>frmTerminalServerClient</windowname>
+  <closetype>button</closetype>
+  <closename>Close</closename>
 </data>

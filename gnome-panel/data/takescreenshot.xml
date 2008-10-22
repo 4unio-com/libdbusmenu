@@ -2,4 +2,6 @@
 <data>
   <menuitem>Take Screenshot</menuitem>
   <windowname>dlg0</windowname>
+  <closetype>button</closetype>
+  <closename>btnCancel</closename>
 </data>

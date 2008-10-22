@@ -2,4 +2,6 @@
 <data>
   <menuitem>mnuAisleRiotSolitaire</menuitem>
   <windowname>Klondike</windowname>
+  <closetype>menu</closetype>
+  <closename>Close</closename>
 </data>

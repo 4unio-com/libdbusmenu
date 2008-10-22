@@ -2,4 +2,6 @@
 <data>
   <menuitem>mnuEkigaSoftphone</menuitem>
   <windowname>frmFirstTimeConfigurationAssistant</windowname>
+  <closetype>menu</closetype>
+  <closename>Close</closename>
 </data>

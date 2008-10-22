@@ -2,4 +2,6 @@
 <data>
   <menuitem>Sudoku</menuitem>
   <windowname>Sudoku</windowname>
+  <closetype>menu</closetype>
+  <closename>Close</closename>
 </data>

@@ -34,14 +34,6 @@
     </script>
   </group>
   <group>
-    <testcaseid>ManagePrintJobsTestCase</testcaseid>
-    <script>
-      <testcase>OpenManagePrintJobs</testcase>
-      <name>./gnome-panel/open_app.py</name>
-      <data>./gnome-panel/data/manageprintjobs.xml</data>
-    </script>
-  </group>
-  <group>
     <testcaseid>PasswordsAndEncryptionKeysTestCase</testcaseid>
     <script>
       <testcase>OpenPasswordsAndEncryptionKeys</testcase>
@@ -79,14 +71,6 @@
       <testcase>OpenTomboyNotes</testcase>
       <name>./gnome-panel/open_app.py</name>
       <data>./gnome-panel/data/tomboynotes.xml</data>
-    </script>
-  </group>
-  <group>
-    <testcaseid>TrackerTestCase</testcaseid>
-    <script>
-      <testcase>OpenTrackerSearchToole</testcase>
-      <name>./gnome-panel/open_app.py</name>
-      <data>./gnome-panel/data/trackersearchtool.xml</data>
     </script>
   </group>
 </ldtp>

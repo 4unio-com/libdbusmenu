@@ -66,21 +66,28 @@ class Application:
         """
         remap(self.name)
 
-    def exit(self, quit_menu='mnuQuit'):
+    def exit(self, close_type='menu', close_name='mnuQuit'):
         """
         Given an application, it tries to quit it.
          
-        @type quit_menu: string
-        @param quit_menu: The name of the Quit menu of the application. If not mentioned the default will be used ("Quit").
+        @type close_type: string
+        @param close_type: The type of close widget of the application. Types: menu, button.
+        @type close_name: string
+        @param close_name: The name of the exit widget of the application. If not mentioned the default will be used ("Quit").
         """
         try:
             app = context(self.name)
             try:
-                actualMenu = app.getchild(quit_menu)
+                close_widget = app.getchild(close_name)
             except LdtpExecutionError, msg:
-                raise LdtpExecutionError, "The " + quit_menu + " menu was not found."
+                raise LdtpExecutionError, "The " + close_name + " widget was not found."
 
-            actualMenu.selectmenuitem()
+            if close_type == 'menu':
+                close_widget.selectmenuitem()
+            elif close_type == 'button':
+                close_widget.click()
+            else:
+                raise LdtpExecutionError, "Wrong close item type."
             response = waittillguinotexist(self.name, '', 20)
         except LdtpExecutionError, msg:
             raise LdtpExecutionError, "Mmm, something went wrong when closing the application: " + str(msg)
