@@ -9,6 +9,7 @@ from ldtputils import *
 import ubuntu_constants
 from time import *
 from re import *
+import pdb
 
 def open_and_check_menu_item(menu_item_txt, window_title_txt):
     """
@@ -101,7 +102,6 @@ class Application:
         @param save_menu: The name of the Save menu of the application. If not mentioned the default will be used ("Save").
         """
         try:
-            print self.name
             app = context(self.name)
             try:
                 actualMenu = app.getchild(save_menu)
@@ -371,13 +371,13 @@ class UpdateManager(Application):
             for i in label:
                 label_name = i.getName()
                 if label_name == ubuntu_constants.UM_LBL_UPTODATE:
-                    print "No updates available"
+                    pdb.set_trace("No updates available")
                     return 0
                 else:
                     groups = match(ubuntu_constants.UM_LBL_N_UPDATES, label_name)
                     if groups:
                         number = groups.group(1)
-                        print "Updates available: " + number
+                        pdb.set_trace("Updates available: " + number)
                         return int(number)
 
         except LdtpExecutionError, msg:
@@ -414,7 +414,7 @@ class UpdateManager(Application):
                         size = 0
 
                     total_size = float(groups.group(1)) * size
-                    print "Download size: " + str(total_size) + " bytes."
+                    pdb.set_trace("Download size: " + str(total_size) + " bytes.")
                     return total_size
 
         except LdtpExecutionError, msg:
