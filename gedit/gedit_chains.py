@@ -6,7 +6,7 @@ from ldtputils import *
 
 from time import *
 
-from ubuntutesting.ubuntu import *
+from ubuntutesting.gnome import *
 from ubuntutesting.check import *
 
 try:
