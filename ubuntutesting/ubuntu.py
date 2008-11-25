@@ -8,10 +8,9 @@ from ldtp import *
 from ldtputils import *
 import ubuntu_constants
 import gnome_constants
-from gnome_testing import *
+from ubuntutesting.gnome import *
 from time import *
 from re import *
-import pdb
 
 def open_and_check_menu_item(menu_item_txt, window_title_txt):
     """
@@ -150,13 +149,11 @@ class UpdateManager(Application):
             for i in label:
                 label_name = i.getName()
                 if label_name == ubuntu_constants.UM_LBL_UPTODATE:
-                    pdb.set_trace("No updates available")
                     return 0
                 else:
                     groups = match(ubuntu_constants.UM_LBL_N_UPDATES, label_name)
                     if groups:
                         number = groups.group(1)
-                        pdb.set_trace("Updates available: " + number)
                         return int(number)
 
         except LdtpExecutionError, msg:
@@ -193,7 +190,6 @@ class UpdateManager(Application):
                         size = 0
 
                     total_size = float(groups.group(1)) * size
-                    pdb.set_trace("Download size: " + str(total_size) + " bytes.")
                     return total_size
 
         except LdtpExecutionError, msg:
