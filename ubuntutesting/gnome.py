@@ -9,7 +9,6 @@ from ldtputils import *
 import gnome_constants
 from time import *
 from re import *
-import pdb
 
 def open_and_check_app(app_name, window_title_txt):
     """
@@ -117,6 +116,137 @@ class Application:
                 app_txt_field.settextvalue(text)
             except LdtpExecutionError, msg:
                 raise LdtpExecutionError, "We couldn't write text: " + str(msg)
+
+class Seahorse(Application):
+    """
+    Seahorse manages the Seahorse application.
+    """
+ 
+    def __init__(self):
+        Application.__init__(self, gnome_constants.SH_WINDOW)
+
+    def open(self):
+        open_and_check_app(gnome_constants.SH_LAUNCHER, gnome_constants.SH_WINDOW)
+
+    def new_key(self, key_type):
+        
+        seahorse = context(self.name)
+        
+        try:
+            mnu_new_key = seahorse.getchild(gnome_constants.SH_MNU_NEWKEY)
+        except LdtpExecutionError, msg:
+            raise LdtpExecutionError, "The new key menu was not found: " + str(msg)
+
+        try:
+            mnu_new_key.selectmenuitem() 
+        except LdtpExecutionError, msg:
+            raise LdtpExecutionError, "There was a problem when selecting new key menu item: " + str(msg)
+
+        try:
+            waittillguiexist(gnome_constants.SH_NEWKEY_DLG)
+            dlg_new_key = context(gnome_constants.SH_NEWKEY_DLG)
+        except LdtpExecutionError, msg:
+            raise LdtpExecutionError, "The new key dialog was not found: " + str(msg)
+
+        try:
+            table  = dlg_new_key.getchild(role = 'table')
+            types_table = table[0]
+
+            for i in range(0, types_table.getrowcount(), 1):
+                text = types_table.getcellvalue(i, 1)
+                candidate = text.split('\n')[0]
+                if candidate == key_type:
+                    types_table.selectrowindex(i)
+                    break
+                wait(1)
+        except LdtpExecutionError, msg:
+            raise LdtpExecutionError, "Error getting the key types table: " + str(msg)
+
+        try:
+            btn_continue = dlg_new_key.getchild(gnome_constants.SH_BTN_CONTINUE)
+        except LdtpExecutionError, msg:
+            raise LdtpExecutionError, "The continue button at the new key dialog was not found: " + str(msg)
+
+        try:
+            btn_continue.click() 
+        except LdtpExecutionError, msg:
+            raise LdtpExecutionError, "There was a problem when clicking the continue button: " + str(msg)
+        
+    def new_pgp_key(self, full_name, email, comment, passphrase):
+        
+        self.new_key(gnome_constants.SH_TYPE_PGP)
+
+        try:
+            waittillguiexist(gnome_constants.SH_NEWPGP_DLG)
+            dlg_new_pgp = context(gnome_constants.SH_NEWPGP_DLG)
+        except LdtpExecutionError, msg:
+            raise LdtpExecutionError, "The new key dialog was not found: " + str(msg)
+
+        try:
+            txt_field = dlg_new_pgp.getchild(gnome_constants.SH_DLG_NEWPGP_FULLNAME)
+        except LdtpExecutionError, msg:
+            raise LdtpExecutionError, "The " + txt_field + " text field was not found: " + str(msg)
+        try:
+            txt_field.settextvalue(full_name)
+        except LdtpExecutionError, msg:
+            raise LdtpExecutionError, "We couldn't write text: " + str(msg)
+
+        try:
+            txt_field = dlg_new_pgp.getchild(gnome_constants.SH_DLG_NEWPGP_EMAIL)
+        except LdtpExecutionError, msg:
+            raise LdtpExecutionError, "The " + txt_field + " text field was not found: " + str(msg)
+        try:
+            txt_field.settextvalue(email)
+        except LdtpExecutionError, msg:
+            raise LdtpExecutionError, "We couldn't write text: " + str(msg)
+   
+        try:
+            txt_field = dlg_new_pgp.getchild(gnome_constants.SH_DLG_NEWPGP_COMMENT)
+        except LdtpExecutionError, msg:
+            raise LdtpExecutionError, "The " + txt_field + " text field was not found: " + str(msg)
+        try:
+            txt_field.settextvalue(comment)
+        except LdtpExecutionError, msg:
+            raise LdtpExecutionError, "We couldn't write text: " + str(msg)
+
+        try:
+            btn_create = dlg_new_pgp.getchild(gnome_constants.SH_BTN_NEWPGP_CREATE)
+        except LdtpExecutionError, msg:
+            raise LdtpExecutionError, "The create button at the new PGP key dialog was not found: " + str(msg)
+
+        try:
+            btn_create.click() 
+        except LdtpExecutionError, msg:
+            raise LdtpExecutionError, "There was a problem when clicking the create button " + str(msg)
+       
+        try:
+            waittillguiexist(gnome_constants.SH_DLG_NEWPGP_PASS)
+            dlg_new_pgp_pass = context(gnome_constants.SH_DLG_NEWPGP_PASS)
+        except LdtpExecutionError, msg:
+            raise LdtpExecutionError, "The new pgp key passphrase dialog was not found: " + str(msg)
+
+        try:
+            enterstring(passphrase)
+            enterstring("<tab>")
+            enterstring(passphrase)
+        except LdtpExecutionError, msg:
+            raise LdtpExecutionError, "Error entering passphrase" + str(msg)
+ 
+        try:
+            btn_pass_ok = dlg_new_pgp_pass.getchild(gnome_constants.SH_BTN_PASS_OK)
+        except LdtpExecutionError, msg:
+            raise LdtpExecutionError, "The OK button at the new PGP key passphrase dialog was not found: " + str(msg)
+
+        try:
+            btn_pass_ok.click() 
+        except LdtpExecutionError, msg:
+            raise LdtpExecutionError, "There was a problem when clicking the OK button " + str(msg)
+ 
+        try:
+            waittillguiexist(gnome_constants.SH_DLG_GENERATING_PGP)
+            waittillguinotexist(gnome_constants.SH_DLG_GENERATING_PGP)
+        except LdtpExecutionError, msg:
+            raise LdtpExecutionError, "The new pgp generating key dialog was not found: " + str(msg)
 
 
 class GEdit(Application):
