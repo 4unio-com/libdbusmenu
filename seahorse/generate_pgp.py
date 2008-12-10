@@ -7,10 +7,12 @@ from ubuntutesting.gnome import *
 
 try:
   
-    #dataXml  = LdtpDataFileParser(datafilename)    
-    #password = dataXml.gettagvalue("password")[0]
-    
-    #updateManager = UpdateManager(password)
+    dataXml  = LdtpDataFileParser(datafilename)    
+    name     = dataXml.gettagvalue("name")[0]
+    email    = dataXml.gettagvalue("email")[0]
+    comment  = dataXml.gettagvalue("comment")[0]
+    passphrase  = dataXml.gettagvalue("passphrase")[0]
+
     
     seahorse = Seahorse()
     
@@ -18,7 +20,7 @@ try:
     
     # Open the update manager and check the repositories
     seahorse.open()
-    seahorse.new_pgp_key("Ara Tester", "tester@tester.org", "This is a test", "passphrase")
+    seahorse.new_pgp_key(name, email, comment, passphrase)
     seahorse.exit()
         
     stop_time = time()
