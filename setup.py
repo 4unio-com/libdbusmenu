@@ -101,6 +101,8 @@ This project provides a library and scripts for desktop testing.
         ("share/ubuntu-desktop-tests/gnome-panel/data", ["gnome-panel/data/*"]),
         ("share/ubuntu-desktop-tests/update-manager", ["update-manager/*.*"]),
         ("share/ubuntu-desktop-tests/update-manager/data", ["update-manager/data/*"])],
+        ("share/ubuntu-desktop-tests/seahorse", ["seahorse/*.*"]),
+        ("share/ubuntu-desktop-tests/seahorse/data", ["seahorse/data/*"])],
     scripts = ["bin/ubuntu-desktop-test"],
     packages = ["ubuntutesting"],
     cmdclass = {
