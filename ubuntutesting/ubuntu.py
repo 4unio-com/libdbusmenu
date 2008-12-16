@@ -91,14 +91,14 @@ class UpdateManager(Application):
         """
 
         if dist_upgrade:
-            launchapp('update-manager', ['-d'], 0)
+            launchapp(ubuntu_constants.UM_LAUNCHER, ['-d'], 0)
             response = waittillguiexist(ubuntu_constants.UM_WINDOW, '', 20)
     
             if response == 0:
                 raise LdtpExecutionError, "The " + ubuntu_constants.UM_WINDOW + " window was not found."    
 
         else:
-            open_and_check_menu_item(ubuntu_constants.UM_MNU_ITEM, ubuntu_constants.UM_WINDOW)
+            open_and_check_app(ubuntu_constants.UM_LAUNCHER, ubuntu_constants.UM_WINDOW)
 
         # Wait the population of the list
         updateManager = context(ubuntu_constants.UM_WINDOW)

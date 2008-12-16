@@ -10,6 +10,7 @@ TOP_PANEL = 'frmTopExpandedEdgePanel'
 # Update Manager constants (prefix = UM)
 UM_MNU_ITEM        = "mnuUpdateManager"
 UM_WINDOW          = "frmUpdateManager"
+UM_LAUNCHER        = "update-manager"
 UM_BTN_CLOSE       = "btnClose"
 UM_BTN_CHECK       = "btnCheck"
 UM_BTN_INSTALL     = "btnInstallUpdates"
