@@ -5,56 +5,56 @@
     <testcaseid>mnuEkigaSoftphoneTestCase</testcaseid>
     <script>
       <testcase>OpenmnuEkigaSoftphone</testcase>
-      <name>./gnome-panel/open_app.py</name>
-      <data>./gnome-panel/data/ekiga.xml</data>
+      <name>./ubuntu-menu/open_app.py</name>
+      <data>./ubuntu-menu/data/ekiga.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>mnuEvolutionMailTestCase</testcaseid>
     <script>
       <testcase>OpenmnuEvolutionMail</testcase>
-      <name>./gnome-panel/open_app.py</name>
-      <data>./gnome-panel/data/evolution1.xml</data>
+      <name>./ubuntu-menu/open_app.py</name>
+      <data>./ubuntu-menu/data/evolution1.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>mnuFirefoxWebBrowserTestCase</testcaseid>
     <script>
       <testcase>OpenmnuFirefoxWebBrowser</testcase>
-      <name>./gnome-panel/open_app.py</name>
-      <data>./gnome-panel/data/firefox.xml</data>
+      <name>./ubuntu-menu/open_app.py</name>
+      <data>./ubuntu-menu/data/firefox.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>mnuPidginInternetMessengerTestCase</testcaseid>
     <script>
       <testcase>OpenmnuPidginInternetMessenger</testcase>
-      <name>./gnome-panel/open_app.py</name>
-      <data>./gnome-panel/data/pidgin.xml</data>
+      <name>./ubuntu-menu/open_app.py</name>
+      <data>./ubuntu-menu/data/pidgin.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>mnuRemoteDesktopViewerTestCase</testcaseid>
     <script>
       <testcase>OpenmnuRemoteDesktopViewer</testcase>
-      <name>./gnome-panel/open_app.py</name>
-      <data>./gnome-panel/data/remotedesktop.xml</data>
+      <name>./ubuntu-menu/open_app.py</name>
+      <data>./ubuntu-menu/data/remotedesktop.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>mnuTerminalServerClientTestCase</testcaseid>
     <script>
       <testcase>OpenmnuTerminalServerClient</testcase>
-      <name>./gnome-panel/open_app.py</name>
-      <data>./gnome-panel/data/terminal.xml</data>
+      <name>./ubuntu-menu/open_app.py</name>
+      <data>./ubuntu-menu/data/terminal.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>mnuTransmissionBitTorrentClientTestCase</testcaseid>
     <script>
       <testcase>OpenmnuTransmissionBitTorrentClient</testcase>
-      <name>./gnome-panel/open_app.py</name>
-      <data>./gnome-panel/data/transmission.xml</data>
+      <name>./ubuntu-menu/open_app.py</name>
+      <data>./ubuntu-menu/data/transmission.xml</data>
     </script>
   </group>
 </ldtp>

@@ -5,112 +5,112 @@
     <testcaseid>AisleRiotSolitaireTestCase</testcaseid>
     <script>
       <testcase>OpenAisleRiotSolitaire</testcase>
-      <name>./gnome-panel/open_app.py</name>
-      <data>./gnome-panel/data/solitaire.xml</data>
+      <name>./ubuntu-menu/open_app.py</name>
+      <data>./ubuntu-menu/data/solitaire.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>BlackjackTestCase</testcaseid>
     <script>
       <testcase>OpenBlackjack</testcase>
-      <name>./gnome-panel/open_app.py</name>
-      <data>./gnome-panel/data/blackjack.xml</data>
+      <name>./ubuntu-menu/open_app.py</name>
+      <data>./ubuntu-menu/data/blackjack.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>ChessTestCase</testcaseid>
     <script>
       <testcase>OpenChess</testcase>
-      <name>./gnome-panel/open_app.py</name>
-      <data>./gnome-panel/data/chess.xml</data>
+      <name>./ubuntu-menu/open_app.py</name>
+      <data>./ubuntu-menu/data/chess.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>FiveormoreTestCase</testcaseid>
     <script>
       <testcase>OpenFiveormore</testcase>
-      <name>./gnome-panel/open_app.py</name>
-      <data>./gnome-panel/data/fiveormore.xml</data>
+      <name>./ubuntu-menu/open_app.py</name>
+      <data>./ubuntu-menu/data/fiveormore.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>Four-in-a-rowTestCase</testcaseid>
     <script>
       <testcase>OpenFour-in-a-row</testcase>
-      <name>./gnome-panel/open_app.py</name>
-      <data>./gnome-panel/data/fourinarow.xml</data>
+      <name>./ubuntu-menu/open_app.py</name>
+      <data>./ubuntu-menu/data/fourinarow.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>GnometrisTestCase</testcaseid>
     <script>
       <testcase>OpenGnometris</testcase>
-      <name>./gnome-panel/open_app.py</name>
-      <data>./gnome-panel/data/tetris.xml</data>
+      <name>./ubuntu-menu/open_app.py</name>
+      <data>./ubuntu-menu/data/tetris.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>KlotskiTestCase</testcaseid>
     <script>
       <testcase>OpenKlotski</testcase>
-      <name>./gnome-panel/open_app.py</name>
-      <data>./gnome-panel/data/klotski.xml</data>
+      <name>./ubuntu-menu/open_app.py</name>
+      <data>./ubuntu-menu/data/klotski.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>MahjonggTestCase</testcaseid>
     <script>
       <testcase>OpenMahjongg</testcase>
-      <name>./gnome-panel/open_app.py</name>
-      <data>./gnome-panel/data/mahjongg.xml</data>
+      <name>./ubuntu-menu/open_app.py</name>
+      <data>./ubuntu-menu/data/mahjongg.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>MinesTestCase</testcaseid>
     <script>
       <testcase>OpenMines</testcase>
-      <name>./gnome-panel/open_app.py</name>
-      <data>./gnome-panel/data/mines.xml</data>
+      <name>./ubuntu-menu/open_app.py</name>
+      <data>./ubuntu-menu/data/mines.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>NibblesTestCase</testcaseid>
     <script>
       <testcase>OpenNibbles</testcase>
-      <name>./gnome-panel/open_app.py</name>
-      <data>./gnome-panel/data/nibbles.xml</data>
+      <name>./ubuntu-menu/open_app.py</name>
+      <data>./ubuntu-menu/data/nibbles.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>SamegNOMETestCase</testcaseid>
     <script>
       <testcase>OpenSamegNOME</testcase>
-      <name>./gnome-panel/open_app.py</name>
-      <data>./gnome-panel/data/samegnome.xml</data>
+      <name>./ubuntu-menu/open_app.py</name>
+      <data>./ubuntu-menu/data/samegnome.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>SudokuTestCase</testcaseid>
     <script>
       <testcase>OpenSudoku</testcase>
-      <name>./gnome-panel/open_app.py</name>
-      <data>./gnome-panel/data/sudoku.xml</data>
+      <name>./ubuntu-menu/open_app.py</name>
+      <data>./ubuntu-menu/data/sudoku.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>TaliTestCase</testcaseid>
     <script>
       <testcase>OpenTali</testcase>
-      <name>./gnome-panel/open_app.py</name>
-      <data>./gnome-panel/data/tali.xml</data>
+      <name>./ubuntu-menu/open_app.py</name>
+      <data>./ubuntu-menu/data/tali.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>TetravexTestCase</testcaseid>
     <script>
       <testcase>OpenTetravex</testcase>
-      <name>./gnome-panel/open_app.py</name>
-      <data>./gnome-panel/data/tetravex.xml</data>
+      <name>./ubuntu-menu/open_app.py</name>
+      <data>./ubuntu-menu/data/tetravex.xml</data>
     </script>
   </group>
 </ldtp>

@@ -5,72 +5,72 @@
     <testcaseid>CalculatorTestCase</testcaseid>
     <script>
       <testcase>OpenCalculator</testcase>
-      <name>./gnome-panel/open_app.py</name>
-      <data>./gnome-panel/data/calculator.xml</data>
+      <name>./ubuntu-menu/open_app.py</name>
+      <data>./ubuntu-menu/data/calculator.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>CharacterMapTestCase</testcaseid>
     <script>
       <testcase>OpenCharacterMap</testcase>
-      <name>./gnome-panel/open_app.py</name>
-      <data>./gnome-panel/data/charactermap.xml</data>
+      <name>./ubuntu-menu/open_app.py</name>
+      <data>./ubuntu-menu/data/charactermap.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>DictionaryTestCase</testcaseid>
     <script>
       <testcase>OpenDictionary</testcase>
-      <name>./gnome-panel/open_app.py</name>
-      <data>./gnome-panel/data/dictionary.xml</data>
+      <name>./ubuntu-menu/open_app.py</name>
+      <data>./ubuntu-menu/data/dictionary.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>DiskusageAnalyzerTestCase</testcaseid>
     <script>
       <testcase>OpenDiskUsageAnalyzer</testcase>
-      <name>./gnome-panel/open_app.py</name>
-      <data>./gnome-panel/data/diskusageanalyzer.xml</data>
+      <name>./ubuntu-menu/open_app.py</name>
+      <data>./ubuntu-menu/data/diskusageanalyzer.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>PasswordsAndEncryptionKeysTestCase</testcaseid>
     <script>
       <testcase>OpenPasswordsAndEncryptionKeys</testcase>
-      <name>./gnome-panel/open_app.py</name>
-      <data>./gnome-panel/data/passwordsandencryptionkeys.xml</data>
+      <name>./ubuntu-menu/open_app.py</name>
+      <data>./ubuntu-menu/data/passwordsandencryptionkeys.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>TakeScreenshotTestCase</testcaseid>
     <script>
       <testcase>OpenTakeScreenshot</testcase>
-      <name>./gnome-panel/open_app.py</name>
-      <data>./gnome-panel/data/takescreenshot.xml</data>
+      <name>./ubuntu-menu/open_app.py</name>
+      <data>./ubuntu-menu/data/takescreenshot.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>TerminalTestCase</testcaseid>
     <script>
       <testcase>OpenTerminal</testcase>
-      <name>./gnome-panel/open_app.py</name>
-      <data>./gnome-panel/data/terminal.xml</data>
+      <name>./ubuntu-menu/open_app.py</name>
+      <data>./ubuntu-menu/data/terminal.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>TextEditorTestCase</testcaseid>
     <script>
       <testcase>OpenTextEditor</testcase>
-      <name>./gnome-panel/open_app.py</name>
-      <data>./gnome-panel/data/texteditor.xml</data>
+      <name>./ubuntu-menu/open_app.py</name>
+      <data>./ubuntu-menu/data/texteditor.xml</data>
     </script>
   </group>
   <group>
     <testcaseid>TomboyNotesTestCase</testcaseid>
     <script>
       <testcase>OpenTomboyNotes</testcase>
-      <name>./gnome-panel/open_app.py</name>
-      <data>./gnome-panel/data/tomboynotes.xml</data>
+      <name>./ubuntu-menu/open_app.py</name>
+      <data>./ubuntu-menu/data/tomboynotes.xml</data>
     </script>
   </group>
 </ldtp>
