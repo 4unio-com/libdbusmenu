@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <data>
   <menuitem>Take Screenshot</menuitem>
-  <windowname>dlg0</windowname>
+  <windowname>Take Screenshot</windowname>
   <closetype>button</closetype>
   <closename>btnCancel</closename>
 </data>
