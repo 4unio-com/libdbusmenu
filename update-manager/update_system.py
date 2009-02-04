@@ -1,13 +1,12 @@
-from ooldtp import *
-from ldtp import *
-from ldtputils import *
-from time import *
+import ldtp 
+import ldtputils
+from time import time
 
-from ubuntutesting.ubuntu import *
+from desktoptesting.ubuntu import time
 
 try:
 
-    dataXml  = LdtpDataFileParser(datafilename)    
+    dataXml  = ldtputils.LdtpDataFileParser(datafilename)    
     password = dataXml.gettagvalue("password")[0]
     
     test = UpdateManager(password)
@@ -23,9 +22,9 @@ try:
     
     elapsed = stop_time - start_time
     
-    log ('elapsed_time: ' + str(elapsed), 'comment')
+    ldtp.log ('elapsed_time: ' + str(elapsed), 'time')
     
-except LdtpExecutionError, msg:
+except ldtp.LdtpExecutionError, msg:
     raise
 
 

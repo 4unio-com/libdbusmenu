@@ -1,13 +1,12 @@
-from ooldtp import *
-from ldtp import *
-from ldtputils import *
-from time import *
+import ldtp
+import ldtputils
+from time import time
 
-from ubuntutesting.ubuntu import *
+from desktoptesting.ubuntu import UpdateManager
 
 try:
   
-    dataXml  = LdtpDataFileParser(datafilename)    
+    dataXml  = ldtputils.LdtpDataFileParser(datafilename)    
     password = dataXml.gettagvalue("password")[0]
     
     updateManager = UpdateManager(password)
@@ -26,16 +25,16 @@ try:
 
     # If the number of updates differ, the mark the test as failed.
     if n_updates != n_updates2:
-        log('The number of updates should have been the same.', 'ERROR')
-        log('The number of updates should have been the same.', 'CAUSE')
+        ldtp.log('The number of updates should have been the same.', 'error')
+        ldtp.log('The number of updates should have been the same.', 'cause')
 
     stop_time = time()
  
     elapsed = stop_time - start_time
     
-    log ('elapsed_time: ' + str(elapsed), 'comment')
+    ldtp.log ('elapsed_time: ' + str(elapsed), 'time')
     
-except LdtpExecutionError, msg:
+except ldtp.LdtpExecutionError, msg:
     raise
 
 
