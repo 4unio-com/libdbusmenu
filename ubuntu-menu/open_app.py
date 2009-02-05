@@ -19,7 +19,7 @@ try:
     
     elapsed = stop_time - start_time
     
-    ldtp.log ('elapsed_time: ' + str(elapsed), 'comment')
+    ldtp.log (str(elapsed), 'time')
     
     # Wait a couple of seconds and try to close the application
     try:

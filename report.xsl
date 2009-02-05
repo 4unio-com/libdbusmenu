@@ -122,7 +122,7 @@
                             <td><font color="green">Passed</font></td>
                         </xsl:if>
                         <td>
-                          <xsl:value-of select="substring-after(time, 'elapsed_time:')"/>
+                            <xsl:value-of select="child::time/child::text()"/>
                         </td>
                         <td>
                           <xsl:if test="child::pass/child::text() = 0">

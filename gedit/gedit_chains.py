@@ -31,7 +31,7 @@ try:
     testcheck = FileComparison(oracle, test_file)
     check = testcheck.perform_test()
 
-    ldtp.log ('elapsed_time: ' + str(elapsed), 'test')
+    ldtp.log (str(elapsed), 'time')
     
     if check == desktoptesting.check.FAIL:
         ldtp.log ('Files differ.', 'cause')

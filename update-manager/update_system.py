@@ -22,7 +22,7 @@ try:
     
     elapsed = stop_time - start_time
     
-    ldtp.log ('elapsed_time: ' + str(elapsed), 'time')
+    ldtp.log (str(elapsed), 'time')
     
 except ldtp.LdtpExecutionError, msg:
     raise

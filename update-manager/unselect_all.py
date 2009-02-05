@@ -38,7 +38,7 @@ try:
     manager.close()
     stop_time = time()
     elapsed = stop_time - start_time
-    ldtp.log ('elapsed_time: ' + str(elapsed), 'test')
+    ldtp.log (str(elapsed), 'time')
     
 except ldtp.LdtpExecutionError, msg:
     raise
