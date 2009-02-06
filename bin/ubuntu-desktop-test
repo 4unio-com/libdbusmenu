@@ -74,8 +74,16 @@ def is_valid_suite(suite_file, suites, files):
         return False
 
     # Support specifying suites with or without the extension
+    # but do not include backup files LP#326177
+    suites_clean = []
     if suites is not None:
-        suites = [os.path.splitext(s)[0] + ".xml" for s in suites]
+        for s in suites:
+            if os.path.splitext(s)[1] is '':
+                suites_clean.append(s + ".xml")
+            else:
+                suites_clean.append(s)
+    
+    suites = suites_clean
 
     suite = os.path.basename(suite_file)
     if suites is not None and suite not in suites:
@@ -96,14 +104,14 @@ def is_valid_suite(suite_file, suites, files):
 
     return True
 
-def is_valid_suite_file(file):
+def is_valid_suite_file(file, suites):
 
     suite = os.path.basename(file)
 
     pattern = r"[a-z0-9][-_a-z0-9+.]*.xml"
     if not re.match(pattern, suite, re.I):
         logging.debug("Suite name `%s' does not match pattern: %s",
-            suite, pattern)
+            file, pattern)
         return False
 
     if not os.path.isfile(file):
@@ -111,6 +119,11 @@ def is_valid_suite_file(file):
             file)
         return False
 
+    if file in suites:
+        logging.debug("Suite file is already in the list",
+                file)
+        return False
+    
     return True
 
 
@@ -135,7 +148,7 @@ def filter_suite_files(applications, suites, files):
 
     if files is not None:
         for file in files:
-            if not is_valid_suite_file(file):
+            if not is_valid_suite_file(file, suite_files):
                 continue
             suite_files.append(file)
 
