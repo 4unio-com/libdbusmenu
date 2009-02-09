@@ -68,22 +68,22 @@ def is_valid_application_directory(application_directory, applications):
     return True
 
 def is_valid_suite(suite_file, suites, files):
-    
+   
     # If the user has specified a file, but not a suite, skip
     if suites is None and files is not None:
         return False
-
+    
     # Support specifying suites with or without the extension
     # but do not include backup files LP#326177
-    suites_clean = []
     if suites is not None:
+        suites_clean = []
         for s in suites:
             if os.path.splitext(s)[1] is '':
                 suites_clean.append(s + ".xml")
             else:
                 suites_clean.append(s)
     
-    suites = suites_clean
+        suites = suites_clean
 
     suite = os.path.basename(suite_file)
     if suites is not None and suite not in suites:
