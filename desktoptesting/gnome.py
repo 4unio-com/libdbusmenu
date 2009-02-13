@@ -61,7 +61,7 @@ class Application:
             app = ooldtp.context(self.name)
             try:
                 close_widget = app.getchild(close_name)
-            except ldtp.LdtpExecutionError, msg:
+            except ldtp.LdtpExecutionError:
                 raise ldtp.LdtpExecutionError, "The " + close_name + " widget was not found."
 
             if close_type == 'menu':
@@ -72,9 +72,9 @@ class Application:
                 raise ldtp.LdtpExecutionError, "Wrong close item type."
             response = ldtp.waittillguinotexist(self.name, '', 20)
             if response == 0:
-                raise ldtp.LdtpExecutionError, "Mmm, something went wrong when closing the application: " + str(msg)
-        except ldtp.LdtpExecutionError, msg:
-            raise ldtp.LdtpExecutionError, "Mmm, something went wrong when closing the application: " + str(msg)
+                raise ldtp.LdtpExecutionError, "Mmm, something went wrong when closing the application."
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "Mmm, something went wrong when closing the application."
 
     def save(self, save_menu='mnuSave'):
         """
@@ -88,12 +88,12 @@ class Application:
             app = ooldtp.context(self.name)
             try:
                 actualMenu = app.getchild(save_menu)
-            except ldtp.LdtpExecutionError, msg:
+            except ldtp.LdtpExecutionError:
                 raise ldtp.LdtpExecutionError, "The " + save_menu + " menu was not found."
 
             actualMenu.selectmenuitem()
-        except ldtp.LdtpExecutionError, msg:
-            raise ldtp.LdtpExecutionError, "Mmm, something went wrong when saving the current document:" + str(msg)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "Mmm, something went wrong when saving the current document."
 
     def write_text(self, text, txt_field=''):
         """
@@ -104,17 +104,17 @@ class Application:
         if txt_field == '':
             try:
                 ldtp.enterstring(text)
-            except ldtp.LdtpExecutionError, msg:
-                raise ldtp.LdtpExecutionError, "We couldn't write text: " + str(msg)
+            except ldtp.LdtpExecutionError:
+                raise ldtp.LdtpExecutionError, "We couldn't write text."
         else:
             try:
                 app_txt_field = app.getchild(txt_field)
-            except ldtp.LdtpExecutionError, msg:
-                raise ldtp.LdtpExecutionError, "The " + txt_field + " text field was not found: " + str(msg)
+            except ldtp.LdtpExecutionError:
+                raise ldtp.LdtpExecutionError, "The " + txt_field + " text field was not found."
             try:
                 app_txt_field.settextvalue(text)
-            except ldtp.LdtpExecutionError, msg:
-                raise ldtp.LdtpExecutionError, "We couldn't write text: " + str(msg)
+            except ldtp.LdtpExecutionError:
+                raise ldtp.LdtpExecutionError, "We couldn't write text."
 
 class Seahorse(Application):
     """
@@ -133,19 +133,19 @@ class Seahorse(Application):
         
         try:
             mnu_new_key = seahorse.getchild(gnome_constants.SH_MNU_NEWKEY)
-        except ldtp.LdtpExecutionError, msg:
-            raise ldtp.LdtpExecutionError, "The new key menu was not found: " + str(msg)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "The new key menu was not found."
 
         try:
             mnu_new_key.selectmenuitem() 
-        except ldtp.LdtpExecutionError, msg:
-            raise ldtp.LdtpExecutionError, "There was a problem when selecting new key menu item: " + str(msg)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "There was a problem when selecting new key menu item."
 
         try:
             ldtp.waittillguiexist(gnome_constants.SH_NEWKEY_DLG)
             dlg_new_key = ooldtp.context(gnome_constants.SH_NEWKEY_DLG)
-        except ldtp.LdtpExecutionError, msg:
-            raise ldtp.LdtpExecutionError, "The new key dialog was not found: " + str(msg)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "The new key dialog was not found."
 
         try:
             table  = dlg_new_key.getchild(role = 'table')
@@ -158,18 +158,18 @@ class Seahorse(Application):
                     types_table.selectrowindex(i)
                     break
                 ldtp.wait(1)
-        except ldtp.LdtpExecutionError, msg:
-            raise ldtp.LdtpExecutionError, "Error getting the key types table: " + str(msg)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "Error getting the key types table."
 
         try:
             btn_continue = dlg_new_key.getchild(gnome_constants.SH_BTN_CONTINUE)
-        except ldtp.LdtpExecutionError, msg:
-            raise ldtp.LdtpExecutionError, "The continue button at the new key dialog was not found: " + str(msg)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "The continue button at the new key dialog was not found."
 
         try:
             btn_continue.click() 
-        except ldtp.LdtpExecutionError, msg:
-            raise ldtp.LdtpExecutionError, "There was a problem when clicking the continue button: " + str(msg)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "There was a problem when clicking the continue button."
         
     def new_pgp_key(self, full_name, email, comment, passphrase):
         
@@ -178,74 +178,74 @@ class Seahorse(Application):
         try:
             ldtp.waittillguiexist(gnome_constants.SH_NEWPGP_DLG)
             dlg_new_pgp = ooldtp.context(gnome_constants.SH_NEWPGP_DLG)
-        except ldtp.LdtpExecutionError, msg:
-            raise ldtp.LdtpExecutionError, "The new key dialog was not found: " + str(msg)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "The new key dialog was not found."
 
         try:
             txt_field = dlg_new_pgp.getchild(gnome_constants.SH_DLG_NEWPGP_FULLNAME)
-        except ldtp.LdtpExecutionError, msg:
-            raise ldtp.LdtpExecutionError, "The " + txt_field + " text field was not found: " + str(msg)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "The " + txt_field + " text field was not found."
         try:
             txt_field.settextvalue(full_name)
-        except ldtp.LdtpExecutionError, msg:
-            raise ldtp.LdtpExecutionError, "We couldn't write text: " + str(msg)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "There was an error when writing the text."
 
         try:
             txt_field = dlg_new_pgp.getchild(gnome_constants.SH_DLG_NEWPGP_EMAIL)
-        except ldtp.LdtpExecutionError, msg:
-            raise ldtp.LdtpExecutionError, "The " + txt_field + " text field was not found: " + str(msg)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "The " + txt_field + " text field was not found."
         try:
             txt_field.settextvalue(email)
-        except ldtp.LdtpExecutionError, msg:
-            raise ldtp.LdtpExecutionError, "We couldn't write text: " + str(msg)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "There was a problem when writing the text."
    
         try:
             txt_field = dlg_new_pgp.getchild(gnome_constants.SH_DLG_NEWPGP_COMMENT)
-        except ldtp.LdtpExecutionError, msg:
-            raise ldtp.LdtpExecutionError, "The " + txt_field + " text field was not found: " + str(msg)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "The " + txt_field + " text field was not found."
         try:
             txt_field.settextvalue(comment)
-        except ldtp.LdtpExecutionError, msg:
-            raise ldtp.LdtpExecutionError, "We couldn't write text: " + str(msg)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "There was a problem when writing the text."
 
         try:
             btn_create = dlg_new_pgp.getchild(gnome_constants.SH_BTN_NEWPGP_CREATE)
-        except ldtp.LdtpExecutionError, msg:
-            raise ldtp.LdtpExecutionError, "The create button at the new PGP key dialog was not found: " + str(msg)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "The create button at the new PGP key dialog was not found."
 
         try:
             btn_create.click() 
-        except ldtp.LdtpExecutionError, msg:
-            raise ldtp.LdtpExecutionError, "There was a problem when clicking the create button " + str(msg)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "There was a problem when clicking the create button."
        
         try:
             ldtp.waittillguiexist(gnome_constants.SH_DLG_NEWPGP_PASS)
             dlg_new_pgp_pass = ooldtp.context(gnome_constants.SH_DLG_NEWPGP_PASS)
-        except ldtp.LdtpExecutionError, msg:
-            raise ldtp.LdtpExecutionError, "The new pgp key passphrase dialog was not found: " + str(msg)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "The new pgp key passphrase dialog was not found."
 
         try:
             ldtp.enterstring(passphrase)
             ldtp.enterstring("<tab>")
             ldtp.enterstring(passphrase)
-        except ldtp.LdtpExecutionError, msg:
-            raise ldtp.LdtpExecutionError, "Error entering passphrase" + str(msg)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "Error entering passphrase."
  
         try:
             btn_pass_ok = dlg_new_pgp_pass.getchild(gnome_constants.SH_BTN_PASS_OK)
-        except ldtp.LdtpExecutionError, msg:
-            raise ldtp.LdtpExecutionError, "The OK button at the new PGP key passphrase dialog was not found: " + str(msg)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "The OK button at the new PGP key passphrase dialog was not found."
 
         try:
             btn_pass_ok.click() 
-        except ldtp.LdtpExecutionError, msg:
-            raise ldtp.LdtpExecutionError, "There was a problem when clicking the OK button " + str(msg)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "There was a problem when clicking the OK button."
  
         try:
             ldtp.waittillguiexist(gnome_constants.SH_DLG_GENERATING_PGP)
             ldtp.waittillguinotexist(gnome_constants.SH_DLG_GENERATING_PGP)
-        except ldtp.LdtpExecutionError, msg:
-            raise ldtp.LdtpExecutionError, "The new pgp generating key dialog was not found: " + str(msg)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "The new pgp generating key dialog was not found."
 
 
 class GEdit(Application):
@@ -280,27 +280,27 @@ class GEdit(Application):
         try:
             ldtp.waittillguiexist(gnome_constants.GE_SAVE_DLG)
             save_dialog = ooldtp.context(gnome_constants.GE_SAVE_DLG)
-        except ldtp.LdtpExecutionError, msg:
-            raise ldtp.LdtpExecutionError, "The Gedit save dialog was not found: " + str(msg)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "The Gedit save dialog was not found."
         try:
             save_dlg_txt_filename = save_dialog.getchild(gnome_constants.GE_SAVE_DLG_TXT_NAME)
-        except ldtp.LdtpExecutionError, msg:
-            raise ldtp.LdtpExecutionError, "The filename txt field in Gedit save dialog was not found: " + str(msg)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "The filename txt field in Gedit save dialog was not found."
         try:
             ldtp.wait(2)
             save_dlg_txt_filename.settextvalue(filename)
-        except ldtp.LdtpExecutionError, msg:
-           raise ldtp.LdtpExecutionError, "We couldn't write text: " + str(msg)
+        except ldtp.LdtpExecutionError:
+           raise ldtp.LdtpExecutionError, "We couldn't write text."
 
         try:
             save_dlg_btn_save = save_dialog.getchild(gnome_constants.GE_SAVE_DLG_BTN_SAVE)
-        except ldtp.LdtpExecutionError, msg:
-            raise ldtp.LdtpExecutionError, "The button Save in Gedit save dialog was not found: " + str(msg)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "The button Save in Gedit save dialog was not found."
         
         try:
             save_dlg_btn_save.click()
-        except ldtp.LdtpExecutionError, msg:
-            raise ldtp.LdtpExecutionError, "There was an error when pushing the Save button: " + str(msg)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "There was an error when pushing the Save button."
 
         ldtp.waittillguinotexist(gnome_constants.GE_SAVE_DLG)
         
@@ -329,11 +329,11 @@ class GEdit(Application):
             gedit = ooldtp.context(self.name)
             try:
                 quit_menu = gedit.getchild(gnome_constants.GE_MNU_QUIT)
-            except ldtp.LdtpExecutionError, msg:
+            except ldtp.LdtpExecutionError:
                 raise ldtp.LdtpExecutionError, "The quit menu was not found."
             quit_menu.selectmenuitem()
-        except ldtp.LdtpExecutionError, msg:
-            raise ldtp.LdtpExecutionError, "Mmm, something went wrong when closing the application: " + str(msg)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "Mmm, something went wrong when closing the application."
 
         response = ldtp.waittillguiexist(gnome_constants.GE_QUESTION_DLG, '', 20)
     
@@ -341,46 +341,46 @@ class GEdit(Application):
         if response == 1:
             try:
                 question_dialog = ooldtp.context(gnome_constants.GE_QUESTION_DLG)
-            except ldtp.LdtpExecutionError, msg:
-                raise ldtp.LdtpExecutionError, "The Gedit question dialog was not found: " + str(msg)
+            except ldtp.LdtpExecutionError:
+                raise ldtp.LdtpExecutionError, "The Gedit question dialog was not found."
             
             # Test if the file needs to be saved
             if save:
                 try:
                     question_dlg_btn_save = question_dialog.getchild(gnome_constants.GE_QUESTION_DLG_BTN_SAVE)
                     question_dlg_btn_save.click()
-                except ldtp.LdtpExecutionError, msg:
+                except ldtp.LdtpExecutionError:
                     # If the Save button was not found, we will try to find the Save As
                     try:
                         question_dlg_btn_save = question_dialog.getchild(gnome_constants.GE_QUESTION_DLG_BTN_SAVE_AS)
                         question_dlg_btn_save.click()
-                    except ldtp.LdtpExecutionError, msg:
-                        raise ldtp.LdtpExecutionError, "The save or save as buttons in Gedit question dialog were not found: " + str(msg)
+                    except ldtp.LdtpExecutionError:
+                        raise ldtp.LdtpExecutionError, "The save or save as buttons in Gedit question dialog were not found."
 
                     try:
                         ldtp.waittillguiexist(gnome_constants.GE_SAVE_DLG)
                         save_dialog = ooldtp.context(gnome_constants.GE_SAVE_DLG)
-                    except ldtp.LdtpExecutionError, msg:
-                        raise ldtp.LdtpExecutionError, "The Gedit save dialog was not found: " + str(msg)
+                    except ldtp.LdtpExecutionError:
+                        raise ldtp.LdtpExecutionError, "The Gedit save dialog was not found."
                     try:
                         save_dlg_txt_filename = save_dialog.getchild(gnome_constants.GE_SAVE_DLG_TXT_NAME)
-                    except ldtp.LdtpExecutionError, msg:
-                        raise ldtp.LdtpExecutionError, "The filename txt field in Gedit save dialog was not found: " + str(msg)
+                    except ldtp.LdtpExecutionError:
+                        raise ldtp.LdtpExecutionError, "The filename txt field in Gedit save dialog was not found."
                     try:
                         ldtp.wait(2)
                         save_dlg_txt_filename.settextvalue(filename)
-                    except ldtp.LdtpExecutionError, msg:
-                        raise ldtp.LdtpExecutionError, "We couldn't write text: " + str(msg)
+                    except ldtp.LdtpExecutionError:
+                        raise ldtp.LdtpExecutionError, "There was an error when writing the text."
 
                     try:
                         save_dlg_btn_save = save_dialog.getchild(gnome_constants.GE_SAVE_DLG_BTN_SAVE)
-                    except ldtp.LdtpExecutionError, msg:
-                        raise ldtp.LdtpExecutionError, "The save button in Gedit save dialog was not found: " + str(msg)
+                    except ldtp.LdtpExecutionError:
+                        raise ldtp.LdtpExecutionError, "The save button in Gedit save dialog was not found."
         
                     try:
                         save_dlg_btn_save.click()
-                    except ldtp.LdtpExecutionError, msg:
-                        raise ldtp.LdtpExecutionError, "There was an error when pushing the Save button: " + str(msg)
+                    except ldtp.LdtpExecutionError:
+                        raise ldtp.LdtpExecutionError, "There was an error when pushing the Save button."
 
                     ldtp.waittillguinotexist(gnome_constants.GE_SAVE_DLG)
             
@@ -388,8 +388,8 @@ class GEdit(Application):
                 try:
                     question_dlg_btn_close = question_dialog.getchild(gnome_constants.GE_QUESTION_DLG_BTN_CLOSE)
                     question_dlg_btn_close.click()
-                except ldtp.LdtpExecutionError, msg:
-                    raise ldtp.LdtpExecutionError, "It was not possible to click the close button: " + str(msg)
+                except ldtp.LdtpExecutionError:
+                    raise ldtp.LdtpExecutionError, "It was not possible to click the close button."
 
             response = ldtp.waittillguinotexist(self.name, '', 20)
  
@@ -428,8 +428,8 @@ class PolicyKit(Application):
             ldtp.enterstring (self.password)
             ldtp.enterstring ("<enter>")
             
-        except ldtp.LdtpExecutionError, msg:
-            raise ldtp.LdtpExecutionError, "The PolicyKit txt field for the password was not found: " + str(msg)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "The PolicyKit txt field for the password was not found."
    
 # TODO: Change this to use ooldtp
 #        try:
@@ -447,8 +447,8 @@ class PolicyKit(Application):
 
         try:
             cancelButton = polKit.getchild(gnome_constants.SU_BTN_CANCEL)
-        except ldtp.LdtpExecutionError, msg:
-            raise ldtp.LdtpExecutionError, "The PolicyKit cancel button was not found: " + str(msg)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "The PolicyKit cancel button was not found."
           
         cancelButton.click()
         ldtp.waittillguinotexist (gnome_constants.SU_WINDOW)
