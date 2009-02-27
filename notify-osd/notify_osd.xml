@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<ldtp>
+  <logfile>/dev/null</logfile>
+  <screenshotdir>/tmp/ldtp-screenshots</screenshotdir>
+  <group>
+    <testcaseid>IconSummaryBodyTestCase</testcaseid>
+    <script>
+      <testcase>IconSummaryBodyTestCase</testcase>
+      <name>./notify-osd/notify_osd.py</name>
+      <data>./notify-osd/data/icons_summary_body_data.xml</data>
+    </script>
+  </group>
+</ldtp>
