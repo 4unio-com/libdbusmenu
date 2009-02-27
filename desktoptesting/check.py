@@ -6,6 +6,7 @@ The check module provides different ways to check if the test failed or passed
 import filecmp
 import os
 import sys
+from ldtputils import imagecompare
 
 FAIL = "fail"
 PASS = "pass"
@@ -36,7 +37,7 @@ class FileComparison(Check):
 
         if not (os.path.exists(oracle) and os.path.exists(test)):
             print "Both oracle and test file must exist"
-            sys.exit(0)
+            raise Exception
 
         self.oracle = oracle
         self.test   = test
@@ -52,5 +53,10 @@ class FileComparison(Check):
         else:
             return FAIL
 
-
-
+class ScreenshotCompare(FileComparison):
+    def perform_test(self, max_diff=0.0):
+        res = imagecompare(self.oracle, self.test)
+        if res > max_diff:
+            return FAIL
+        else:
+            return PASS
