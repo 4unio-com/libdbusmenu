@@ -33,11 +33,10 @@ class NotifyOSD(Application):
         ldtp.waittillguiexist(summary)
         start_time = time()
         x, y, w, h = ldtp.getwindowsize(summary)
-        print x, y, w, h
         screenshot = \
-            ldtputils.imagecapture(x=x, y=y, resolution1=w, resolution2=h)
-        print 'Quick! Do something!'
-        print ldtp.appundertest('notify-osd')
+            ldtputils.imagecapture(x=x+3, y=y+3, 
+                                   resolution1=w-3, 
+                                   resolution2=h-3)
         ldtp.waittillguinotexist(summary)
         end_time = time() - start_time
         return (end_time, screenshot)
