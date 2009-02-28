@@ -10,4 +10,28 @@
       <data>./notify-osd/data/icons_summary_body_data.xml</data>
     </script>
   </group>
+  <group>
+    <testcaseid>IconSummaryTestCase</testcaseid>
+    <script>
+      <testcase>IconSummaryTestCase</testcase>
+      <name>./notify-osd/notify_osd.py</name>
+      <data>./notify-osd/data/icons_summary_data.xml</data>
+    </script>
+  </group>
+  <group>
+    <testcaseid>SummaryBodyTestCase</testcaseid>
+    <script>
+      <testcase>SummaryBodyTestCase</testcase>
+      <name>./notify-osd/notify_osd.py</name>
+      <data>./notify-osd/data/summary_body_data.xml</data>
+    </script>
+  </group>
+  <group>
+    <testcaseid>SummaryTestCase</testcaseid>
+    <script>
+      <testcase>SummaryTestCase</testcase>
+      <name>./notify-osd/notify_osd.py</name>
+      <data>./notify-osd/data/summary_data.xml</data>
+    </script>
+  </group>
 </ldtp>
