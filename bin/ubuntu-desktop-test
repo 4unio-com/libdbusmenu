@@ -13,7 +13,7 @@ from subprocess import Popen, PIPE
 
 # Globals
 TESTS_SHARE = "."
-
+TESTS_HOME  = os.environ["HOME"] + "/.ubuntu-desktop-test"
 
 def error(message, *args):
     message = "Error: %s\n" % message
@@ -127,14 +127,12 @@ def is_valid_suite_file(file, suites):
     return True
 
 
-def filter_suite_files(applications, suites, files):
-    if not os.path.isdir(TESTS_SHARE):
-        error("Share directory `%s' is not a directory.", TESTS_SHARE)
+def filter_suite_files(applications, suites, files, folder):
 
     # Filter applications
     suite_files = []
-    for application in os.listdir(TESTS_SHARE):
-        application_directory = os.path.join(TESTS_SHARE, application)
+    for application in os.listdir(folder):
+        application_directory = os.path.join(folder, application)
         if not is_valid_application_directory(application_directory, applications):
             continue
 
@@ -189,7 +187,7 @@ def main(args=sys.argv):
     usage = "%prog [OPTIONS]"
     parser = OptionParser(usage=usage)
 
-    default_target = "~/.ubuntu-desktop-tests"
+    default_target = "~/.ubuntu-desktop-test"
     default_log_level = "critical"
 
     parser.add_option("-l", "--log",
@@ -247,7 +245,17 @@ def main(args=sys.argv):
             options.target)
 
     # Filter suite files from project directory
-    suite_files = filter_suite_files(options.application, options.suite, options.file)
+
+    if not os.path.isdir(TESTS_SHARE): 
+        error("Share directory `%s' is not a directory.", TESTS_SHARE)
+    else:
+        suite_files = filter_suite_files(options.application, options.suite, options.file, TESTS_SHARE)
+    
+    print suite_files
+    
+    if os.path.isdir(TESTS_HOME):
+        suite_files += filter_suite_files(options.application, options.suite, options.file, TESTS_HOME)
+    print suite_files
 
     # Run filtered suite file
     for suite_file in suite_files:
