@@ -180,7 +180,7 @@
     <!-- Launchpad 2.1.12 (r7513) -->
   </xsl:template>
   <xsl:template match="screenshot" mode="link">
-    <a href="file:{text()}">
+    <a href="{text()}">
       <xsl:value-of select="text()"/>
     </a>
     <xsl:text> </xsl:text>
