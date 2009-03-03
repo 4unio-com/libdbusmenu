@@ -169,13 +169,14 @@ def convert_log_file(log_file, html_file, target_directory):
     if not os.path.exists(xsl_file):
         error("XSL file `%s' does not exist.", xsl_file)
 
-    screenshot_dir = target_directory + "/screenshots"
+    if os.path.exists(SCREENSHOTS_SHARE):
+        screenshot_dir = target_directory + "/screenshots"
 
-    if not os.path.exists(screenshot_dir):
-        safe_make_directory(screenshot_dir)
+        if not os.path.exists(screenshot_dir):
+            safe_make_directory(screenshot_dir)
 
-    command = "cp " + SCREENSHOTS_SHARE + "/* " + screenshot_dir
-    safe_run_command(command)
+        command = "cp " + SCREENSHOTS_SHARE + "/* " + screenshot_dir
+        safe_run_command(command)
 
     log_file_tmp = log_file + ".tmp"
     o = open(log_file_tmp, "w")
