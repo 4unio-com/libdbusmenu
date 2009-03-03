@@ -182,7 +182,7 @@ def convert_log_file(log_file, html_file, target_directory):
     log_file_tmp = log_file + ".tmp"
     o = open(log_file_tmp, "w")
     data = open(log_file).read()
-    o.write(re.sub(SCREENSHOTS_SHARE, "../screenshots", data))
+    o.write(re.sub(SCREENSHOTS_SHARE, "screenshots", data))
     o.flush()
     o.close()
     
@@ -205,7 +205,7 @@ def process_suite_file(suite_file, target_directory):
     run_suite_file(suite_file, log_file)
 
     html_file = log_file.replace(".log", ".html")
-    convert_log_file(log_file, html_file, target_directory)
+    convert_log_file(log_file, html_file, application_target)
 
 
 def main(args=sys.argv):
