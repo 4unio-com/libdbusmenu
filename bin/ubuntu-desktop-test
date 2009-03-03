@@ -172,16 +172,17 @@ def convert_log_file(log_file, html_file, target_directory):
     if os.path.exists(SCREENSHOTS_SHARE):
         screenshot_dir = target_directory + "/screenshots"
 
-        if not os.path.exists(screenshot_dir):
+        if not os.path.exists(screenshot_dir):            
             safe_make_directory(screenshot_dir)
 
-        command = "cp " + SCREENSHOTS_SHARE + "/* " + screenshot_dir
-        safe_run_command(command)
+        if os.listdir(SCREENSHOTS_SHARE) is not []:
+            command = "cp " + SCREENSHOTS_SHARE + "/* " + screenshot_dir
+            safe_run_command(command)
 
     log_file_tmp = log_file + ".tmp"
     o = open(log_file_tmp, "w")
     data = open(log_file).read()
-    o.write(re.sub(SCREENSHOTS_SHARE, screenshot_dir, data))
+    o.write(re.sub(SCREENSHOTS_SHARE, "../screenshots", data))
     o.flush()
     o.close()
     
