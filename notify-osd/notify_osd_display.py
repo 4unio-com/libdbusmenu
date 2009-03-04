@@ -18,7 +18,8 @@ body = dataXml.gettagvalue("body")[0]
 icon = dataXml.gettagvalue("icon")[0]
 
 test.open(False)
-elapsed, screeny = test.show_icon_summary_body(summary, body, icon)
+test.notify(summary, body, icon)
+elapsed, screeny = test.grab_image_and_wait(summary)
 test.exit()
     
 testcheck = ScreenshotCompare(oracle, screeny)

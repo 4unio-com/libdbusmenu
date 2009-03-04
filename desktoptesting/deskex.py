@@ -27,25 +27,18 @@ class NotifyOSD(Application):
         if self.focus_desktop:
             ldtp.generatekeyevent('<alt><ctrl>d')
 
-    def show_icon_summary_body(self, summary, body="", icon=None):
+    def notify(self, summary, body="", icon=None):
 	n = pynotify.Notification (summary, body, icon)
 	n.show ()
+
+    def grab_image_and_wait(self, summary):
         ldtp.waittillguiexist(summary)
         start_time = time()
         x, y, w, h = ldtp.getwindowsize(summary)
         screenshot = \
             ldtputils.imagecapture(x=x+3, y=y+3, 
-                                   resolution1=w-3, 
-                                   resolution2=h-3)
+                                   resolution1=w-6, 
+                                   resolution2=h-6)
         ldtp.waittillguinotexist(summary)
         end_time = time() - start_time
         return (end_time, screenshot)
-
-    def show_icon_summary(self, icon, summary):
-        self.show_icon_summary_body(summary, icon=icon)
-
-    def show_summary_body(self, summary, body):
-        self.show_icon_summary_body(summary, body)
-
-    def show_summary_only(self, summary):
-        self.show_icon_summary_body(summary)

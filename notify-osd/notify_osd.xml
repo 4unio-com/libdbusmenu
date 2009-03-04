@@ -6,7 +6,7 @@
     <testcaseid>IconSummaryBodyTestCase</testcaseid>
     <script>
       <testcase>IconSummaryBodyTestCase</testcase>
-      <name>./notify-osd/notify_osd.py</name>
+      <name>./notify-osd/notify_osd_display.py</name>
       <data>./notify-osd/data/icons_summary_body_data.xml</data>
     </script>
   </group>
@@ -14,7 +14,7 @@
     <testcaseid>IconSummaryTestCase</testcaseid>
     <script>
       <testcase>IconSummaryTestCase</testcase>
-      <name>./notify-osd/notify_osd.py</name>
+      <name>./notify-osd/notify_osd_display.py</name>
       <data>./notify-osd/data/icons_summary_data.xml</data>
     </script>
   </group>
@@ -22,7 +22,7 @@
     <testcaseid>SummaryBodyTestCase</testcaseid>
     <script>
       <testcase>SummaryBodyTestCase</testcase>
-      <name>./notify-osd/notify_osd.py</name>
+      <name>./notify-osd/notify_osd_display.py</name>
       <data>./notify-osd/data/summary_body_data.xml</data>
     </script>
   </group>
@@ -30,8 +30,16 @@
     <testcaseid>SummaryTestCase</testcaseid>
     <script>
       <testcase>SummaryTestCase</testcase>
-      <name>./notify-osd/notify_osd.py</name>
+      <name>./notify-osd/notify_osd_display.py</name>
       <data>./notify-osd/data/summary_data.xml</data>
+    </script>
+  </group>
+  <group>
+    <testcaseid>QueueTest</testcaseid>
+    <script>
+      <testcase>QueueTest</testcase>
+      <name>./notify-osd/notify_osd_queue.py</name>
+      <data>./notify-osd/data/bubble_queue.xml</data>
     </script>
   </group>
 </ldtp>
