@@ -175,7 +175,7 @@ def convert_log_file(log_file, html_file, target_directory):
         if not os.path.exists(screenshot_dir):            
             safe_make_directory(screenshot_dir)
 
-        if os.listdir(SCREENSHOTS_SHARE):
+        if len(os.listdir(SCREENSHOTS_SHARE)) > 0:
             command = "cp " + SCREENSHOTS_SHARE + "/* " + screenshot_dir
             safe_run_command(command)
 
