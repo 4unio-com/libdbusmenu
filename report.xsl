@@ -115,12 +115,14 @@
                         <td>
                           <xsl:value-of select="ancestor::script[last()]/@name"/>
                         </td>
-                        <xsl:if test="child::pass/child::text() = 0">
+                        <xsl:choose>
+                          <xsl:when test="child::pass/child::text() = 0">
                             <td><font color="red">Failed</font></td>
-                        </xsl:if>
-                        <xsl:if test="child::pass/child::text() = 1">
+                          </xsl:when>
+                          <xsl:otherwise>
                             <td><font color="green">Passed</font></td>
-                        </xsl:if>
+                          </xsl:otherwise>
+                        </xsl:choose>
                         <td>
                             <xsl:value-of select="child::time/child::text()"/>
                         </td>
