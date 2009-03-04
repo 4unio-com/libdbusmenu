@@ -14,6 +14,8 @@ test = NotifyOSD()
 
 dataXml  = ldtputils.LdtpDataFileParser(datafilename)
 
+start_time = time()
+
 test.open(False)
 
 test.notify(
@@ -35,15 +37,12 @@ x1, y1, w1, h1 = test.get_extents(dataXml.gettagvalue("summary1")[0])
 if w1 == -1:
     # First bubble does not exist anymore, this could mean that the second
     # bubble did not appear synchronously.
-    ldtp.log ('Not synchronous.', 'cause')
-    ldtp.log ('Not synchronous.', 'error')    
+    ldtp.logFailures ("Not synchronous")
+    ldtp.logFailures ("Not synchronous", False, "fail") 
 elif (y1 + h1) - y2 > ALLOWED_OVERLAP:
-    #screenshot = \
-    #    ldtputils.imagecapture(x=min(x1, x2)+3, y=min(y1, y2)+3, 
-    #                           resolution1=max(w1, w2)-6, 
-    #                           resolution2=h2+y2-6)
-    #ldtp.log (screenshot, 'screenshot')    
-    ldtp.log ('Bad overlap.', 'cause')
-    ldtp.log ('Bad overlap.', 'error')
+    ldtp.logFailures ("Bad overlap")
+    ldtp.logFailures ("Bad overlap", False, "fail") 
     
 test.exit()
+
+ldtp.log (str(time() - start_time), 'time')

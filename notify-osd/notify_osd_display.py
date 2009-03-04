@@ -3,7 +3,7 @@
 import ldtp
 import ldtputils
 
-from time import time, gmtime, strftime
+import shutil, os
 
 from desktoptesting.deskex import NotifyOSD
 from desktoptesting.check import ScreenshotCompare, PASS, FAIL
@@ -20,13 +20,18 @@ icon = dataXml.gettagvalue("icon")[0]
 test.open(False)
 test.notify(summary, body, icon)
 elapsed, screeny = test.grab_image_and_wait(summary)
-test.exit()
     
 testcheck = ScreenshotCompare(oracle, screeny)
 check = testcheck.perform_test()
 
 if check == FAIL:
-    ldtp.log ('Screenshots differ.', 'cause')
-    ldtp.log ('Screenshots differ.', 'error')
+    shutil.copy(screeny, "/tmp/ldtp-screenshots")
+    newscreeny = os.path.join("/tmp/ldtp-screenshots", 
+                              os.path.basename(screeny))
+    ldtp.log (newscreeny, "screenshot")
+    ldtp.logFailures ("Screenshots differ", False)
+    ldtp.logFailures ("Screenshots differ", False, "fail") 
+
+test.exit()
 
 ldtp.log (str(elapsed), 'time')

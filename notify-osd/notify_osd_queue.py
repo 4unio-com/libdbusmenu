@@ -2,7 +2,7 @@
 
 import ldtp
 import ldtputils
-import os
+import os, shutil
 
 from time import time, gmtime, strftime
 
@@ -49,11 +49,15 @@ for b in bubbles:
     testcheck = ScreenshotCompare(b.oracle, b.screeny)
     check = testcheck.perform_test()
     if check == FAIL:
+        shutil.copy(b.screeny, "/tmp/ldtp-screenshots")
+        newscreeny = os.path.join("/tmp/ldtp-screenshots", 
+                                  os.path.basename(b.screeny))
+        ldtp.log (newscreeny, "screenshot")
         status = FAIL
 
 if status == FAIL:
-    ldtp.log ('Screenshots differ.', 'cause')
-    ldtp.log ('Screenshots differ.', 'error')
+    ldtp.logFailures ("Screenshots differ", False)
+    ldtp.logFailures ("Screenshots differ", False, "fail") 
         
 test.exit()
 

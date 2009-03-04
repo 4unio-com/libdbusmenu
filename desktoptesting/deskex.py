@@ -1,11 +1,14 @@
 from desktoptesting.gnome import Application
 from time import time
+import tempfile
 import pynotify
 import ldtp, ldtputils
+import os
 
 class NotifyOSD(Application):
     def __init__(self):
         self.focus_desktop = False
+        self.screenshots = []
 
     def open(self, focus_desktop=True):
         self.focus_desktop = focus_desktop
@@ -26,6 +29,8 @@ class NotifyOSD(Application):
     def exit(self):
         if self.focus_desktop:
             ldtp.generatekeyevent('<alt><ctrl>d')
+        for screenshot in self.screenshots:
+            os.remove(screenshot)
 
     def notify(self, summary, body="", icon=None):
 	n = pynotify.Notification (summary, body, icon)
@@ -42,11 +47,13 @@ class NotifyOSD(Application):
         start_time = time()
         x, y, w, h = ldtp.getwindowsize(summary)
         screenshot = \
-            ldtputils.imagecapture(x=x+3, y=y+3, 
+            ldtputils.imagecapture(outFile=tempfile.mktemp('.png', 'nosd_'),
+                                   x=x+3, y=y+3, 
                                    resolution1=w-6, 
                                    resolution2=h-6)
         ldtp.waittillguinotexist(summary)
         end_time = time() - start_time
+        self.screenshots.append(screenshot)
         return (end_time, screenshot)
 
     def get_extents(self, summary, wait=False):
