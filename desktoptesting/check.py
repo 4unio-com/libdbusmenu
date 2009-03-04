@@ -6,6 +6,7 @@ The check module provides different ways to check if the test failed or passed
 import filecmp
 import os
 import sys
+import shutil
 from ldtputils import imagecompare
 
 FAIL = "fail"
@@ -60,3 +61,6 @@ class ScreenshotCompare(FileComparison):
             return FAIL
         else:
             return PASS
+
+    def calibrate(self):
+        shutil.copy(self.test, self.oracle)
