@@ -42,4 +42,12 @@
       <data>./notify-osd/data/bubble_queue.xml</data>
     </script>
   </group>
+  <group>
+    <testcaseid>SynchronousTest</testcaseid>
+    <script>
+      <testcase>SynchronousTest</testcase>
+      <name>./notify-osd/notify_osd_synchronous.py</name>
+      <data>./notify-osd/data/synchronous_data.xml</data>
+    </script>
+  </group>
 </ldtp>
