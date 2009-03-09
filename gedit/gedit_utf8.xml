@@ -3,10 +3,10 @@
   <logfile>/dev/null</logfile>
   <screenshotdir>/tmp/ldtp-screenshots</screenshotdir>
   <group>
-    <testcaseid>SavedUTF8TestCase</testcaseid>
+      <testcaseid>SavedUTF8TestCase</testcaseid>
     <script>
       <testcase>SavedUTF8TestCase</testcase>
-      <name>./gedit/gedit.py</name>
+      <name>./gedit/gedit_chains.py</name>
       <data>./gedit/data/utf8_data.xml</data>
     </script>
   </group>

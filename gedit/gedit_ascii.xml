@@ -6,7 +6,7 @@
     <testcaseid>SavedAsciiTestCase</testcaseid>
     <script>
       <testcase>SavedAsciiTestCase</testcase>
-      <name>./gedit/gedit.py</name>
+      <name>./gedit/gedit_chains.py</name>
       <data>./gedit/data/ascii_data.xml</data>
     </script>
   </group>

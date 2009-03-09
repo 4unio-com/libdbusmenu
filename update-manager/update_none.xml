@@ -5,8 +5,8 @@
   <group>
     <testcaseid>UpdateManagerTestCase</testcaseid>
     <script>
-      <testcase>UpdateManagerInstall</testcase>
-      <name>./update-manager/update_system.py</name>
+      <testcase>UpdateManagerInstallNone</testcase>
+      <name>./update-manager/update_none.py</name>
       <data>./update-manager/data/update_manager_data.xml</data>
     </script>
   </group>
