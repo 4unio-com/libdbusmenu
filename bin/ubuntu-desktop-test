@@ -4,11 +4,13 @@ import os
 import re
 import sys
 import logging
+import xml.dom.minidom
 
 from logging import StreamHandler, FileHandler, Formatter
 from optparse import OptionParser
 from stat import ST_MODE, S_IMODE
 from subprocess import Popen, PIPE
+from time import time, gmtime, strftime
 
 
 # Globals
@@ -164,11 +166,7 @@ def run_suite_file(suite_file, log_file):
         % (conf_file, suite_file, log_file)
     safe_run_command(command)
 
-def convert_log_file(log_file, html_file, target_directory):
-    xsl_file = os.path.join(TESTS_SHARE, "report.xsl")
-    if not os.path.exists(xsl_file):
-        error("XSL file `%s' does not exist.", xsl_file)
-
+def convert_log_file(log_file, general_log, target_directory):
     if os.path.exists(SCREENSHOTS_SHARE):
         screenshot_dir = target_directory + "/screenshots"
 
@@ -189,12 +187,30 @@ def convert_log_file(log_file, html_file, target_directory):
     os.remove(log_file)
     os.rename(log_file_tmp, log_file)
 
-    command = "xsltproc -o %s %s %s" \
-        % (html_file, xsl_file, log_file)
-    safe_run_command(command)
+    # Add the results of this testcase to general log files.
+    add_log_file(log_file, general_log)
 
+def add_log_file(log_file, general_log):
+    
+    if not os.path.exists(general_log):
+        f = open(general_log, 'w')
+        dom = xml.dom.minidom.parseString("<ldtp></ldtp>")
+        dom.writexml(f)
+        f.flush()
+        f.close()
 
-def process_suite_file(suite_file, target_directory):
+    general_dom = xml.dom.minidom.parse(general_log)
+    current_dom = xml.dom.minidom.parse(log_file)
+
+    new_child = current_dom.getElementsByTagName("group")[0]
+    general_dom.documentElement.appendChild(new_child)
+
+    f = open(general_log, 'w')
+    general_dom.writexml(f)
+    f.flush()
+    f.close()
+
+def process_suite_file(suite_file, target_directory, general_log):
     application_name = os.path.basename(os.path.dirname(suite_file))
     application_target = os.path.join(target_directory, application_name)
     safe_make_directory(application_target)
@@ -204,8 +220,7 @@ def process_suite_file(suite_file, target_directory):
         suite_name.replace(".xml", ".log"))
     run_suite_file(suite_file, log_file)
 
-    html_file = log_file.replace(".log", ".html")
-    convert_log_file(log_file, html_file, application_target)
+    convert_log_file(log_file, general_log, application_target)
 
 
 def main(args=sys.argv):
@@ -281,10 +296,23 @@ def main(args=sys.argv):
 
     suite_files += filter_suite_files(options.application, options.suite, options.file, None)
 
+    # Define the general log file
+    general_log = strftime(options.target + "/%Y%m%d_%H%M%S" + ".log", gmtime((time())))
+
     # Run filtered suite file
     for suite_file in suite_files:
-        process_suite_file(suite_file, options.target)
+        process_suite_file(suite_file, options.target, general_log)
 
+    xsl_file = os.path.join(TESTS_SHARE, "report.xsl")
+    if not os.path.exists(xsl_file):
+        error("XSL file `%s' does not exist.", xsl_file)
+
+    html_file = general_log.replace(".log", ".html")
+
+    command = "xsltproc -o %s %s %s" \
+        % (html_file, xsl_file, general_log)
+    safe_run_command(command)
+ 
     return 0
 
 if __name__ == "__main__":
