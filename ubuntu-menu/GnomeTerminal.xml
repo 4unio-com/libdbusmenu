@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<ldtp>
+  <logfile>/dev/null</logfile>
+  <screenshotdir>/tmp/ldtp-screenshots</screenshotdir>
+  <group>
+    <testcaseid>TerminalTestCase</testcaseid>
+    <script>
+      <testcase>OpenTerminal</testcase>
+      <name>./ubuntu-menu/open_app.py</name>
+      <data>./ubuntu-menu/data/terminal.xml</data>
+    </script>
+  </group>
+</ldtp>

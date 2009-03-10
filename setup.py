@@ -2,6 +2,8 @@
 
 import os
 import re
+import shutil
+
 from glob import glob
 from tempfile import mkstemp
 
@@ -67,7 +69,7 @@ class testing_install_data(install_data, object):
             tmpfile = mkstemp()[1]
             substitute_variables(xmlfile, tmpfile, {
                 ">.": ">%s" % sharedir})
-            os.rename(tmpfile, xmlfile)
+            shutil.move(tmpfile, xmlfile)
 
 class testing_install_scripts(install_scripts, object):
 
