@@ -1,3 +1,10 @@
+ubuntu-desktop-testing (0.1-0ubuntu2) jaunty; urgency=low
+
+  * Various fixes for Checkbox integration
+  * Fixed packaging for Jaunty/Python 2.6
+
+ -- Dave Murphy <schwuk@ubuntu.com>  Tue, 10 Mar 2009 01:47:13 +0000
+
 ubuntu-desktop-testing (0.1-0ubuntu1) intrepid; urgency=low
 
   * Initial release.
