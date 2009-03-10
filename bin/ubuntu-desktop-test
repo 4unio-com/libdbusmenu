@@ -111,7 +111,7 @@ def is_valid_suite_file(file, suites):
 
     suite = os.path.basename(file)
 
-    pattern = r"[a-z0-9][-_a-z0-9+.]*.xml"
+    pattern = r"[a-z0-9][-_a-z0-9+.]*.xml$"
     if not re.match(pattern, suite, re.I):
         logging.debug("Suite name `%s' does not match pattern: %s",
             file, pattern)
