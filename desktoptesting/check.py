@@ -36,10 +36,6 @@ class FileComparison(Check):
 
         Check.__init__(self)
 
-        if not (os.path.exists(oracle) and os.path.exists(test)):
-            print "Both oracle and test file must exist"
-            raise Exception
-
         self.oracle = oracle
         self.test   = test
 

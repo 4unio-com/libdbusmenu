@@ -7,38 +7,35 @@ from time import time, gmtime, strftime
 
 from desktoptesting.gnome import GEdit
 from desktoptesting.check import FileComparison, FAIL
+from desktoptesting.test_runner import TestRunner
 
-try:
+oracle = "./gedit/data/ascii.txt"
+chain = "This is a very basic string!"
+test_file = strftime("/tmp/" + "%Y%m%d_%H%M%S" + ".txt", gmtime((time())))
 
-    test = GEdit()
+class GEditChain(GEdit):
+    def testASCII(self):
+        "Save ASCII to file"
+        self._commonTest(
+            "./gedit/data/ascii.txt",
+            "This is a very basic string!",
+            strftime("/tmp/" + "%Y%m%d_%H%M%S" + ".txt", gmtime((time()))))
 
-    dataXml  = ldtputils.LdtpDataFileParser(datafilename)    
-    oracle = dataXml.gettagvalue("oracle")[0]
-    chain  = dataXml.gettagvalue("string")[0]
-    test_file = strftime("/tmp/" + "%Y%m%d_%H%M%S" + ".txt", gmtime((time())))
-    
-    start_time = time()
-    
-    test.open()
-    test.write_text(chain)
-    test.save(test_file)
-    test.exit()
+    def testUnicode(self):
+        "Save Unicode to file"
+        self._commonTest(
+            "./gedit/data/utf8.txt",
+            "This is a japanese string: 広告掲載 - ビジネス",
+            strftime("/tmp/" + "%Y%m%d_%H%M%S" + ".txt", gmtime((time()))))
 
-    stop_time = time()
-    
-    elapsed = stop_time - start_time
-    
-    testcheck = FileComparison(oracle, test_file)
-    check = testcheck.perform_test()
+    def _commonTest(self, oracle, chain, test_file):
+        self.write_text(chain)
+        self.save(test_file)
 
-    ldtp.log (str(elapsed), 'time')
-    
-    if check == FAIL:
-        ldtp.logFailures ("Files differ")
-        ldtp.logFailures ("Files differ", False, "fail") 
+        testcheck = FileComparison(oracle, test_file)
 
-except ldtp.LdtpExecutionError, msg:
-    raise
+        if testcheck.perform_test() == FAIL:
+            raise AssertionError, "Files differ"
 
-
-
+gedit_chains_test = GEditChain()
+gedit_chains_test.run()

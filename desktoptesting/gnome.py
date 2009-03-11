@@ -6,6 +6,8 @@ The gnome module provides wrappers for LDTP to make the write of Gnome tests eas
 import ooldtp
 import ldtp 
 import gnome_constants
+from test_runner import TestRunner
+from time import sleep
 
 def open_and_check_app(app_name, window_title_txt):
     """
@@ -249,13 +251,56 @@ class Seahorse(Application):
             raise ldtp.LdtpExecutionError, "The new pgp generating key dialog was not found."
 
 
-class GEdit(Application):
+class GEdit(Application, TestRunner):
     """
     GEdit manages the Gedit application.
     """
  
     def __init__(self):
         Application.__init__(self, gnome_constants.GE_WINDOW)
+
+    def setup(self):
+        self.open()
+
+    def teardown(self):
+        self.exit()
+
+    def cleanup(self):
+        # Exit using the Quit menu 
+
+        try:
+            try:
+                gedit = ooldtp.context(self.name)
+                quit_menu = gedit.getchild(gnome_constants.GE_MNU_CLOSE)
+            except ldtp.LdtpExecutionError:
+                raise ldtp.LdtpExecutionError, "The quit menu was not found."
+            quit_menu.selectmenuitem()
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "Mmm, something went wrong when closing the application."
+
+        sleep(1)
+    
+        # If the text has changed, the save dialog will appear
+        try:
+            question_dialog = ooldtp.context(gnome_constants.GE_QUESTION_DLG)
+        except ldtp.LdtpExecutionError:
+            pass
+        # Test if the file needs to be saved
+        else:
+            try:
+                question_dlg_btn_close = question_dialog.getchild(gnome_constants.GE_QUESTION_DLG_BTN_CLOSE)
+                question_dlg_btn_close.click()
+            except ldtp.LdtpExecutionError:
+                pass
+        sleep(1)
+        
+        try:
+            gedit = ooldtp.context(self.name)
+            new_menu = gedit.getchild(gnome_constants.GE_MNU_NEW)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "The quit menu was not found."
+        new_menu.selectmenuitem()
+        
 
     def write_text(self, text):
         """
