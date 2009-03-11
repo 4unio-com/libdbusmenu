@@ -79,7 +79,7 @@ if __name__ == "__main__":
             print >> sys.stderr, "teardown"
 
         def cleanup(self):
-            print >> sys.stderr, "teardown"            
+            print >> sys.stderr, "cleanup"            
         
     class TestTest(AnAppSpecific):
         def test_01(self):

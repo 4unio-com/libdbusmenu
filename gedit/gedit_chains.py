@@ -9,10 +9,6 @@ from desktoptesting.gnome import GEdit
 from desktoptesting.check import FileComparison, FAIL
 from desktoptesting.test_runner import TestRunner
 
-oracle = "./gedit/data/ascii.txt"
-chain = "This is a very basic string!"
-test_file = strftime("/tmp/" + "%Y%m%d_%H%M%S" + ".txt", gmtime((time())))
-
 class GEditChain(GEdit):
     def testASCII(self):
         "Save ASCII to file"
