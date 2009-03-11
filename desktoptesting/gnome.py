@@ -6,7 +6,7 @@ The gnome module provides wrappers for LDTP to make the write of Gnome tests eas
 import ooldtp
 import ldtp 
 import gnome_constants
-from test_runner import TestRunner
+from test_runner import TestSuite
 from time import sleep
 
 def open_and_check_app(app_name, window_title_txt):
@@ -250,8 +250,7 @@ class Seahorse(Application):
         except ldtp.LdtpExecutionError:
             raise ldtp.LdtpExecutionError, "The new pgp generating key dialog was not found."
 
-
-class GEdit(Application, TestRunner):
+class GEdit(Application, TestSuite):
     """
     GEdit manages the Gedit application.
     """
@@ -296,7 +295,7 @@ class GEdit(Application, TestRunner):
         result = ldtp.waittillguiexist(
             self.name, gnome_constants.GE_TXT_FIELD, 1)
         if result != 1:
-            raise LdtpExecutionError, "Failed to set up new document."
+            raise ldtp.LdtpExecutionError, "Failed to set up new document."
         
 
     def write_text(self, text):

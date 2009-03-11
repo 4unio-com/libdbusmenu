@@ -5,13 +5,14 @@ import re
 import sys
 import logging
 import xml.dom.minidom
+import ldtp
+import traceback
 
 from logging import StreamHandler, FileHandler, Formatter
 from optparse import OptionParser
 from stat import ST_MODE, S_IMODE
 from subprocess import Popen, PIPE
 from time import time, gmtime, strftime
-
 
 # Globals
 TESTS_SHARE = "."
@@ -159,12 +160,8 @@ def filter_suite_files(applications, suites, files, folder):
 
 def run_suite_file(suite_file, log_file):
     conf_file = os.path.join(TESTS_SHARE, "conffile.ini")
-    if not os.path.exists(conf_file):
-        error("Configuration file `%s' does not exist.", conf_file)
-
-    command = "ldtprunner --conf=%s %s > %s" \
-        % (conf_file, suite_file, log_file)
-    safe_run_command(command)
+    runner = TestSuiteRunner(suite_file)
+    runner.run()
 
 def convert_log_file(log_file, general_log, target_directory):
     if os.path.exists(SCREENSHOTS_SHARE):
@@ -219,8 +216,8 @@ def process_suite_file(suite_file, target_directory, general_log):
     log_file = os.path.join(application_target,
         suite_name.replace(".xml", ".log"))
     run_suite_file(suite_file, log_file)
-
-    convert_log_file(log_file, general_log, application_target)
+    
+    #convert_log_file(log_file, general_log, application_target)
 
 
 def main(args=sys.argv):
@@ -303,6 +300,7 @@ def main(args=sys.argv):
     for suite_file in suite_files:
         process_suite_file(suite_file, options.target, general_log)
 
+    return 0
     xsl_file = os.path.join(TESTS_SHARE, "report.xsl")
     if not os.path.exists(xsl_file):
         error("XSL file `%s' does not exist.", xsl_file)
@@ -314,6 +312,101 @@ def main(args=sys.argv):
     safe_run_command(command)
  
     return 0
+
+class TestCaseRunner:
+    def __init__(self, obj, xml_node):
+        self.args = {}
+        self.name = xml_node.getAttribute('name')
+        self.test_func = getattr(
+            obj, xml_node.getElementsByTagName('method')[0].firstChild.data)
+        args_element = xml_node.getElementsByTagName('args')
+        if args_element:
+            self._get_args(args_element[0])
+
+    def _get_args(self, node):
+        for n in node.childNodes:
+            if n.nodeType != n.ELEMENT_NODE:
+                continue
+            self.args[n.tagName.encode('ascii')] = n.firstChild.data
+        print self.args
+
+    def run(self, logger):
+        starttime = time()
+        logger.log(self.name, 'teststart')
+        try:
+            self.test_func(**self.args)
+        except AssertionError, e:
+            # The test failed.
+            logger.log (traceback.format_exc(), 'stacktrace')
+            logger.log (str(e), 'cause')
+            logger.logFailures(str(e), logStatus="fail")
+        except Exception, e:
+            # There was an unrelated error.
+            logger.log (traceback.format_exc(), 'stacktrace')
+            logger.logFailures(str(e), logStatus="error")
+            logger.logFailures(str(e), logStatus="fail")
+        else:
+            logger.log (self.name, 'pass')
+        finally:
+            logger.log (str(time() - starttime), 'time')
+            logger.log(self.name, 'testend')
+        
+class TestSuiteRunner:
+    def __init__(self, suite_file, loggerclass=None):
+        dom = xml.dom.minidom.parse(suite_file)
+        clsname, modname = None, None
+        case_runners = []
+        for node in dom.documentElement.childNodes:
+            if node.nodeType != node.ELEMENT_NODE:
+                continue
+            if node.tagName == 'class':
+                modname, clsname = node.firstChild.data.rsplit('.', 1)
+            if node.tagName == 'case':
+                case_runners.append(node)
+        if None in (clsname, modname):
+            raise Exception, "Missing a suite class"
+
+        sys.path.insert(1, os.path.dirname(suite_file))
+        mod = __import__(modname)
+        sys.path.pop(1)
+
+        cls = getattr(mod, clsname)
+
+        self.testsuite = cls()
+        
+        self.case_runners = \
+            [TestCaseRunner(self.testsuite, c) for c in case_runners]
+
+    def run(self, loggerclass=None, setup_once=True):
+        if loggerclass:
+            logger = loggerclass()
+        else:
+            logger = ldtp
+
+        logger.log (self.__class__.__name__, 'scriptstart')
+        if setup_once:
+            # Set up the environment.
+            self.testsuite.setup()
+
+        firsttest = True
+        for testrunner in self.case_runners:
+            if not setup_once:
+                # Set up the app for each test, if requested.
+                self.testsuite.setup()
+            if not firsttest:
+                # Clean up from previous run.
+                self.testsuite.cleanup()
+            firsttest = False
+            testrunner.run(logger)
+            if not setup_once:
+                # Teardown up the app for each test, if requested.
+                self.testsuite.teardown()
+
+        if setup_once:
+            # Tear down after entire suite.
+            self.testsuite.teardown()
+        logger.log (self.__class__.__name__, 'scriptend')
+        logger.stoplog()
 
 if __name__ == "__main__":
     sys.exit(main())
