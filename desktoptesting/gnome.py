@@ -278,28 +278,25 @@ class GEdit(Application, TestRunner):
         except ldtp.LdtpExecutionError:
             raise ldtp.LdtpExecutionError, "Mmm, something went wrong when closing the application."
 
-        sleep(1)
-    
-        # If the text has changed, the save dialog will appear
-        try:
+        result = ldtp.waittillguiexist(gnome_constants.GE_QUESTION_DLG,
+                                       guiTimeOut = 2)
+
+        if result == 1:
             question_dialog = ooldtp.context(gnome_constants.GE_QUESTION_DLG)
-        except ldtp.LdtpExecutionError:
-            pass
-        # Test if the file needs to be saved
-        else:
-            try:
-                question_dlg_btn_close = question_dialog.getchild(gnome_constants.GE_QUESTION_DLG_BTN_CLOSE)
-                question_dlg_btn_close.click()
-            except ldtp.LdtpExecutionError:
-                pass
-        sleep(1)
+            question_dlg_btn_close = question_dialog.getchild(gnome_constants.GE_QUESTION_DLG_BTN_CLOSE)
+            question_dlg_btn_close.click()
         
         try:
             gedit = ooldtp.context(self.name)
             new_menu = gedit.getchild(gnome_constants.GE_MNU_NEW)
         except ldtp.LdtpExecutionError:
-            raise ldtp.LdtpExecutionError, "The quit menu was not found."
+            raise ldtp.LdtpExecutionError, "The new menu was not found."
         new_menu.selectmenuitem()
+        
+        result = ldtp.waittillguiexist(
+            self.name, gnome_constants.GE_TXT_FIELD, 1)
+        if result != 1:
+            raise LdtpExecutionError, "Failed to set up new document."
         
 
     def write_text(self, text):
