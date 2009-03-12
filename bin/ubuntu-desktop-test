@@ -160,8 +160,11 @@ def filter_suite_files(applications, suites, files, folder):
 
 def run_suite_file(suite_file, log_file):
     conf_file = os.path.join(TESTS_SHARE, "conffile.ini")
-    runner = TestSuiteRunner(suite_file)
-    runner.run()
+    runner = TestSuite(suite_file)
+    results = runner.run()
+    f = open(log_file, 'w')
+    f.write(results)
+    f.close()
 
 def convert_log_file(log_file, general_log, target_directory):
     if os.path.exists(SCREENSHOTS_SHARE):
@@ -313,8 +316,34 @@ def main(args=sys.argv):
  
     return 0
 
-class TestCaseRunner:
+class Test:
+    def __init__(self):
+        self.result = {}
+    def add_results_to_node(self, node):
+        if self.result == {}: return
+        result = node.ownerDocument.createElement("result")
+        for key, val in self.result.items():
+            if not isinstance(val, list):
+                val = [val]
+            for item in val:
+                n = node.ownerDocument.createElement(key)
+                n.appendChild(n.ownerDocument.createTextNode(str(item)))
+                result.appendChild(n)
+                
+        node.appendChild(result)
+
+    def append_result(self, key, value):
+        l = self.result.get(key, [])
+        l.append(value)
+        self.result[key] = l
+
+    def set_result(self, key, value):
+        self.result[key] = value
+
+class TestCase(Test):
     def __init__(self, obj, xml_node):
+        Test.__init__(self)
+        self.xml_node = xml_node
         self.args = {}
         self.name = xml_node.getAttribute('name')
         self.test_func = getattr(
@@ -332,31 +361,33 @@ class TestCaseRunner:
 
     def run(self, logger):
         starttime = time()
-        logger.log(self.name, 'teststart')
         try:
             self.test_func(**self.args)
         except AssertionError, e:
             # The test failed.
-            logger.log (traceback.format_exc(), 'stacktrace')
-            logger.log (str(e), 'cause')
-            logger.logFailures(str(e), logStatus="fail")
+            self.append_result('message', str(e))
+            self.append_result('stacktrace', traceback.format_exc())
+            self.set_result('pass', 0)
         except Exception, e:
             # There was an unrelated error.
-            logger.log (traceback.format_exc(), 'stacktrace')
-            logger.logFailures(str(e), logStatus="error")
-            logger.logFailures(str(e), logStatus="fail")
+            self.append_result('message', str(e))
+            self.append_result('stacktrace', traceback.format_exc())
+            self.set_result('error', 1)
         else:
-            logger.log (self.name, 'pass')
+            self.set_result('pass', 0)
         finally:
-            logger.log (str(time() - starttime), 'time')
-            logger.log(self.name, 'testend')
+            self.set_result('time', time() - starttime)
         
-class TestSuiteRunner:
+        self.add_results_to_node(self.xml_node)
+        
+class TestSuite(Test):
     def __init__(self, suite_file, loggerclass=None):
-        dom = xml.dom.minidom.parse(suite_file)
+        Test.__init__(self)
+        self.dom = xml.dom.minidom.parse(suite_file)
+        self._strip_whitespace(self.dom.documentElement)
         clsname, modname = None, None
         case_runners = []
-        for node in dom.documentElement.childNodes:
+        for node in self.dom.documentElement.childNodes:
             if node.nodeType != node.ELEMENT_NODE:
                 continue
             if node.tagName == 'class':
@@ -375,21 +406,37 @@ class TestSuiteRunner:
         self.testsuite = cls()
         
         self.case_runners = \
-            [TestCaseRunner(self.testsuite, c) for c in case_runners]
-
+            [TestCase(self.testsuite, c) for c in case_runners]
+    
     def run(self, loggerclass=None, setup_once=True):
+        try:
+            self._run(loggerclass, setup_once)
+        except Exception, e:
+            # There was an unrelated error.
+            self.append_result('message', str(e))
+            self.append_result('stacktrace', traceback.format_exc())
+            self.set_result('error', 1)
+            try:
+                self.testsuite.teardown()
+            except:
+                pass
+
+        self.add_results_to_node(self.dom.documentElement)
+
+        return self.dom.toprettyxml('  ')
+            
+    def _run(self, loggerclass, setup_once):
         if loggerclass:
             logger = loggerclass()
         else:
             logger = ldtp
 
-        logger.log (self.__class__.__name__, 'scriptstart')
         if setup_once:
             # Set up the environment.
             self.testsuite.setup()
 
         firsttest = True
-        for testrunner in self.case_runners:
+        for testcase in self.case_runners:
             if not setup_once:
                 # Set up the app for each test, if requested.
                 self.testsuite.setup()
@@ -397,16 +444,30 @@ class TestSuiteRunner:
                 # Clean up from previous run.
                 self.testsuite.cleanup()
             firsttest = False
-            testrunner.run(logger)
+            testcase.run(logger)
             if not setup_once:
-                # Teardown up the app for each test, if requested.
+                # Teardown upthe app for each test, if requested.
                 self.testsuite.teardown()
 
         if setup_once:
             # Tear down after entire suite.
             self.testsuite.teardown()
-        logger.log (self.__class__.__name__, 'scriptend')
-        logger.stoplog()
+
+    def _strip_whitespace(self, element):
+        if element is None: 
+            return
+        sibling = element.firstChild
+        while sibling:
+            nextSibling = sibling.nextSibling
+            if sibling.nodeType == sibling.TEXT_NODE:
+                stripped = sibling.data.strip()
+                if stripped == '':
+                    element.removeChild(sibling)
+                else:
+                    sibling.data = stripped
+            else:
+                self._strip_whitespace(sibling)
+            sibling = nextSibling
 
 if __name__ == "__main__":
     sys.exit(main())

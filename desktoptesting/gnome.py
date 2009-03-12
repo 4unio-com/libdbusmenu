@@ -266,7 +266,6 @@ class GEdit(Application, TestSuite):
 
     def cleanup(self):
         # Exit using the Quit menu 
-
         try:
             try:
                 gedit = ooldtp.context(self.name)
@@ -293,7 +292,7 @@ class GEdit(Application, TestSuite):
         new_menu.selectmenuitem()
         
         result = ldtp.waittillguiexist(
-            self.name, gnome_constants.GE_TXT_FIELD, 1)
+            self.name, gnome_constants.GE_TXT_FIELD)
         if result != 1:
             raise ldtp.LdtpExecutionError, "Failed to set up new document."
         
