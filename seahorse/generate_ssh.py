@@ -8,7 +8,6 @@ try:
   
     dataXml     = ldtputils.LdtpDataFileParser(datafilename)    
     description = dataXml.gettagvalue("description")[0]
-    print "desc: " + description
     set_up      = dataXml.gettagvalue("set_up")[0]
     passphrase  = dataXml.gettagvalue("passphrase")[0]
     computer    = ''
@@ -25,6 +24,12 @@ try:
     # Open the update manager and check the repositories
     seahorse.open()
     seahorse.new_ssh_key(description, passphrase, set_up, computer, login)
+    
+    # Check that the key was successfully created
+    if seahorse.assert_exists_key(description) == False:
+        seahorse.exit()
+        raise ldtp.LdtpExecutionError, "The key was not successfully created."
+
     seahorse.exit()
         
     stop_time = time()

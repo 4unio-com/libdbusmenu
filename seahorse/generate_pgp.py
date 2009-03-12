@@ -20,6 +20,11 @@ try:
     # Open the update manager and check the repositories
     seahorse.open()
     seahorse.new_pgp_key(name, email, comment, passphrase)
+    
+    if seahorse.assert_exists_key(name) == False:
+        seahorse.exit()
+        raise ldtp.LdtpExecutionError, "The key was not successfully created."
+
     seahorse.exit()
         
     stop_time = time()

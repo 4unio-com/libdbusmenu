@@ -393,12 +393,44 @@ class Seahorse(Application):
         try:
             while ldtp.guiexist(gnome_constants.SH_DLG_CREATING_SSH) == 1:
                 ldtp.wait(1)
+            
         except ldtp.LdtpExecutionError:
             raise ldtp.LdtpExecutionError, "The creating key dialog was not found."
         
         # It is too fast to grab the main window afterwards
         ldtp.wait(3)
+
+    def assert_exists_key(self, name, tab_name = gnome_constants.SH_TAB_PERSONAL_KEYS):
+        """
+        It checks that the KEY with description 'description' is
+        part of the keys of the current user
+
+        @type name: string
+        @param name: The name of the key to search
+        
+        @type tab_name: string
+        @param tab_name: The tab name to search for the key.
+        """
+
+        seahorse = ooldtp.context(self.name)
+        try:
+
+            page_list = seahorse.getchild(gnome_constants.SH_TAB_LIST)
+            page_list.selecttab(gnome_constants.SH_TAB_PERSONAL_KEYS)
+            scroll_pane = ldtp.getobjectproperty(self.name, tab_name, 'children')
+            list_keys = ldtp.getobjectproperty(self.name, scroll_pane, 'children')
+            list_keys = list_keys.split(' ')[0]
+            list_keys = seahorse.getchild(list_keys)
+            for i in range(0, list_keys.getrowcount()):
+                current = list_keys.getcellvalue(i, 1)
+                if name in current:
+                    return True
             
+            return False
+
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "Error retrieving the list of keys."
+
 class GEdit(Application):
     """
     GEdit manages the Gedit application.

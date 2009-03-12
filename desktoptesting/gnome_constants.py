@@ -50,4 +50,7 @@ SH_DLG_SET_UP          = "Set Up Computer for SSH Connection"
 SH_TXT_SET_UP_COMPUTER = "txtThehostnameoraddressoftheserver."
 SH_TXT_SET_UP_LOGIN    = "txtLoginName"
 SH_BTN_SET_UP          = "btnSetUp"
-SH_BTN_NEWSSH_CREATE = "Just Create Key"
+SH_BTN_NEWSSH_CREATE   = "Just Create Key"
+SH_TAB_PERSONAL_KEYS   = "My Personal Keys"
+SH_TAB_LIST            = "ptl0"
+
