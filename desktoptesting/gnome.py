@@ -6,7 +6,6 @@ The gnome module provides wrappers for LDTP to make the write of Gnome tests eas
 import ooldtp
 import ldtp 
 import gnome_constants
-from test_runner import TestSuite
 from time import sleep
 
 def open_and_check_app(app_name, window_title_txt):
@@ -44,6 +43,20 @@ class Application:
     def __init__(self, name = ""):
         self.name = name
       
+    def setup(self):
+        pass
+
+    def teardown(self):
+        pass
+
+    def cleanup(self):
+        pass
+
+    def recover(self):
+        self.teardown()
+        sleep(1)
+        self.setup()
+
     def remap(self):
         """
         It reloads the application map for the given ooldtp.context.
@@ -250,7 +263,7 @@ class Seahorse(Application):
         except ldtp.LdtpExecutionError:
             raise ldtp.LdtpExecutionError, "The new pgp generating key dialog was not found."
 
-class GEdit(Application, TestSuite):
+class GEdit(Application):
     """
     GEdit manages the Gedit application.
     """
