@@ -473,11 +473,11 @@ class UpdateManager(Application):
                 self.select_update(name)
 
             # Get the filler tab
-            filler = ldtp.getobjectproperty(ubuntu_constants.UM_WINDOW , ubuntu_constants.UM_TAB_CHANGES, 'childrens')
+            filler = ldtp.getobjectproperty(ubuntu_constants.UM_WINDOW , ubuntu_constants.UM_TAB_CHANGES, 'children')
             # Get the scroll pane
-            scroll_pane = ldtp.getobjectproperty(ubuntu_constants.UM_WINDOW , filler, 'childrens')
+            scroll_pane = ldtp.getobjectproperty(ubuntu_constants.UM_WINDOW , filler, 'children')
             # Get the text field
-            text_field = ldtp.getobjectproperty(ubuntu_constants.UM_WINDOW , scroll_pane, 'childrens')
+            text_field = ldtp.getobjectproperty(ubuntu_constants.UM_WINDOW , scroll_pane, 'children')
             text_field = text_field.split(' ')[0]
             # Get the text
             text = ldtp.gettextvalue(ubuntu_constants.UM_WINDOW, text_field)

@@ -128,6 +128,12 @@ class Seahorse(Application):
         open_and_check_app(gnome_constants.SH_LAUNCHER, gnome_constants.SH_WINDOW)
 
     def new_key(self, key_type):
+        """
+        It opens up the list of available new keys, and select the one to create.
+        
+        @type key_type: string
+        @param key_type: The type of key to create. 
+        """
         
         seahorse = ooldtp.context(self.name)
         
@@ -172,6 +178,24 @@ class Seahorse(Application):
             raise ldtp.LdtpExecutionError, "There was a problem when clicking the continue button."
         
     def new_pgp_key(self, full_name, email, comment, passphrase):
+        """
+        It creates a new PGP key with the default settings.
+
+        TODO: Allow advanced options
+        TODO: Check the list afterwards for the newly created key
+
+        @type full_name: string 
+        @param full_name: Full name to type for the PGP key
+
+        @type email: string 
+        @param email: Email to type for the PGP key
+
+        @type comment: string 
+        @param comment: Comment to type for the PGP key
+
+        @type passphrase: string 
+        @param passphrase: Passphrase to type for the PGP key
+        """
         
         self.new_key(gnome_constants.SH_TYPE_PGP)
 
@@ -219,8 +243,8 @@ class Seahorse(Application):
             raise ldtp.LdtpExecutionError, "There was a problem when clicking the create button."
        
         try:
-            ldtp.waittillguiexist(gnome_constants.SH_DLG_NEWPGP_PASS)
-            dlg_new_pgp_pass = ooldtp.context(gnome_constants.SH_DLG_NEWPGP_PASS)
+            ldtp.waittillguiexist(gnome_constants.SH_DLG_NEWKEY_PASS)
+            dlg_new_pgp_pass = ooldtp.context(gnome_constants.SH_DLG_NEWKEY_PASS)
         except ldtp.LdtpExecutionError:
             raise ldtp.LdtpExecutionError, "The new pgp key passphrase dialog was not found."
 
@@ -242,12 +266,170 @@ class Seahorse(Application):
             raise ldtp.LdtpExecutionError, "There was a problem when clicking the OK button."
  
         try:
-            ldtp.waittillguiexist(gnome_constants.SH_DLG_GENERATING_PGP)
-            while ldtp.guiexist(gnome_constants.SH_DLG_GENERATING_PGP) == 1:
+            ldtp.waittillguiexist(gnome_constants.SH_DLG_GENERATING_KEY)
+            while ldtp.guiexist(gnome_constants.SH_DLG_GENERATING_KEY) == 1:
                 ldtp.wait(1)
         except ldtp.LdtpExecutionError:
             raise ldtp.LdtpExecutionError, "The new pgp generating key dialog was not found."
 
+
+    def new_ssh_key(self, description, passphrase, set_up = False, computer = '', login = ''):
+        """
+        It creates a new SSH key with the default settings.
+
+        TODO: Setting up the key is not working yet
+
+        @type description: string 
+        @param description: Description to type in the SSH key
+
+        @type passphrase: string 
+        @param passphrase: Passphrase to type for the SSH key
+
+        @type set_up: boolean 
+        @param passphrase: True, to set up the SSH key
+
+        @type computer: string 
+        @param computer: URL or IP of the computer to set up the key
+        
+        @type login: string
+        @param login: Login to use in the remote computer
+        """
+        
+        self.new_key(gnome_constants.SH_TYPE_SSH)
+
+        try:
+            ldtp.waittillguiexist(gnome_constants.SH_NEWSSH_DLG)
+            dlg_new_ssh = ooldtp.context(gnome_constants.SH_NEWSSH_DLG)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "The new key dialog was not found."
+
+        try:
+            txt_field = dlg_new_ssh.getchild(gnome_constants.SH_DLG_NEWSSH_DESC)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "The " + gnome_constants.SH_DLG_NEWSSH_DESC + " text field was not found."
+        try:
+            txt_field.settextvalue(description)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "There was an error when writing the text."
+
+        if set_up == True:
+            try:
+                btn_create = dlg_new_ssh.getchild(gnome_constants.SH_BTN_NEWSSH_CREATE_AND_SETUP)
+            except ldtp.LdtpExecutionError:
+                raise ldtp.LdtpExecutionError, "The create button at the new PGP key dialog was not found."
+
+        else:
+            try:
+                btn_create = dlg_new_ssh.getchild(gnome_constants.SH_BTN_NEWSSH_CREATE)
+            except ldtp.LdtpExecutionError:
+                raise ldtp.LdtpExecutionError, "The create button at the new PGP key dialog was not found."
+
+        try:
+            btn_create.click() 
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "There was a problem when clicking the create button."
+      
+ 
+        try:
+            ldtp.waittillguiexist(gnome_constants.SH_DLG_NEWKEY_PASS)
+            dlg_new_key_pass = ooldtp.context(gnome_constants.SH_DLG_NEWKEY_PASS)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "The new key passphrase dialog was not found."
+
+        try:
+            ldtp.enterstring(passphrase)
+            ldtp.enterstring("<tab>")
+            ldtp.enterstring(passphrase)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "Error entering passphrase."
+ 
+        try:
+            btn_pass_ok = dlg_new_key_pass.getchild(gnome_constants.SH_BTN_PASS_OK)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "The OK button at the new key passphrase dialog was not found."
+
+        try:
+            btn_pass_ok.click() 
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "There was a problem when clicking the OK button."
+ 
+        if set_up == True and login is not None:
+
+            try:
+                ldtp.waittillguiexist(gnome_constants.SH_DLG_SET_UP)
+                dlg_set_up_computer = ooldtp.context(gnome_constants.SH_DLG_SET_UP)
+            except ldtp.LdtpExecutionError:
+                raise ldtp.LdtpExecutionError, "The set up computer dialog was not found."
+
+            try:
+                txt_field = dlg_set_up_computer.getchild(gnome_constants.SH_TXT_SET_UP_LOGIN)
+            except ldtp.LdtpExecutionError:
+                raise ldtp.LdtpExecutionError, "The " + gnome_constants.SH_TXT_SET_UP_LOGIN + " text field was not found."
+            try:
+                txt_field.settextvalue(login)
+            except ldtp.LdtpExecutionError:
+                raise ldtp.LdtpExecutionError, "There was an error when writing the text."
+
+        if set_up == True:
+            try:
+                txt_field = dlg_set_up_computer.getchild(gnome_constants.SH_TXT_SET_UP_COMPUTER)
+            except ldtp.LdtpExecutionError:
+                raise ldtp.LdtpExecutionError, "The " + gnome_constants.SH_TXT_SET_UP_COMPUTER + " text field was not found."
+            try:
+                txt_field.settextvalue(computer)
+            except ldtp.LdtpExecutionError:
+                raise ldtp.LdtpExecutionError, "There was an error when writing the text."
+
+            try:
+                btn_set_up = dlg_set_up_computer.getchild(gnome_constants.SH_BTN_SET_UP)
+            except ldtp.LdtpExecutionError:
+                raise ldtp.LdtpExecutionError, "The set up button was not found."
+
+            try:
+                btn_set_up.click() 
+            except ldtp.LdtpExecutionError:
+                raise ldtp.LdtpExecutionError, "There was a problem when clicking the set up button."
+            
+        try:
+            while ldtp.guiexist(gnome_constants.SH_DLG_CREATING_SSH) == 1:
+                ldtp.wait(1)
+            
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "The creating key dialog was not found."
+        
+        # It is too fast to grab the main window afterwards
+        ldtp.wait(3)
+
+    def assert_exists_key(self, name, tab_name = gnome_constants.SH_TAB_PERSONAL_KEYS):
+        """
+        It checks that the KEY with description 'description' is
+        part of the keys of the current user
+
+        @type name: string
+        @param name: The name of the key to search
+        
+        @type tab_name: string
+        @param tab_name: The tab name to search for the key.
+        """
+
+        seahorse = ooldtp.context(self.name)
+        try:
+
+            page_list = seahorse.getchild(gnome_constants.SH_TAB_LIST)
+            page_list.selecttab(gnome_constants.SH_TAB_PERSONAL_KEYS)
+            scroll_pane = ldtp.getobjectproperty(self.name, tab_name, 'children')
+            list_keys = ldtp.getobjectproperty(self.name, scroll_pane, 'children')
+            list_keys = list_keys.split(' ')[0]
+            list_keys = seahorse.getchild(list_keys)
+            for i in range(0, list_keys.getrowcount()):
+                current = list_keys.getcellvalue(i, 1)
+                if name in current:
+                    return True
+            
+            return False
+
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "Error retrieving the list of keys."
 
 class GEdit(Application):
     """

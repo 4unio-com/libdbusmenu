@@ -6,12 +6,16 @@ from desktoptesting.gnome import Seahorse
 
 try:
   
-    dataXml  = ldtputils.LdtpDataFileParser(datafilename)    
-    name     = dataXml.gettagvalue("name")[0]
-    email    = dataXml.gettagvalue("email")[0]
-    comment  = dataXml.gettagvalue("comment")[0]
+    dataXml     = ldtputils.LdtpDataFileParser(datafilename)    
+    description = dataXml.gettagvalue("description")[0]
+    set_up      = dataXml.gettagvalue("set_up")[0]
     passphrase  = dataXml.gettagvalue("passphrase")[0]
+    computer    = ''
+    login       = ''
 
+    if set_up == 'True':
+        computer    = dataXml.gettagvalue("computer")[0]
+        login       = dataXml.gettagvalue("login")[0]
     
     seahorse = Seahorse()
     
@@ -19,9 +23,10 @@ try:
     
     # Open the update manager and check the repositories
     seahorse.open()
-    seahorse.new_pgp_key(name, email, comment, passphrase)
+    seahorse.new_ssh_key(description, passphrase, set_up, computer, login)
     
-    if seahorse.assert_exists_key(name) == False:
+    # Check that the key was successfully created
+    if seahorse.assert_exists_key(description) == False:
         seahorse.exit()
         raise ldtp.LdtpExecutionError, "The key was not successfully created."
 
