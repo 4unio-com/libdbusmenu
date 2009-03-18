@@ -6,42 +6,21 @@ The gnome module provides wrappers for LDTP to make the write of Gnome tests eas
 import ooldtp
 import ldtp 
 import gnome_constants
-from time import sleep
-
-def open_and_check_app(app_name, window_title_txt):
-    """
-    Given an application, it tries to open it.
-     
-    @type app_name: string
-    @param app_name: The command to start the application.
-    
-    @type window_title_txt: string 
-    @param window_title_txt: The name of the window to recognize once opened.
-        
-        The naming convention is the following:
-        
-        E{-} Prepend 'frm' if the window is a form, or 'dlg' if the window is a dialog.
-        
-        E{-} Append the window name with no spaces.
-              
-        Example: For the window Disk Usage Analyzer, the window name would be frmDiskUsageAnalyzer.
-    
-    """
-    
-    ldtp.launchapp(app_name)
-
-    ldtp.wait(2)
-    response = ldtp.waittillguiexist(window_title_txt, '', 20)
-    
-    if response == 0:
-        raise ldtp.LdtpExecutionError, "The " + window_title_txt + " window was not found."    
 
 class Application:
     """
     Supperclass for the rest of the applications
     """
-    def __init__(self, name = ""):
+    def __init__(self, name = '', close_type='menu', close_name='mnuQuit'):
+        """
+        @type close_type: string
+        @param close_type: The type of close widget of the application. Types: menu, button.
+        @type close_name: string
+        @param close_name: The name of the exit widget of the application. If not mentioned the default will be used ("Quit").
+        """
         self.name = name
+        self.close_type = close_type
+        self.close_name = close_name
       
     def setup(self):
         pass
@@ -50,12 +29,26 @@ class Application:
         pass
 
     def cleanup(self):
-        pass
+        self.set_name('')
+        self.set_close_type('menu')
+        self.set_close_name('mnuQuit')
 
     def recover(self):
         self.teardown()
         sleep(1)
         self.setup()
+
+    def set_name(self, name):
+        if name is not None:
+            self.name = name
+
+    def set_close_type(self, close_type):
+        if close_type is not None:
+            self.close_type = close_type
+
+    def set_close_name(self, close_name):
+        if close_name is not None:
+            self.close_name = close_name
 
     def remap(self):
         """
@@ -63,33 +56,44 @@ class Application:
         """
         ldtp.remap(self.name)
 
-    def exit(self, close_type='menu', close_name='mnuQuit'):
+    def open_and_check_app(self, app_name):
         """
-        Given an application, it tries to quit it.
+        Given an application, it tries to open it.
          
-        @type close_type: string
-        @param close_type: The type of close widget of the application. Types: menu, button.
-        @type close_name: string
-        @param close_name: The name of the exit widget of the application. If not mentioned the default will be used ("Quit").
+        @type app_name: string
+        @param app_name: The command to start the application.
+        """
+        
+        ldtp.launchapp(app_name)
+
+        ldtp.wait(2)
+        response = ldtp.waittillguiexist(self.name, '', 20)
+        
+        if response == 0:
+            raise ldtp.LdtpExecutionError, "The " + self.name + " window was not found."    
+
+    def exit(self):
+        """
+        Given an application, it tries to quit it. 
         """
         try:
             app = ooldtp.context(self.name)
             try:
-                close_widget = app.getchild(close_name)
+                close_widget = app.getchild(self.close_name)
             except ldtp.LdtpExecutionError:
-                raise ldtp.LdtpExecutionError, "The " + close_name + " widget was not found."
+                raise ldtp.LdtpExecutionError, "The " + self.close_name + " widget was not found."
 
-            if close_type == 'menu':
+            if self.close_type == 'menu':
                 close_widget.selectmenuitem()
-            elif close_type == 'button':
+            elif self.close_type == 'button':
                 close_widget.click()
             else:
                 raise ldtp.LdtpExecutionError, "Wrong close item type."
             response = ldtp.waittillguinotexist(self.name, '', 20)
             if response == 0:
                 raise ldtp.LdtpExecutionError, "Mmm, something went wrong when closing the application."
-        except ldtp.LdtpExecutionError:
-            raise ldtp.LdtpExecutionError, "Mmm, something went wrong when closing the application."
+        except ldtp.LdtpExecutionError, msg:
+            raise ldtp.LdtpExecutionError, "Mmm, something went wrong when closing the application: " + str(msg)
 
     def save(self, save_menu='mnuSave'):
         """
@@ -139,10 +143,26 @@ class Seahorse(Application):
     def __init__(self):
         Application.__init__(self, gnome_constants.SH_WINDOW)
 
+    def setup(self):
+        self.open()
+
+    def teardown(self):
+        self.exit()
+
+    def cleanup(self):
+        #TODO: it should delete all the "My Personal Keys"
+        pass
+
     def open(self):
-        open_and_check_app(gnome_constants.SH_LAUNCHER, gnome_constants.SH_WINDOW)
+        Application.open_and_check_app(self, gnome_constants.SH_LAUNCHER)
 
     def new_key(self, key_type):
+        """
+        It opens up the list of available new keys, and select the one to create.
+        
+        @type key_type: string
+        @param key_type: The type of key to create. 
+        """
         
         seahorse = ooldtp.context(self.name)
         
@@ -187,6 +207,24 @@ class Seahorse(Application):
             raise ldtp.LdtpExecutionError, "There was a problem when clicking the continue button."
         
     def new_pgp_key(self, full_name, email, comment, passphrase):
+        """
+        It creates a new PGP key with the default settings.
+
+        TODO: Allow advanced options
+        TODO: Check the list afterwards for the newly created key
+
+        @type full_name: string 
+        @param full_name: Full name to type for the PGP key
+
+        @type email: string 
+        @param email: Email to type for the PGP key
+
+        @type comment: string 
+        @param comment: Comment to type for the PGP key
+
+        @type passphrase: string 
+        @param passphrase: Passphrase to type for the PGP key
+        """
         
         self.new_key(gnome_constants.SH_TYPE_PGP)
 
@@ -234,8 +272,8 @@ class Seahorse(Application):
             raise ldtp.LdtpExecutionError, "There was a problem when clicking the create button."
        
         try:
-            ldtp.waittillguiexist(gnome_constants.SH_DLG_NEWPGP_PASS)
-            dlg_new_pgp_pass = ooldtp.context(gnome_constants.SH_DLG_NEWPGP_PASS)
+            ldtp.waittillguiexist(gnome_constants.SH_DLG_NEWKEY_PASS)
+            dlg_new_pgp_pass = ooldtp.context(gnome_constants.SH_DLG_NEWKEY_PASS)
         except ldtp.LdtpExecutionError:
             raise ldtp.LdtpExecutionError, "The new pgp key passphrase dialog was not found."
 
@@ -257,11 +295,170 @@ class Seahorse(Application):
             raise ldtp.LdtpExecutionError, "There was a problem when clicking the OK button."
  
         try:
-            ldtp.waittillguiexist(gnome_constants.SH_DLG_GENERATING_PGP)
-            while ldtp.guiexist(gnome_constants.SH_DLG_GENERATING_PGP) == 1:
+            ldtp.waittillguiexist(gnome_constants.SH_DLG_GENERATING_KEY)
+            while ldtp.guiexist(gnome_constants.SH_DLG_GENERATING_KEY) == 1:
                 ldtp.wait(1)
         except ldtp.LdtpExecutionError:
             raise ldtp.LdtpExecutionError, "The new pgp generating key dialog was not found."
+
+
+    def new_ssh_key(self, description, passphrase, set_up = False, computer = '', login = ''):
+        """
+        It creates a new SSH key with the default settings.
+
+        TODO: Setting up the key is not working yet
+
+        @type description: string 
+        @param description: Description to type in the SSH key
+
+        @type passphrase: string 
+        @param passphrase: Passphrase to type for the SSH key
+
+        @type set_up: boolean 
+        @param passphrase: True, to set up the SSH key
+
+        @type computer: string 
+        @param computer: URL or IP of the computer to set up the key
+        
+        @type login: string
+        @param login: Login to use in the remote computer
+        """
+        
+        self.new_key(gnome_constants.SH_TYPE_SSH)
+
+        try:
+            ldtp.waittillguiexist(gnome_constants.SH_NEWSSH_DLG)
+            dlg_new_ssh = ooldtp.context(gnome_constants.SH_NEWSSH_DLG)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "The new key dialog was not found."
+
+        try:
+            txt_field = dlg_new_ssh.getchild(gnome_constants.SH_DLG_NEWSSH_DESC)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "The " + gnome_constants.SH_DLG_NEWSSH_DESC + " text field was not found."
+        try:
+            txt_field.settextvalue(description)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "There was an error when writing the text."
+
+        if set_up == True:
+            try:
+                btn_create = dlg_new_ssh.getchild(gnome_constants.SH_BTN_NEWSSH_CREATE_AND_SETUP)
+            except ldtp.LdtpExecutionError:
+                raise ldtp.LdtpExecutionError, "The create button at the new PGP key dialog was not found."
+
+        else:
+            try:
+                btn_create = dlg_new_ssh.getchild(gnome_constants.SH_BTN_NEWSSH_CREATE)
+            except ldtp.LdtpExecutionError:
+                raise ldtp.LdtpExecutionError, "The create button at the new PGP key dialog was not found."
+
+        try:
+            btn_create.click() 
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "There was a problem when clicking the create button."
+      
+ 
+        try:
+            ldtp.waittillguiexist(gnome_constants.SH_DLG_NEWKEY_PASS)
+            dlg_new_key_pass = ooldtp.context(gnome_constants.SH_DLG_NEWKEY_PASS)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "The new key passphrase dialog was not found."
+
+        try:
+            ldtp.enterstring(passphrase)
+            ldtp.enterstring("<tab>")
+            ldtp.enterstring(passphrase)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "Error entering passphrase."
+ 
+        try:
+            btn_pass_ok = dlg_new_key_pass.getchild(gnome_constants.SH_BTN_PASS_OK)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "The OK button at the new key passphrase dialog was not found."
+
+        try:
+            btn_pass_ok.click() 
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "There was a problem when clicking the OK button."
+ 
+        if set_up == True and login is not None:
+
+            try:
+                ldtp.waittillguiexist(gnome_constants.SH_DLG_SET_UP)
+                dlg_set_up_computer = ooldtp.context(gnome_constants.SH_DLG_SET_UP)
+            except ldtp.LdtpExecutionError:
+                raise ldtp.LdtpExecutionError, "The set up computer dialog was not found."
+
+            try:
+                txt_field = dlg_set_up_computer.getchild(gnome_constants.SH_TXT_SET_UP_LOGIN)
+            except ldtp.LdtpExecutionError:
+                raise ldtp.LdtpExecutionError, "The " + gnome_constants.SH_TXT_SET_UP_LOGIN + " text field was not found."
+            try:
+                txt_field.settextvalue(login)
+            except ldtp.LdtpExecutionError:
+                raise ldtp.LdtpExecutionError, "There was an error when writing the text."
+
+        if set_up == True:
+            try:
+                txt_field = dlg_set_up_computer.getchild(gnome_constants.SH_TXT_SET_UP_COMPUTER)
+            except ldtp.LdtpExecutionError:
+                raise ldtp.LdtpExecutionError, "The " + gnome_constants.SH_TXT_SET_UP_COMPUTER + " text field was not found."
+            try:
+                txt_field.settextvalue(computer)
+            except ldtp.LdtpExecutionError:
+                raise ldtp.LdtpExecutionError, "There was an error when writing the text."
+
+            try:
+                btn_set_up = dlg_set_up_computer.getchild(gnome_constants.SH_BTN_SET_UP)
+            except ldtp.LdtpExecutionError:
+                raise ldtp.LdtpExecutionError, "The set up button was not found."
+
+            try:
+                btn_set_up.click() 
+            except ldtp.LdtpExecutionError:
+                raise ldtp.LdtpExecutionError, "There was a problem when clicking the set up button."
+            
+        try:
+            while ldtp.guiexist(gnome_constants.SH_DLG_CREATING_SSH) == 1:
+                ldtp.wait(1)
+            
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "The creating key dialog was not found."
+        
+        # It is too fast to grab the main window afterwards
+        ldtp.wait(3)
+
+    def assert_exists_key(self, name, tab_name = gnome_constants.SH_TAB_PERSONAL_KEYS):
+        """
+        It checks that the KEY with description 'description' is
+        part of the keys of the current user
+
+        @type name: string
+        @param name: The name of the key to search
+        
+        @type tab_name: string
+        @param tab_name: The tab name to search for the key.
+        """
+
+        seahorse = ooldtp.context(self.name)
+        try:
+
+            page_list = seahorse.getchild(gnome_constants.SH_TAB_LIST)
+            page_list.selecttab(gnome_constants.SH_TAB_PERSONAL_KEYS)
+            scroll_pane = ldtp.getobjectproperty(self.name, tab_name, 'children')
+            list_keys = ldtp.getobjectproperty(self.name, scroll_pane, 'children')
+            list_keys = list_keys.split(' ')[0]
+            list_keys = seahorse.getchild(list_keys)
+            for i in range(0, list_keys.getrowcount()):
+                current = list_keys.getcellvalue(i, 1)
+                if name in current:
+                    return True
+            
+            return False
+
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "Error retrieving the list of keys."
 
 class GEdit(Application):
     """
@@ -364,7 +561,7 @@ class GEdit(Application):
         didn't start properly.
 
         """
-        open_and_check_app(gnome_constants.GE_LAUNCHER, gnome_constants.GE_WINDOW)
+        Application.open_and_check_app(self, gnome_constants.GE_LAUNCHER)
 
     def exit(self, save=False, filename=''):
         """
