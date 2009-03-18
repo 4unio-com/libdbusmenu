@@ -9,49 +9,59 @@ import ubuntu_constants
 from desktoptesting.gnome import Application, PolicyKit, open_and_check_app
 import re
 
-def open_and_check_menu_item(menu_item_txt, window_title_txt):
-    """
-    Given a menu item, it tries to open the application associated with it.
-     
-    @type menu_item_txt: string
-    @param menu_item_txt: The name of the menu item that the user wants to open.
+class UbuntuMenu(Application):
     
-        The naming convention is the following:
-        
-        E{-} Prepend 'mnu' to the menu item
-        
-        E{-} Append the menu item with no spaces.
-             
-        Example: For the menu Disk Usage Analyzer, the menu name would be mnuDiskUsageAnalyzer.
-        
-    @type window_title_txt: string 
-    @param window_title_txt: The name of the window to recognize once opened.
-        
-        The naming convention is the following:
-        
-        E{-} Prepend 'frm' if the window is a form, or 'dlg' if the window is a dialog.
-        
-        E{-} Append the window name with no spaces.
-              
-        Example: For the window Disk Usage Analyzer, the window name would be frmDiskUsageAnalyzer.
-    
-    """
-    
-    topPanel = ooldtp.context(ubuntu_constants.TOP_PANEL)
-    
-    try:
-        actualMenu = topPanel.getchild(menu_item_txt)
-    except ldtp.LdtpExecutionError:
-        raise ldtp.LdtpExecutionError, "The " + menu_item_txt + " menu was not found: " 
-  
-    actualMenu.selectmenuitem()
+    def setup(self):
+        pass
+    def teardown(self):
+        self.cleanup() 
 
-    ldtp.wait(2)
-    response = ldtp.waittillguiexist(window_title_txt, '', 20)
-    
-    if response == 0:
-        raise ldtp.LdtpExecutionError, "The " + window_title_txt + " window was not found."    
+    def cleanup(self):
+        self.exit()
+        Application.cleanup(self)
 
+    def open_and_check_menu_item(self, menu_item_txt):
+        """
+        Given a menu item, it tries to open the application associated with it.
+         
+        @type menu_item_txt: string
+        @param menu_item_txt: The name of the menu item that the user wants to open.
+        
+            The naming convention is the following:
+            
+            E{-} Prepend 'mnu' to the menu item
+            
+            E{-} Append the menu item with no spaces.
+                 
+            Example: For the menu Disk Usage Analyzer, the menu name would be mnuDiskUsageAnalyzer.
+            
+        @type window_title_txt: string 
+        @param window_title_txt: The name of the window to recognize once opened.
+            
+            The naming convention is the following:
+            
+            E{-} Prepend 'frm' if the window is a form, or 'dlg' if the window is a dialog.
+            
+            E{-} Append the window name with no spaces.
+                  
+            Example: For the window Disk Usage Analyzer, the window name would be frmDiskUsageAnalyzer.
+        
+        """
+       
+        topPanel = ooldtp.context(ubuntu_constants.TOP_PANEL)
+        
+        try:
+            actualMenu = topPanel.getchild(menu_item_txt)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "The " + menu_item_txt + " menu was not found. " 
+      
+        actualMenu.selectmenuitem()
+
+        ldtp.wait(2)
+        response = ldtp.waittillguiexist(self.name, '', 20)
+        
+        if response == 0:
+            raise ldtp.LdtpExecutionError, "The " + self.name + " window was not found."    
 
  
 class UpdateManager(Application):
