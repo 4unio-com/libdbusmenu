@@ -7,74 +7,93 @@ import ooldtp
 import ldtp 
 import gnome_constants
 
-def open_and_check_app(app_name, window_title_txt):
-    """
-    Given an application, it tries to open it.
-     
-    @type app_name: string
-    @param app_name: The command to start the application.
-    
-    @type window_title_txt: string 
-    @param window_title_txt: The name of the window to recognize once opened.
-        
-        The naming convention is the following:
-        
-        E{-} Prepend 'frm' if the window is a form, or 'dlg' if the window is a dialog.
-        
-        E{-} Append the window name with no spaces.
-              
-        Example: For the window Disk Usage Analyzer, the window name would be frmDiskUsageAnalyzer.
-    
-    """
-    
-    ldtp.launchapp(app_name)
-
-    ldtp.wait(2)
-    response = ldtp.waittillguiexist(window_title_txt, '', 20)
-    
-    if response == 0:
-        raise ldtp.LdtpExecutionError, "The " + window_title_txt + " window was not found."    
-
 class Application:
     """
     Supperclass for the rest of the applications
     """
-    def __init__(self, name = ""):
+    def __init__(self, name = '', close_type='menu', close_name='mnuQuit'):
+        """
+        @type close_type: string
+        @param close_type: The type of close widget of the application. Types: menu, button.
+        @type close_name: string
+        @param close_name: The name of the exit widget of the application. If not mentioned the default will be used ("Quit").
+        """
         self.name = name
+        self.close_type = close_type
+        self.close_name = close_name
       
+    def setup(self):
+        pass
+
+    def teardown(self):
+        pass
+
+    def cleanup(self):
+        self.set_name('')
+        self.set_close_type('menu')
+        self.set_close_name('mnuQuit')
+
+    def recover(self):
+        self.teardown()
+        sleep(1)
+        self.setup()
+
+    def set_name(self, name):
+        if name is not None:
+            self.name = name
+
+    def set_close_type(self, close_type):
+        if close_type is not None:
+            self.close_type = close_type
+
+    def set_close_name(self, close_name):
+        if close_name is not None:
+            self.close_name = close_name
+
     def remap(self):
         """
         It reloads the application map for the given ooldtp.context.
         """
         ldtp.remap(self.name)
 
-    def exit(self, close_type='menu', close_name='mnuQuit'):
+    def open_and_check_app(self, app_name):
         """
-        Given an application, it tries to quit it.
+        Given an application, it tries to open it.
          
-        @type close_type: string
-        @param close_type: The type of close widget of the application. Types: menu, button.
-        @type close_name: string
-        @param close_name: The name of the exit widget of the application. If not mentioned the default will be used ("Quit").
+        @type app_name: string
+        @param app_name: The command to start the application.
+        """
+        
+        ldtp.launchapp(app_name)
+
+        ldtp.wait(2)
+        response = ldtp.waittillguiexist(self.name, '', 20)
+        
+        if response == 0:
+            raise ldtp.LdtpExecutionError, "The " + self.name + " window was not found."    
+
+    def exit(self):
+        """
+        Given an application, it tries to quit it. 
         """
         try:
             app = ooldtp.context(self.name)
             try:
-                close_widget = app.getchild(close_name)
+                close_widget = app.getchild(self.close_name)
             except ldtp.LdtpExecutionError:
-                raise ldtp.LdtpExecutionError, "The " + close_name + " widget was not found."
+                raise ldtp.LdtpExecutionError, "The " + self.close_name + " widget was not found."
 
-            if close_type == 'menu':
+            if self.close_type == 'menu':
                 close_widget.selectmenuitem()
-            elif close_type == 'button':
+            elif self.close_type == 'button':
                 close_widget.click()
             else:
                 raise ldtp.LdtpExecutionError, "Wrong close item type."
             response = ldtp.waittillguinotexist(self.name, '', 20)
             if response == 0:
                 raise ldtp.LdtpExecutionError, "Mmm, something went wrong when closing the application."
-        except ldtp.LdtpExecutionError:
-            raise ldtp.LdtpExecutionError, "Mmm, something went wrong when closing the application."
+        except ldtp.LdtpExecutionError, msg:
+            raise ldtp.LdtpExecutionError, "Mmm, something went wrong when closing the application: " + str(msg)
 
     def save(self, save_menu='mnuSave'):
         """
@@ -124,8 +143,18 @@ class Seahorse(Application):
     def __init__(self):
         Application.__init__(self, gnome_constants.SH_WINDOW)
 
+    def setup(self):
+        self.open()
+
+    def teardown(self):
+        self.exit()
+
+    def cleanup(self):
+        #TODO: it should delete all the "My Personal Keys"
+        pass
+
     def open(self):
-        open_and_check_app(gnome_constants.SH_LAUNCHER, gnome_constants.SH_WINDOW)
+        Application.open_and_check_app(self, gnome_constants.SH_LAUNCHER)
 
     def new_key(self, key_type):
         """
@@ -439,6 +468,45 @@ class GEdit(Application):
     def __init__(self):
         Application.__init__(self, gnome_constants.GE_WINDOW)
 
+    def setup(self):
+        self.open()
+
+    def teardown(self):
+        self.exit()
+
+    def cleanup(self):
+        # Exit using the Quit menu 
+        try:
+            try:
+                gedit = ooldtp.context(self.name)
+                quit_menu = gedit.getchild(gnome_constants.GE_MNU_CLOSE)
+            except ldtp.LdtpExecutionError:
+                raise ldtp.LdtpExecutionError, "The quit menu was not found."
+            quit_menu.selectmenuitem()
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "Mmm, something went wrong when closing the application."
+
+        result = ldtp.waittillguiexist(gnome_constants.GE_QUESTION_DLG,
+                                       guiTimeOut = 2)
+
+        if result == 1:
+            question_dialog = ooldtp.context(gnome_constants.GE_QUESTION_DLG)
+            question_dlg_btn_close = question_dialog.getchild(gnome_constants.GE_QUESTION_DLG_BTN_CLOSE)
+            question_dlg_btn_close.click()
+        
+        try:
+            gedit = ooldtp.context(self.name)
+            new_menu = gedit.getchild(gnome_constants.GE_MNU_NEW)
+        except ldtp.LdtpExecutionError:
+            raise ldtp.LdtpExecutionError, "The new menu was not found."
+        new_menu.selectmenuitem()
+        
+        result = ldtp.waittillguiexist(
+            self.name, gnome_constants.GE_TXT_FIELD)
+        if result != 1:
+            raise ldtp.LdtpExecutionError, "Failed to set up new document."
+        
+
     def write_text(self, text):
         """
         It writes text to the current buffer of the Gedit window.
@@ -493,7 +561,7 @@ class GEdit(Application):
         didn't start properly.
 
         """
-        open_and_check_app(gnome_constants.GE_LAUNCHER, gnome_constants.GE_WINDOW)
+        Application.open_and_check_app(self, gnome_constants.GE_LAUNCHER)
 
     def exit(self, save=False, filename=''):
         """

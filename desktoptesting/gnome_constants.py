@@ -14,7 +14,7 @@ SU_BTN_OK     = "btnOK"
 SU_BTN_CANCEL = "btnCancel"
 
 # GEdit constants (prefix = GE)
-GE_WINDOW     = "frm*-gedit"
+GE_WINDOW     = "frm*gedit"
 GE_TXT_FIELD  = "txt1"
 GE_LAUNCHER   = "gedit"
 GE_SAVE_DLG   = "dlgSave*"
@@ -25,6 +25,8 @@ GE_QUESTION_DLG_BTN_SAVE = "btnSave"
 GE_QUESTION_DLG_BTN_SAVE_AS = "btnSaveAs"
 GE_QUESTION_DLG_BTN_CLOSE = "btnClosewithoutSaving"
 GE_MNU_QUIT = "mnuQuit"
+GE_MNU_CLOSE = "mnuClose"
+GE_MNU_NEW = "mnuNew"
 
 # Seahorse contants (prefix = SH)
 SH_WINDOW       = "frmPasswordsandEncryptionKeys"
