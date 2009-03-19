@@ -5,3 +5,5 @@
    + general suite results are not yet transformed
  * ubuntu-menu
    + migrate tests to new framework
+ * update-manager
+   + migrate tests to new framework
