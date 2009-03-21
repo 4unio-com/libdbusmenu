@@ -14,6 +14,7 @@ from optparse import OptionParser
 from stat import ST_MODE, S_IMODE
 from subprocess import Popen, PIPE
 from time import time, gmtime, strftime
+from shutil import move
 
 # Globals
 TESTS_SHARE = "."
@@ -315,11 +316,14 @@ class TestRunner:
     def set_result(self, key, value):
         self.result[key] = value
 
-    def append_screenshot(self):
-        _logFile = "%s/screenshot-%s.png" % (SCREENSHOTS_SHARE,
-                                             strftime ("%m-%d-%Y-%H-%M-%s"))
+    def append_screenshot(self, screenshot_file=None):
+        _logFile = "%s/screenshot-%s.png" (SCREENSHOTS_SHARE,
+                                           strftime ("%m-%d-%Y-%H-%M-%s"))
         safe_make_directory(SCREENSHOTS_SHARE)
-        ldtputils.imagecapture(outFile = _logFile)
+        if screenshot_file is None:
+            ldtputils.imagecapture(outFile = _logFile)
+        else:
+            move(screenshot_file, _logFile)
         self.append_result('screenshot', _logFile)
 
 
@@ -344,22 +348,39 @@ class TestCaseRunner(TestRunner):
     def run(self, logger):
         starttime = time()
         try:
-            self.test_func(**self.args)
+            rv = self.test_func(**self.args)
         except AssertionError, e:
             # The test failed.
-            self.append_result('message', str(e))
+            if len(e.args) > 1:
+                self.append_result('message', e.args[0])
+                self.append_screenshot(e.args[1])
+            else:
+                self.append_result('message', str(e))
+                self.append_screenshot()
             self.append_result('stacktrace', traceback.format_exc())
-            self.append_screenshot()
             self.set_result('pass', 0)
         except Exception, e:
             # There was an unrelated error.
-            self.append_result('message', str(e))
+            if len(e.args) > 1:
+                self.append_result('message', e.args[0])
+                self.append_screenshot(e.args[1])
+            else:
+                self.append_result('message', str(e))
+                self.append_screenshot()
             self.append_result('stacktrace', traceback.format_exc())
-            self.append_screenshot()
             self.set_result('error', 1)
         else:
             self.set_result('pass', 1)
-        finally:
+            try:
+                message, screenshot = rv
+            except ValueError:
+                pass
+            else:
+                if message:
+                    self.append_result('message', message)
+                if screenshot:
+                    self.append_screenshot(screenshot)
+       finally:
             self.set_result('time', time() - starttime)
         
         self.add_results_to_node(self.xml_node)
