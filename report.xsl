@@ -27,6 +27,10 @@
         initInlineHelp();
       }
       registerLaunchpadFunction(onLoadFunction);
+      function ReverseDisplay(d) {
+        if(document.getElementById(d).style.display == "none") { document.getElementById(d).style.display = "block"; }
+        else { document.getElementById(d).style.display = "none"; }
+      }
     </script>
         <link rel="shortcut icon" href="https://edge.launchpad.net/@@/launchpad.png"/>
       </head>
@@ -94,30 +98,41 @@
                   This are the results from a run of Ubuntu Desktop Tests. <br/>
                   If you find false positives, please, report bugs against <a href="https://launchpad.net/ubuntu-desktop-testing/+filebug">ubuntu-desktop-testing</a> project.
               </p>
+              <h2><b>Suite: <xsl:value-of select="suite/@name" /></b> (Class: <xsl:value-of select="suite/class" />)</h2>
+              <h2>Description: <xsl:value-of select="suite/description" /></h2>
+              <br /> 
               <table width="100%" class="sortable listing" id="trackers">
                 <thead>
                   <tr>
-                    <th>Test Name</th>
-                    <th>Script Name</th>
+                    <th>TestCase Name</th>
+                    <th>Description</th>  
+                    <th>Method</th>
                     <th>Status</th>
                     <th>Time Elapsed (s)</th>
-                    <th>Error</th>
+                    <th>Message</th>
                     <th>Screenshot</th>
+                    <th>Stacktrace</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <xsl:for-each select="descendant::group">
-                    <xsl:for-each select="child::script/child::test">
+                    <xsl:for-each select="descendant::case">  
                       <tr>
                         <td>
                           <xsl:value-of select="@name"/>
                         </td>
                         <td>
-                          <xsl:value-of select="ancestor::script[last()]/@name"/>
+                          <xsl:value-of select="child::description"/>
                         </td>
+                        <td>
+                          <xsl:value-of select="child::method"/>
+                        </td>
+                        <xsl:for-each select="descendant::result">  
                         <xsl:choose>
+                          <xsl:when test="child::error/child::text() = 1">
+                            <td><font color="red">Script Error</font></td>
+                          </xsl:when>
                           <xsl:when test="child::pass/child::text() = 0">
-                            <td><font color="red">Failed</font></td>
+                            <td><font color="red">Test Failed</font></td>
                           </xsl:when>
                           <xsl:otherwise>
                             <td><font color="green">Passed</font></td>
@@ -127,17 +142,25 @@
                             <xsl:value-of select="child::time/child::text()"/>
                         </td>
                         <td>
-                          <xsl:if test="child::pass/child::text() = 0">
-                              <xsl:value-of select="child::error/child::text()"/>
-                          </xsl:if>
+                            <xsl:value-of select="child::message/child::text()"/>
                         </td>
                         <td>
-                          <xsl:if test="child::pass/child::text() = 0">
                             <xsl:apply-templates select="child::screenshot" mode="link"/>
-                          </xsl:if>
                         </td>
+                        <td>
+                            <xsl:if test="child::pass/child::text() != 1">
+                                <xsl:call-template name="stacktemplate">
+                                    <xsl:with-param name="stackid">
+                                        <xsl:value-of select="translate(../@name, ' ', '_')" />
+                                    </xsl:with-param>
+                                    <xsl:with-param name="stacktext">
+                                        <xsl:value-of select="child::stacktrace/child::text()" />
+                                    </xsl:with-param>
+                                </xsl:call-template>
+                            </xsl:if>
+                        </td>
+                        </xsl:for-each>
                       </tr>
-                    </xsl:for-each>
                   </xsl:for-each>
                 </tbody>
               </table>
@@ -185,6 +208,17 @@
     <a href="{text()}">
       <xsl:value-of select="text()"/>
     </a>
-    <xsl:text> </xsl:text>
   </xsl:template>
+  <xsl:template name="stacktemplate">
+      <xsl:param name="stackid" />
+      <xsl:param name="stacktext" />
+      <a href="javascript:ReverseDisplay('{$stackid}')">
+          [Show/Hide Stacktrace]
+      </a>
+      <div id="{$stackid}" style="display:none;">
+       <pre>
+          <xsl:value-of select="$stacktext" />
+      </pre>
+      </div>
+ </xsl:template>
 </xsl:stylesheet>
