@@ -317,8 +317,8 @@ class TestRunner:
         self.result[key] = value
 
     def append_screenshot(self, screenshot_file=None):
-        _logFile = "%s/screenshot-%s.png" (SCREENSHOTS_SHARE,
-                                           strftime ("%m-%d-%Y-%H-%M-%s"))
+        _logFile = "%s/screenshot-%s.png" % (SCREENSHOTS_SHARE,
+                                             strftime ("%m-%d-%Y-%H-%M-%s"))
         safe_make_directory(SCREENSHOTS_SHARE)
         if screenshot_file is None:
             ldtputils.imagecapture(outFile = _logFile)
@@ -341,7 +341,7 @@ class TestCaseRunner(TestRunner):
 
     def _get_args(self, node):
         for n in node.childNodes:
-            if n.nodeType != n.ELEMENT_NODE:
+            if n.nodeType != n.ELEMENT_NODE or not n.hasChildNodes():
                 continue
             self.args[n.tagName.encode('ascii')] = n.firstChild.data
 
@@ -373,14 +373,14 @@ class TestCaseRunner(TestRunner):
             self.set_result('pass', 1)
             try:
                 message, screenshot = rv
-            except ValueError:
+            except:
                 pass
             else:
                 if message:
                     self.append_result('message', message)
                 if screenshot:
                     self.append_screenshot(screenshot)
-       finally:
+        finally:
             self.set_result('time', time() - starttime)
         
         self.add_results_to_node(self.xml_node)
