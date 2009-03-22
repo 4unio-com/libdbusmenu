@@ -10,9 +10,6 @@ class NotifyOSD(Application):
         self.focus_desktop = False
         self.screenshots = []
 
-    def open(self, focus_desktop=True):
-        self.focus_desktop = focus_desktop
-
         if not pynotify.init('notify-osd-test'):
             raise ldtp.LdtpExecutionError, \
                 "Failed to initialize notification connection."
@@ -22,6 +19,9 @@ class NotifyOSD(Application):
             raise ldtp.LdtpExecutionError, \
                 "The notify service is '%s', expected 'notify-dameon'" % \
                 info.get('name', None)
+
+    def open(self, focus_desktop=True):
+        self.focus_desktop = focus_desktop
 
         if self.focus_desktop:
             ldtp.generatekeyevent('<alt><ctrl>d')
