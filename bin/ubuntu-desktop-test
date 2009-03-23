@@ -160,10 +160,10 @@ def filter_suite_files(applications, suites, files, folder):
 
     return suite_files
 
-def run_suite_file(suite_file, log_file):
+def run_suite_file(suite_file, log_file, cases=None):
     conf_file = os.path.join(TESTS_SHARE, "conffile.ini")
     runner = TestSuiteRunner(suite_file)
-    results = runner.run()
+    results = runner.run(cases=cases)
     f = open(log_file, 'w')
     f.write(results)
     f.close()
@@ -200,7 +200,7 @@ def convert_log_file(log_file):
         % (html_file, xsl_file, log_file)
     safe_run_command(command)
  
-def process_suite_file(suite_file, target_directory):
+def process_suite_file(suite_file, target_directory, cases=None):
     application_name = os.path.basename(os.path.dirname(suite_file))
     application_target = os.path.join(target_directory, application_name)
     safe_make_directory(application_target)
@@ -208,7 +208,7 @@ def process_suite_file(suite_file, target_directory):
     suite_name = os.path.basename(suite_file)
     log_file = os.path.join(application_target,
         suite_name.replace(".xml", ".log"))
-    run_suite_file(suite_file, log_file)
+    run_suite_file(suite_file, log_file, cases)
 
     convert_log_file(log_file)
 
@@ -247,6 +247,11 @@ def main(args=sys.argv):
                       default=default_target,
                       help="Target directory for logs and reports. Defaults "
                            "to: %default")
+    parser.add_option("-c", "--case",
+                      action="append",
+                      type="string",
+                      default=None,
+                      help="Test cases to run (all, if not specified).")
 
     (options, args) = parser.parse_args(args[1:])
 
@@ -287,7 +292,7 @@ def main(args=sys.argv):
 
     # Run filtered suite file
     for suite_file in suite_files:
-        process_suite_file(suite_file, options.target)
+        process_suite_file(suite_file, options.target, options.case)
 
 
     return 0
@@ -416,9 +421,9 @@ class TestSuiteRunner(TestRunner):
         self.case_runners = \
             [TestCaseRunner(self.testsuite, c) for c in case_runners]
     
-    def run(self, loggerclass=None, setup_once=True):
+    def run(self, loggerclass=None, setup_once=True, cases=None):
         try:
-            self._run(loggerclass, setup_once)
+            self._run(loggerclass, setup_once, cases)
         except Exception, e:
             # There was an unrelated error.
             self.append_result('message', str(e))
@@ -433,7 +438,7 @@ class TestSuiteRunner(TestRunner):
 
         return self.dom.toprettyxml('  ')
             
-    def _run(self, loggerclass, setup_once):
+    def _run(self, loggerclass, setup_once, cases):
         if loggerclass:
             logger = loggerclass()
         else:
@@ -445,6 +450,8 @@ class TestSuiteRunner(TestRunner):
 
         firsttest = True
         for testcase in self.case_runners:
+            if cases and testcase.name not in cases:
+                continue
             if not setup_once:
                 # Set up the app for each test, if requested.
                 self.testsuite.setup()
