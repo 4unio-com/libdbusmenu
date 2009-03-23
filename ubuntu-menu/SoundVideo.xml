@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<suite name="Sound And Video">
+  <class>ubuntu_menu.UbuntuMenuTest</class>
+  <description>
+    Tests that verify Sound And Video applications in the Ubuntu menu
+  </description>
+  <case name="Open Brasero">
+    <method>testOpenMenu</method>
+    <description>It opens the Brasero menu and closes the application.</description>
+    <args>
+      <menuitem>Brasero Disc Burner</menuitem>
+      <windowname>frmBrasero</windowname>
+    </args>
+   </case>
+   <case name="Open Movie Player">
+    <method>testOpenMenu</method>
+    <description>It opens the Movie Player menu and closes the application.</description>
+    <args>
+      <menuitem>Movie Player</menuitem>
+      <windowname>Movie Player</windowname>
+    </args>
+   </case>
+   <case name="Open Rhythmbox Music Player">
+    <method>testOpenMenu</method>
+    <description>It opens the Rhythmbox Music Player and closes the application.</description>
+    <args>
+      <menuitem>mnuRhythmboxMusicPlayer</menuitem>
+      <windowname>frmMusicPlayer*</windowname>
+    </args>
+   </case>
+</suite>
