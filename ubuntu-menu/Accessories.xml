@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<suite name="accessories">
+  <class>ubuntu_menu.UbuntuMenuTest</class>
+  <description>
+    Tests that verify Accessories applications in the Ubuntu menu
+  </description>
+  <case name="Open Calculator">
+    <method>testOpenMenu</method>
+    <description>It opens the Calculator menu and closes the application.</description>
+    <args>
+      <menuitem>mnuCalculator</menuitem>
+      <windowname>Calculator</windowname>
+   </args>
+   </case>
+   <case name="Open Character Map">
+    <method>testOpenMenu</method>
+    <description>It opens the Character Map menu and closes the application.</description>
+    <args>
+      <menuitem>Character Map</menuitem>
+      <windowname>Character Map</windowname>
+      <closetype>menu</closetype>
+      <closename>mnuClose</closename>
+    </args>
+  </case>
+  <case name="Open Dictionary">
+    <method>testOpenMenu</method>
+    <description>It opens the Dictionary menu and closes the application.</description>
+    <args>
+      <menuitem>Dictionary</menuitem>
+      <windowname>Dictionary</windowname>
+      <closetype>menu</closetype>
+      <closename>mnuClose</closename>
+    </args>
+  </case>
+  <case name="Open Disk Usage Analyzer">
+    <method>testOpenMenu</method>
+    <description>It opens the Disk Usage Analyzer menu and closes the application.</description>
+    <args>
+      <menuitem>Disk Usage Analyzer</menuitem>
+      <windowname>Disk Usage Analyzer</windowname>
+    </args>
+  </case>
+  <case name="Open Passwords And Encryption Keys">
+    <method>testOpenMenu</method>
+    <description>It opens the Passwords And Encryption Keys menu and closes the application.</description>
+    <args>
+      <menuitem>Passwords and Encryption Keys</menuitem>
+      <windowname>Passwords and Encryption Keys</windowname>
+    </args>
+  </case>
+  <case name="Open Take Screenshot">
+    <method>testOpenMenu</method>
+    <description>It opens the Take Screenshot menu and closes the application.</description>
+    <args>
+      <menuitem>Take Screenshot</menuitem>
+      <windowname>TakeScreenshot</windowname>
+      <closetype>button</closetype>
+      <closename>btnCancel</closename>
+    </args>
+  </case>
+  <case name="Open Take Screenshot">
+    <method>testOpenMenu</method>
+    <description>It opens the Take Screenshot menu and closes the application.</description>
+    <args>
+      <menuitem>Take Screenshot</menuitem>
+      <windowname>TakeScreenshot</windowname>
+      <closetype>button</closetype>
+      <closename>btnCancel</closename>
+    </args>
+  </case>
+<!--  <case name="Open Terminal">
+    <method>testOpenMenu</method>
+    <description>It opens the Gnome Terminal menu and closes the application.</description>
+    <args>
+      <menuitem>Terminal</menuitem>
+      <windowname>Terminal</windowname>
+      <closetype>menu</closetype>
+      <closename>Close Window</closename>
+    </args>
+</case>
+-->
+  <case name="Open Text Editor">
+    <method>testOpenMenu</method>
+    <description>It opens the Text Editor menu and closes the application.</description>
+    <args>
+      <menuitem>Text Editor</menuitem>
+      <windowname>frm*-gedit</windowname>
+    </args>
+  </case>
+  <case name="Open Tomboy Notes">
+    <method>testOpenMenu</method>
+    <description>It opens the Tomboy Notes menu and closes the application.</description>
+    <args>
+      <menuitem>Tomboy Notes</menuitem>
+      <windowname>Search All Notes</windowname>
+    </args>
+  </case>
+</suite>

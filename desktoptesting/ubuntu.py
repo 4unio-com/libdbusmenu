@@ -6,7 +6,7 @@ The ubuntu module provides wrappers for LDTP to make the write of Ubuntu tests e
 import ooldtp 
 import ldtp 
 import ubuntu_constants
-from desktoptesting.gnome import Application, PolicyKit, open_and_check_app
+from desktoptesting.gnome import Application, PolicyKit
 import re
 
 class UbuntuMenu(Application):

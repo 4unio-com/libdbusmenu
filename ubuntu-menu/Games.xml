@@ -1,0 +1,122 @@
+<?xml version="1.0"?>
+<suite name="games">
+  <class>ubuntu_menu.UbuntuMenuTest</class>
+  <description>
+    Tests that verify Games applications in the Ubuntu menu
+  </description>
+  <case name="Open AisleRiot Solitaire">
+    <method>testOpenMenu</method>
+    <description>It opens the AisleRiot Solitaire menu and closes the application.</description>
+    <args>
+      <menuitem>mnuAisleRiotSolitaire</menuitem>
+      <windowname>Klondike</windowname>
+    </args>
+   </case>
+   <case name="Open Blackjack">
+    <method>testOpenMenu</method>
+    <description>It opens the Blackjack menu and closes the application.</description>
+    <args>
+      <menuitem>Blackjack</menuitem>
+      <windowname>Blackjack*</windowname>
+    </args>
+   </case>
+   <case name="Open Chess">
+    <method>testOpenMenu</method>
+    <description>It opens the Chess menu and closes the application.</description>
+    <args>
+      <menuitem>Chess</menuitem>
+      <windowname>Chess*</windowname>
+    </args>
+   </case>
+   <case name="Open Five or More">
+    <method>testOpenMenu</method>
+    <description>It opens the Five or More menu and closes the application.</description>
+    <args>
+      <menuitem>mnuFiveorMore</menuitem>
+      <windowname>frmFiveorMore</windowname>
+    </args>
+   </case>
+   <case name="Open Four-in-a-row">
+    <method>testOpenMenu</method>
+    <description>It opens the Four-in-a-row menu and closes the application.</description>
+    <args>
+      <menuitem>mnuFour-in-a-Row</menuitem>
+      <windowname>Four-in-a-row</windowname>
+    </args>
+   </case>
+   <case name="Open Gnometris">
+    <method>testOpenMenu</method>
+    <description>It opens the Gnometris menu and closes the application.</description>
+    <args>
+      <menuitem>Gnometris</menuitem>
+      <windowname>Gnometris</windowname>
+    </args>
+   </case>
+   <case name="Open Klotski">
+    <method>testOpenMenu</method>
+    <description>It opens the Klotski menu and closes the application.</description>
+    <args>
+      <menuitem>Klotski</menuitem>
+      <windowname>Klotski</windowname>
+    </args>
+   </case>
+   <case name="Open Mahjongg">
+    <method>testOpenMenu</method>
+    <description>It opens the Mahjongg menu and closes the application.</description>
+    <args>
+      <menuitem>Mahjongg</menuitem>
+      <windowname>Mahjongg</windowname>
+    </args>
+   </case>
+   <case name="Open Mines">
+    <method>testOpenMenu</method>
+    <description>It opens the Mines menu and closes the application.</description>
+    <args>
+      <menuitem>Mines</menuitem>
+      <windowname>Mines</windowname>
+    </args>
+   </case>
+   <case name="Open Nibbles">
+    <method>testOpenMenu</method>
+    <description>It opens the Nibbles menu and closes the application.</description>
+    <args>
+      <menuitem>Nibbles</menuitem>
+      <windowname>Nibbles</windowname>
+    </args>
+   </case>
+   <case name="Open Same GNOME">
+    <method>testOpenMenu</method>
+    <description>It opens the Same GNOME menu and closes the application.</description>
+    <args>
+      <menuitem>mnuSameGNOME</menuitem>
+      <windowname>frmSameGNOME</windowname>
+    </args>
+   </case>
+   <case name="Open Sudoku">
+    <method>testOpenMenu</method>
+    <description>It opens the Sudoku menu and closes the application.</description>
+    <args>
+      <menuitem>Sudoku</menuitem>
+      <windowname>Sudoku</windowname>
+      <closetype>menu</closetype>
+      <closename>Close</closename>
+    </args>
+   </case>
+   <case name="Open Tali">
+    <method>testOpenMenu</method>
+    <description>It opens the Tali menu and closes the application.</description>
+    <args>
+      <menuitem>Tali</menuitem>
+      <windowname>Tali</windowname>
+    </args>
+   </case>
+   <case name="Open Tetravez">
+    <method>testOpenMenu</method>
+    <description>It opens the Tetravex menu and closes the application.</description>
+    <args>
+      <menuitem>Tetravex</menuitem>
+      <windowname>Tetravex</windowname>
+    </args>
+   </case>
+</suite> 
+
