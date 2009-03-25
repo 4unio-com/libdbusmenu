@@ -90,6 +90,18 @@ class UpdateManager(Application):
         Application.__init__(self, ubuntu_constants.UM_WINDOW)
         self.password = password
         
+    def setup(self):
+        self.open()
+
+    def teardown(self):
+        self.close() 
+
+    def cleanup(self):
+        pass
+
+    def set_password(self, password):
+        self.password = password
+ 
     def open(self, dist_upgrade=False):
         """
         It opens the update-manager application and raises an error if the application
@@ -105,7 +117,7 @@ class UpdateManager(Application):
                 raise ldtp.LdtpExecutionError, "The " + ubuntu_constants.UM_WINDOW + " window was not found."    
 
         else:
-            open_and_check_app(ubuntu_constants.UM_LAUNCHER, ubuntu_constants.UM_WINDOW)
+            self.open_and_check_app(ubuntu_constants.UM_LAUNCHER)
 
         # Wait the population of the list
         updateManager = ooldtp.context(ubuntu_constants.UM_WINDOW)
