@@ -3,7 +3,3 @@
    + Seahorse cleanup does not delete created keys
  * report.xsl
    + general suite results are not yet transformed
- * ubuntu-menu
-   + migrate tests to new framework
- * update-manager
-   + migrate tests to new framework
