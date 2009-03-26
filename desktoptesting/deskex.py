@@ -4,6 +4,51 @@ import tempfile
 import pynotify
 import ldtp, ldtputils
 import os
+import gtk
+
+try:
+    import indicate
+except ImportError:
+    indicate = None
+
+class IndicatorApplet(Application):
+    def __init__(self):
+        self.indicators = []
+
+    def open(self):
+        pass
+    
+    def add_server(self, desktop_file):
+        self.server = indicate.indicate_server_ref_default()
+        self.server.set_type("message.im")
+        self.server.set_desktop_file(desktop_file)
+        self.server.show()
+        while gtk.events_pending():
+            gtk.main_iteration()
+
+    def show_indicator(self, sender):
+        indicator = indicate.IndicatorMessage()
+        indicator.set_property("subtype", "im")
+        indicator.set_property("sender", sender)
+        indicator.set_property_time("time", time())
+        pixbuf = gtk.gdk.pixbuf_new_from_file(
+            "/usr/share/icons/hicolor/22x22/apps/gnome-freecell.png")
+        indicator.set_property_icon("icon", pixbuf)
+        indicator.show()
+        self.indicators.append(indicator)
+        while gtk.events_pending():
+            gtk.main_iteration()
+
+    def close(self):
+        for indicator in self.indicators:
+            indicator.hide()
+        self.server.hide()
+        
+    def setup(self):
+        self.open()
+
+    def teardown(self):
+        self.close()
 
 class NotifyOSD(Application):
     def __init__(self):

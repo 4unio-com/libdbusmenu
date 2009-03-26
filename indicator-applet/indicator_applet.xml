@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<suite name="indicator-applet">
+  <class>indicator_applet.IndicatorAppletTest</class>
+  <description>indicator-applet tests</description>
+  <case name="Basic">
+    <method>serverTest</method>
+    <description>
+      Add a server to the indicator applet.
+    </description>
+    <args>
+      <desktop_file>
+        ./indicator-applet/data/indicator_test.desktop
+      </desktop_file>
+    </args>
+  </case>
+</suite>
