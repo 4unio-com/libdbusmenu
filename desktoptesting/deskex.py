@@ -4,7 +4,7 @@ import tempfile
 import pynotify
 import ldtp, ldtputils
 import os
-import gtk
+import gtk, glib
 from deskex_constants import *
 
 try:
@@ -48,6 +48,32 @@ class IndicatorApplet(Application):
             outFile=tempfile.mktemp('.png', 'ia_'),
             x=x, y=y, resolution1=w, resolution2=h)        
         return screeny
+
+    def wait_for_indicator_display(self, sender, timeout=5):
+        handlers = []
+        displayed = [False]
+
+        def _display_cb(indicator):
+            displayed[0] = True
+            gtk.main_quit()
+            
+        def _timeout_cb():
+            gtk.main_quit()
+            return False
+
+        for indicator in self.indicators:
+            if sender == indicator.get_property("sender"):
+                handler = indicator.connect("user-display", _display_cb)
+                handlers.append((handler, indicator))
+
+        glib.timeout_add_seconds(timeout, _timeout_cb)
+
+        gtk.main()
+
+        for handler, indicator in handlers:
+            indicator.disconnect(handler)
+
+        return displayed[0]
 
     def cleanup(self):
         for indicator in self.indicators:
@@ -132,6 +158,4 @@ if __name__ == "__main__":
     test.open()
     test.add_server('/usr/share/applications/pidgin.desktop')
     test.show_indicator('Elmer Fud')
-    sleep(5)
-    test.close()
-    sleep(5)
+    print test.wait_for_indicator_display('Elmer Fud', 20)
