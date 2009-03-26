@@ -1,5 +1,5 @@
 from desktoptesting.gnome import Application
-from time import time
+from time import time, sleep
 import tempfile
 import pynotify
 import ldtp, ldtputils
@@ -15,12 +15,14 @@ except ImportError:
 class IndicatorApplet(Application):
     def __init__(self):
         self.indicators = []
+        self.server = None
 
     def open(self):
         pass
     
     def add_server(self, desktop_file):
-        self.server = indicate.indicate_server_ref_default()
+        if not self.server:
+            self.server = indicate.indicate_server_ref_default()
         self.server.set_type("message.im")
         self.server.set_desktop_file(desktop_file)
         self.server.show()
@@ -47,11 +49,15 @@ class IndicatorApplet(Application):
             x=x, y=y, resolution1=w, resolution2=h)        
         return screeny
 
-    def close(self):
+    def cleanup(self):
         for indicator in self.indicators:
             indicator.hide()
         self.server.hide()
-        
+        sleep(1)
+
+    def close(self):
+        self.cleanup()
+
     def setup(self):
         self.open()
 
@@ -121,9 +127,11 @@ class NotifyOSD(Application):
             return -1, -1, -1, -1
             
 if __name__ == "__main__":
-    test = NotifyOSD()
-    test.open(False)
-    test.notify("Test", "testy test", "notification-message-IM")
-    test.notify_synchronous("Volume", "", 
-                            "notification-audio-volume-medium", 75)
-    test.exit()
+    from time import sleep
+    test = IndicatorApplet()
+    test.open()
+    test.add_server('/usr/share/applications/pidgin.desktop')
+    test.show_indicator('Elmer Fud')
+    sleep(5)
+    test.close()
+    sleep(5)
