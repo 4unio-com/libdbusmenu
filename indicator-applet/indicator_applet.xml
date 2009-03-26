@@ -2,7 +2,7 @@
 <suite name="indicator-applet">
   <class>indicator_applet.IndicatorAppletTest</class>
   <description>indicator-applet tests</description>
-  <case name="Basic">
+  <case name="Server">
     <method>serverTest</method>
     <description>
       Add a server to the indicator applet.
@@ -11,6 +11,34 @@
       <desktop_file>
         ./indicator-applet/data/indicator_test.desktop
       </desktop_file>
+    </args>
+  </case>
+  <case name="MessageIndicator">
+    <method>messageTest</method>
+    <description>
+      Add a message indicator to the indicator applet.
+    </description>
+    <args>
+      <desktop_file>
+        ./indicator-applet/data/indicator_test.desktop
+      </desktop_file>
+      <sender>
+        Elmer Fud
+      </sender>
+    </args>
+  </case>
+  <case name="IconChange">
+    <method>iconChangeTest</method>
+    <description>
+      Test to see if the applet's icon changes when a new message arrives.
+    </description>
+    <args>
+      <desktop_file>
+        ./indicator-applet/data/indicator_test.desktop
+      </desktop_file>
+      <sender>
+        Elmer Fud
+      </sender>
     </args>
   </case>
 </suite>

@@ -5,6 +5,7 @@ import pynotify
 import ldtp, ldtputils
 import os
 import gtk
+from deskex_constants import *
 
 try:
     import indicate
@@ -38,6 +39,13 @@ class IndicatorApplet(Application):
         self.indicators.append(indicator)
         while gtk.events_pending():
             gtk.main_iteration()
+
+    def capture_applet_icon(self):
+        x, y, w, h = ldtp.getobjectsize(TOP_PANEL, IA_TOPLEVEL)
+        screeny = ldtputils.imagecapture(
+            outFile=tempfile.mktemp('.png', 'ia_'),
+            x=x, y=y, resolution1=w, resolution2=h)        
+        return screeny
 
     def close(self):
         for indicator in self.indicators:
