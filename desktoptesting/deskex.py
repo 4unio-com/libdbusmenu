@@ -14,6 +14,7 @@ except ImportError:
 
 class IndicatorApplet(Application):
     def __init__(self):
+        Application.__init__(self, 'indicator-applet')
         self.indicators = []
         self.server = None
 
@@ -49,11 +50,15 @@ class IndicatorApplet(Application):
             x=x, y=y, resolution1=w, resolution2=h)        
         return screeny
 
+    def select_indicator(self, sender):
+        ldtp.selectmenuitem(TOP_PANEL, 'mnu' + sender.replace(' ',''))
+    
     def wait_for_indicator_display(self, sender, timeout=5):
         handlers = []
         displayed = [False]
 
         def _display_cb(indicator):
+            indicator.hide() # This is just normal behavior, so why not?
             displayed[0] = True
             gtk.main_quit()
             
