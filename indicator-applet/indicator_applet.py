@@ -31,3 +31,11 @@ class IndicatorAppletTest(IndicatorApplet):
         if checker.perform_test() != FAIL:
             raise AssertionError('icon did not change.')
 
+    def displayIndicatorTest(self, desktop_file=None, sender=None):
+        self.add_server(os.path.abspath(desktop_file))
+        self.show_indicator(sender)
+        sleep(1)
+        self.select_indicator(sender)
+        if not self.wait_for_indicator_display(sender):
+            raise AssertionError('Indicator did not get a callback')
+        

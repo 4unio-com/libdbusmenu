@@ -41,4 +41,19 @@
       </sender>
     </args>
   </case>
+  <case name="DisplayIndicator">
+    <method>displayIndicatorTest</method>
+    <description>
+      Test to see if the display callback is called when message
+      indicator is selected.
+    </description>
+    <args>
+      <desktop_file>
+        ./indicator-applet/data/indicator_test.desktop
+      </desktop_file>
+      <sender>
+        Elmer Fud
+      </sender>
+    </args>
+  </case>
 </suite>
