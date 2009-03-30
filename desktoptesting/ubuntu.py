@@ -5,7 +5,6 @@ The ubuntu module provides wrappers for LDTP to make the write of Ubuntu tests e
 """
 import ooldtp 
 import ldtp 
-import ubuntu_constants
 from desktoptesting.gnome import Application, PolicyKit
 import re
 
@@ -13,6 +12,7 @@ class UbuntuMenu(Application):
     
     def setup(self):
         pass
+
     def teardown(self):
         self.cleanup() 
 
@@ -48,7 +48,7 @@ class UbuntuMenu(Application):
         
         """
        
-        topPanel = ooldtp.context(ubuntu_constants.TOP_PANEL)
+        topPanel = ooldtp.context(self.__class__.TOP_PANEL)
         
         try:
             actualMenu = topPanel.getchild(menu_item_txt)
@@ -73,6 +73,22 @@ class UpdateManager(Application):
     
     i.e. C{updateManager = UpdateManager("my_password")}
     """
+    MNU_ITEM        = "mnuUpdateManager"
+    WINDOW          = "frmUpdateManager"
+    LAUNCHER        = "update-manager"
+    BTN_CLOSE       = "btnClose"
+    BTN_CHECK       = "btnCheck"
+    BTN_INSTALL     = "btnInstallUpdates"
+    TBL_UPDATES     = "updates"
+    BAN_LIST        = " updates"
+    TAB_CHANGES     = "Changes"
+    TXT_DESCRIPTION = "Description"
+    LBL_WAIT        = "lblKeepyoursystemup-to-date"
+    LBL_UPTODATE    = "lblYoursystemisup-to-date"
+    LBL_N_UPDATES   = r'lblYoucaninstall(\d+)updates?'
+    LBL_DOWNLOADSIZE = r'lblDownloadsize((\d+)((\.)(\d+))?)(.*)' 
+
+
     
     def __init__(self, password = ""):
         """
@@ -87,7 +103,7 @@ class UpdateManager(Application):
         @param password: User's password for administrative tasks.
 
         """
-        Application.__init__(self, ubuntu_constants.UM_WINDOW)
+        Application.__init__(self)
         self.password = password
         
     def setup(self):
@@ -110,17 +126,17 @@ class UpdateManager(Application):
         """
 
         if dist_upgrade:
-            ldtp.launchapp(ubuntu_constants.UM_LAUNCHER, ['-d'], 0)
-            response = ldtp.waittillguiexist(ubuntu_constants.UM_WINDOW, '', 20)
+            ldtp.launchapp(self.__class__.LAUNCHER, ['-d'], 0)
+            response = ldtp.waittillguiexist(self.name, '', 20)
     
             if response == 0:
-                raise ldtp.LdtpExecutionError, "The " + ubuntu_constants.UM_WINDOW + " window was not found."    
+                raise ldtp.LdtpExecutionError, "The " + self.name + " window was not found."    
 
         else:
-            self.open_and_check_app(ubuntu_constants.UM_LAUNCHER)
+            self.open_and_check_app()
 
         # Wait the population of the list
-        updateManager = ooldtp.context(ubuntu_constants.UM_WINDOW)
+        updateManager = ooldtp.context(self.name)
 
         populating = True
 
@@ -132,7 +148,7 @@ class UpdateManager(Application):
                 label = updateManager.getchild(role = 'label')
                 for i in label:
                     label_name = i.getName()
-                    if label_name == ubuntu_constants.UM_LBL_WAIT:
+                    if label_name == self.__class__.LBL_WAIT:
                         populating = True
         
         except ldtp.LdtpExecutionError:
@@ -143,15 +159,15 @@ class UpdateManager(Application):
         It closes the update-manager window using the close button.
         """
 
-        updateManager = ooldtp.context(ubuntu_constants.UM_WINDOW)
+        updateManager = ooldtp.context(self.name)
     
         try:
-            closeButton = updateManager.getchild(ubuntu_constants.UM_BTN_CLOSE)
+            closeButton = updateManager.getchild(self.__class__.BTN_CLOSE)
         except ldtp.LdtpExecutionError:
             raise ldtp.LdtpExecutionError, "The Update Manager Close button was not found."
           
         closeButton.click()
-        ldtp.waittillguinotexist (ubuntu_constants.UM_WINDOW)
+        ldtp.waittillguinotexist (self.name)
            
     def number_updates(self):
         """
@@ -161,16 +177,16 @@ class UpdateManager(Application):
         @return: An integer with the number of available updates.
         
         """
-        updateManager = ooldtp.context(ubuntu_constants.UM_WINDOW)
+        updateManager = ooldtp.context(self.name)
 
         try:
             label = updateManager.getchild(role = 'label')
             for i in label:
                 label_name = i.getName()
-                if label_name == ubuntu_constants.UM_LBL_UPTODATE:
+                if label_name == self.__class__.LBL_UPTODATE:
                     return 0
                 else:
-                    groups = re.match(ubuntu_constants.UM_LBL_N_UPDATES, label_name)
+                    groups = re.match(self.__class__.LBL_N_UPDATES, label_name)
                     if groups:
                         number = groups.group(1)
                         return int(number)
@@ -186,13 +202,13 @@ class UpdateManager(Application):
 
         @return: A float with the download size in bytes 
         """
-        updateManager = ooldtp.context(ubuntu_constants.UM_WINDOW) 
+        updateManager = ooldtp.context(self.name) 
 
         try:
             label = updateManager.getchild(role = 'label')
             for i in label:
                 label_name = i.getName()
-                groups = re.match(ubuntu_constants.UM_LBL_DOWNLOADSIZE, label_name)
+                groups = re.match(self.__class__.LBL_DOWNLOADSIZE, label_name)
                 
                 if groups:
                     # Calculate size based on the tag after the number
@@ -220,10 +236,10 @@ class UpdateManager(Application):
         """
         It selects all the available updates 
         """
-        updateManager = ooldtp.context(ubuntu_constants.UM_WINDOW) 
+        updateManager = ooldtp.context(self.name) 
 
         try:
-            table  = updateManager.getchild(ubuntu_constants.UM_TBL_UPDATES, role = 'table')
+            table  = updateManager.getchild(self.__class__.TBL_UPDATES, role = 'table')
             updates_table = table[0]
 
             for i in range(0, updates_table.getrowcount(), 1):
@@ -238,10 +254,10 @@ class UpdateManager(Application):
         """
         It unselects all the available updates 
         """
-        updateManager = ooldtp.context(ubuntu_constants.UM_WINDOW) 
+        updateManager = ooldtp.context(self.name) 
 
         try:
-            table  = updateManager.getchild(ubuntu_constants.UM_TBL_UPDATES, role = 'table')
+            table  = updateManager.getchild(self.__class__.TBL_UPDATES, role = 'table')
             updates_table = table[0]
 
             # TODO: When table admits right click, use the context menu
@@ -266,18 +282,18 @@ class UpdateManager(Application):
         @return: A list with the available updates
         """
 
-        updateManager = ooldtp.context(ubuntu_constants.UM_WINDOW)
+        updateManager = ooldtp.context(self.name)
 
         available_updates = []
 
         try:
-            table  = updateManager.getchild(ubuntu_constants.UM_TBL_UPDATES, role = 'table')
+            table  = updateManager.getchild(self.__class__.TBL_UPDATES, role = 'table')
             updates_table = table[0]
 
             for i in range(0, updates_table.getrowcount(), 1):
                 text = updates_table.getcellvalue(i, 1)
                 candidate = text.split('\n')[0]
-                if candidate.find(ubuntu_constants.UM_BAN_LIST) == -1:
+                if candidate.find(self.__class__.BAN_LIST) == -1:
                     available_updates.append(candidate)
                 ldtp.wait(1)
         except ldtp.LdtpExecutionError:
@@ -293,10 +309,10 @@ class UpdateManager(Application):
         @param name: The name of the package to select
         """
 
-        updateManager = ooldtp.context(ubuntu_constants.UM_WINDOW)
+        updateManager = ooldtp.context(self.name)
 
         try:
-            table  = updateManager.getchild(ubuntu_constants.UM_TBL_UPDATES, role = 'table')
+            table  = updateManager.getchild(self.__class__.TBL_UPDATES, role = 'table')
             updates_table = table[0]
 
             for i in range(0, updates_table.getrowcount(), 1):
@@ -317,10 +333,10 @@ class UpdateManager(Application):
         @param name: The name of the package to select
         """
 
-        updateManager = ooldtp.context(ubuntu_constants.UM_WINDOW)
+        updateManager = ooldtp.context(self.name)
 
         try:
-            table  = updateManager.getchild(ubuntu_constants.UM_TBL_UPDATES, role = 'table')
+            table  = updateManager.getchild(self.__class__.TBL_UPDATES, role = 'table')
             updates_table = table[0]
 
             for i in range(0, updates_table.getrowcount(), 1):
@@ -342,7 +358,7 @@ class UpdateManager(Application):
         """
 
         try:
-            updateManager = ooldtp.context(ubuntu_constants.UM_WINDOW)
+            updateManager = ooldtp.context(self.name)
         except ldtp.LdtpExecutionError:
             raise ldtp.LdtpExecutionError, "The Update Manager window was not found."
         
@@ -354,7 +370,7 @@ class UpdateManager(Application):
         polKit = PolicyKit(self.password)
 
         try:
-            checkButton = updateManager.getchild(ubuntu_constants.UM_BTN_CHECK)
+            checkButton = updateManager.getchild(self.__class__.BTN_CHECK)
         except ldtp.LdtpExecutionError:
             raise ldtp.LdtpExecutionError, "The Update Manager Check button was not found."
           
@@ -377,7 +393,7 @@ class UpdateManager(Application):
         """
 
         try:
-            updateManager = ooldtp.context(ubuntu_constants.UM_WINDOW)
+            updateManager = ooldtp.context(self.name)
         except ldtp.LdtpExecutionError:
             raise ldtp.LdtpExecutionError, "The Update Manager window was not found."
 
@@ -385,7 +401,7 @@ class UpdateManager(Application):
         if self.number_updates() > 0:
             
             try:
-                btnInstall = updateManager.getchild(ubuntu_constants.UM_BTN_INSTALL)
+                btnInstall = updateManager.getchild(self.__class__.BTN_INSTALL)
             except ldtp.LdtpExecutionError:
                 raise ldtp.LdtpExecutionError, "The Update Manager install button was not found."
             
@@ -403,7 +419,7 @@ class UpdateManager(Application):
         
         # Wait for the the close button to be ready
         try:
-            btnClose = updateManager.getchild(ubuntu_constants.UM_BTN_CLOSE)
+            btnClose = updateManager.getchild(self.__class__.BTN_CLOSE)
         except ldtp.LdtpExecutionError:
             raise ldtp.LdtpExecutionError, "The Update Manager Close button was not found."
         
@@ -418,12 +434,12 @@ class UpdateManager(Application):
         """
 
         try:
-            updateManager = ooldtp.context(ubuntu_constants.UM_WINDOW)
+            updateManager = ooldtp.context(self.name)
         except ldtp.LdtpExecutionError:
             raise ldtp.LdtpExecutionError, "The Update Manager window was not found."
         
         try:
-            btnTest = updateManager.getchild(ubuntu_constants.UM_BTN_INSTALL)
+            btnTest = updateManager.getchild(self.__class__.BTN_INSTALL)
             state = btnTest.stateenabled()
         except ldtp.LdtpExecutionError:
             raise ldtp.LdtpExecutionError, "The install button was not found."
@@ -455,7 +471,7 @@ class UpdateManager(Application):
         @return: The decription of the packages, as shown in the application
         """
         try:
-            updateManager = ooldtp.context(ubuntu_constants.UM_WINDOW)
+            updateManager = ooldtp.context(self.name)
         except ldtp.LdtpExecutionError:
             raise ldtp.LdtpExecutionError, "The Update Manager window was not found."
         
@@ -464,9 +480,9 @@ class UpdateManager(Application):
                 self.select_update(name)
 
             # Get the description text field 
-            text_field = updateManager.getchild(ubuntu_constants.UM_TXT_DESCRIPTION, role='text')
+            text_field = updateManager.getchild(self.__class__.TXT_DESCRIPTION, role='text')
              # Get the text 
-            text = ldtp.gettextvalue(ubuntu_constants.UM_WINDOW, text_field[0].getName())
+            text = ldtp.gettextvalue(self.name, text_field[0].getName())
             return text
         except ldtp.LdtpExecutionError:
             raise ldtp.LdtpExecutionError, "The description text was not found."
@@ -486,7 +502,7 @@ class UpdateManager(Application):
         @return: The decription of the changes
         """
         try:
-            ooldtp.context(ubuntu_constants.UM_WINDOW)
+            ooldtp.context(self.name)
         except ldtp.LdtpExecutionError:
             raise ldtp.LdtpExecutionError, "The Update Manager window was not found."
         
@@ -495,14 +511,14 @@ class UpdateManager(Application):
                 self.select_update(name)
 
             # Get the filler tab
-            filler = ldtp.getobjectproperty(ubuntu_constants.UM_WINDOW , ubuntu_constants.UM_TAB_CHANGES, 'children')
+            filler = ldtp.getobjectproperty(self.name , self.__class__.TAB_CHANGES, 'children')
             # Get the scroll pane
-            scroll_pane = ldtp.getobjectproperty(ubuntu_constants.UM_WINDOW , filler, 'children')
+            scroll_pane = ldtp.getobjectproperty(self.name , filler, 'children')
             # Get the text field
-            text_field = ldtp.getobjectproperty(ubuntu_constants.UM_WINDOW , scroll_pane, 'children')
+            text_field = ldtp.getobjectproperty(self.name , scroll_pane, 'children')
             text_field = text_field.split(' ')[0]
             # Get the text
-            text = ldtp.gettextvalue(ubuntu_constants.UM_WINDOW, text_field)
+            text = ldtp.gettextvalue(self.name, text_field)
             return text
         except ldtp.LdtpExecutionError:
             raise ldtp.LdtpExecutionError, "The Changes tab was not found."
@@ -517,7 +533,7 @@ class UpdateManager(Application):
         @param show: True, to show the description; False, to hide the description.
         """
         try:
-            updateManager = ooldtp.context(ubuntu_constants.UM_WINDOW)
+            updateManager = ooldtp.context(self.name)
         except ldtp.LdtpExecutionError:
             raise ldtp.LdtpExecutionError, "The Update Manager window was not found."
         
@@ -531,5 +547,3 @@ class UpdateManager(Application):
             raise ldtp.LdtpExecutionError, "The description button was not found."
         
         return state
-    
-   
