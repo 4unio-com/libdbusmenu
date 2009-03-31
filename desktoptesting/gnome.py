@@ -18,7 +18,7 @@ class Application:
     """
     CLOSE_TYPE = 'menu'
     CLOSE_NAME = 'mnuQuit'
-
+    WINDOW     = ''
     TOP_PANEL = 'frmTopExpandedEdgePanel'
 
 
@@ -52,9 +52,9 @@ class Application:
         pass
 
     def cleanup(self):
-        self.name = self.__class__.WINDOW
-        self.close_type = self.__class__.CLOSE_TYPE
-        self.close_name = self.__class__.CLOSE_NAME
+        self.set_name(self.__class__.WINDOW)
+        self.set_close_type(self.__class__.CLOSE_TYPE)
+        self.set_close_name(self.__class__.CLOSE_NAME)
 
     def recover(self):
         self.teardown()
