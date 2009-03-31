@@ -83,7 +83,8 @@ class IndicatorApplet(Application):
     def cleanup(self):
         for indicator in self.indicators:
             indicator.hide()
-        self.server.hide()
+        # BUG: 351537
+        # self.server.hide()
         sleep(1)
 
     def close(self):
