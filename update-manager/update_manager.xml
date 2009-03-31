@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<suite name="update_manager">
+  <class>update_manager.UpdateManagerTest</class>
+  <description>
+    Tests that verify different actions with the Update Manager application in Ubuntu
+  </description>
+  <case name="Unselect All">
+    <method>test_unselect_all</method>
+    <description>It selects no updates and checks if the size of the download equals 0B</description>
+   </case>
+   <case name="Update None">
+    <method>test_update_none</method>
+    <description>It checks twice for updates but it does not update anything. #updates should be equal.</description>
+    <args>
+      <password>araceli</password>
+    </args>
+  </case>
+  <case name="Update First">
+    <method>test_update_first</method>
+    <description>It install the first available update. It checks that it is not on the list after the update.</description>
+    <args>
+      <password>araceli</password>
+    </args>
+  </case>
+</suite>
