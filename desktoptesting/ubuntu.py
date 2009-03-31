@@ -126,7 +126,7 @@ class UpdateManager(Application):
         """
 
         if dist_upgrade:
-            ldtp.launchapp(self.__class__.LAUNCHER, ['-d'], 0)
+            ldtp.launchapp(self.LAUNCHER, ['-d'], 0)
             response = ldtp.waittillguiexist(self.name, '', 20)
     
             if response == 0:
@@ -148,7 +148,7 @@ class UpdateManager(Application):
                 label = updateManager.getchild(role = 'label')
                 for i in label:
                     label_name = i.getName()
-                    if label_name == self.__class__.LBL_WAIT:
+                    if label_name == self.LBL_WAIT:
                         populating = True
         
         except ldtp.LdtpExecutionError:
@@ -162,7 +162,7 @@ class UpdateManager(Application):
         updateManager = ooldtp.context(self.name)
     
         try:
-            closeButton = updateManager.getchild(self.__class__.BTN_CLOSE)
+            closeButton = updateManager.getchild(self.BTN_CLOSE)
         except ldtp.LdtpExecutionError:
             raise ldtp.LdtpExecutionError, "The Update Manager Close button was not found."
           
@@ -183,10 +183,10 @@ class UpdateManager(Application):
             label = updateManager.getchild(role = 'label')
             for i in label:
                 label_name = i.getName()
-                if label_name == self.__class__.LBL_UPTODATE:
+                if label_name == self.LBL_UPTODATE:
                     return 0
                 else:
-                    groups = re.match(self.__class__.LBL_N_UPDATES, label_name)
+                    groups = re.match(self.LBL_N_UPDATES, label_name)
                     if groups:
                         number = groups.group(1)
                         return int(number)
@@ -208,7 +208,7 @@ class UpdateManager(Application):
             label = updateManager.getchild(role = 'label')
             for i in label:
                 label_name = i.getName()
-                groups = re.match(self.__class__.LBL_DOWNLOADSIZE, label_name)
+                groups = re.match(self.LBL_DOWNLOADSIZE, label_name)
                 
                 if groups:
                     # Calculate size based on the tag after the number
@@ -239,7 +239,7 @@ class UpdateManager(Application):
         updateManager = ooldtp.context(self.name) 
 
         try:
-            table  = updateManager.getchild(self.__class__.TBL_UPDATES, role = 'table')
+            table  = updateManager.getchild(self.TBL_UPDATES, role = 'table')
             updates_table = table[0]
 
             for i in range(0, updates_table.getrowcount(), 1):
@@ -257,7 +257,7 @@ class UpdateManager(Application):
         updateManager = ooldtp.context(self.name) 
 
         try:
-            table  = updateManager.getchild(self.__class__.TBL_UPDATES, role = 'table')
+            table  = updateManager.getchild(self.TBL_UPDATES, role = 'table')
             updates_table = table[0]
 
             # TODO: When table admits right click, use the context menu
@@ -287,13 +287,13 @@ class UpdateManager(Application):
         available_updates = []
 
         try:
-            table  = updateManager.getchild(self.__class__.TBL_UPDATES, role = 'table')
+            table  = updateManager.getchild(self.TBL_UPDATES, role = 'table')
             updates_table = table[0]
 
             for i in range(0, updates_table.getrowcount(), 1):
                 text = updates_table.getcellvalue(i, 1)
                 candidate = text.split('\n')[0]
-                if candidate.find(self.__class__.BAN_LIST) == -1:
+                if candidate.find(self.BAN_LIST) == -1:
                     available_updates.append(candidate)
                 ldtp.wait(1)
         except ldtp.LdtpExecutionError:
@@ -312,7 +312,7 @@ class UpdateManager(Application):
         updateManager = ooldtp.context(self.name)
 
         try:
-            table  = updateManager.getchild(self.__class__.TBL_UPDATES, role = 'table')
+            table  = updateManager.getchild(self.TBL_UPDATES, role = 'table')
             updates_table = table[0]
 
             for i in range(0, updates_table.getrowcount(), 1):
@@ -336,7 +336,7 @@ class UpdateManager(Application):
         updateManager = ooldtp.context(self.name)
 
         try:
-            table  = updateManager.getchild(self.__class__.TBL_UPDATES, role = 'table')
+            table  = updateManager.getchild(self.TBL_UPDATES, role = 'table')
             updates_table = table[0]
 
             for i in range(0, updates_table.getrowcount(), 1):
@@ -370,7 +370,7 @@ class UpdateManager(Application):
         polKit = PolicyKit(self.password)
 
         try:
-            checkButton = updateManager.getchild(self.__class__.BTN_CHECK)
+            checkButton = updateManager.getchild(self.BTN_CHECK)
         except ldtp.LdtpExecutionError:
             raise ldtp.LdtpExecutionError, "The Update Manager Check button was not found."
           
@@ -401,7 +401,7 @@ class UpdateManager(Application):
         if self.number_updates() > 0:
             
             try:
-                btnInstall = updateManager.getchild(self.__class__.BTN_INSTALL)
+                btnInstall = updateManager.getchild(self.BTN_INSTALL)
             except ldtp.LdtpExecutionError:
                 raise ldtp.LdtpExecutionError, "The Update Manager install button was not found."
             
@@ -419,7 +419,7 @@ class UpdateManager(Application):
         
         # Wait for the the close button to be ready
         try:
-            btnClose = updateManager.getchild(self.__class__.BTN_CLOSE)
+            btnClose = updateManager.getchild(self.BTN_CLOSE)
         except ldtp.LdtpExecutionError:
             raise ldtp.LdtpExecutionError, "The Update Manager Close button was not found."
         
@@ -439,7 +439,7 @@ class UpdateManager(Application):
             raise ldtp.LdtpExecutionError, "The Update Manager window was not found."
         
         try:
-            btnTest = updateManager.getchild(self.__class__.BTN_INSTALL)
+            btnTest = updateManager.getchild(self.BTN_INSTALL)
             state = btnTest.stateenabled()
         except ldtp.LdtpExecutionError:
             raise ldtp.LdtpExecutionError, "The install button was not found."
@@ -480,7 +480,7 @@ class UpdateManager(Application):
                 self.select_update(name)
 
             # Get the description text field 
-            text_field = updateManager.getchild(self.__class__.TXT_DESCRIPTION, role='text')
+            text_field = updateManager.getchild(self.TXT_DESCRIPTION, role='text')
              # Get the text 
             text = ldtp.gettextvalue(self.name, text_field[0].getName())
             return text
@@ -511,7 +511,7 @@ class UpdateManager(Application):
                 self.select_update(name)
 
             # Get the filler tab
-            filler = ldtp.getobjectproperty(self.name , self.__class__.TAB_CHANGES, 'children')
+            filler = ldtp.getobjectproperty(self.name , self.TAB_CHANGES, 'children')
             # Get the scroll pane
             scroll_pane = ldtp.getobjectproperty(self.name , filler, 'children')
             # Get the text field
