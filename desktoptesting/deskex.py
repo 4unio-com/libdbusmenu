@@ -52,7 +52,7 @@ class IndicatorApplet(Application):
 
     def select_indicator(self, sender):
         ldtp.selectmenuitem(TOP_PANEL, 'mnu' + sender.replace(' ',''))
-    
+
     def wait_for_indicator_display(self, sender, timeout=5):
         handlers = []
         displayed = [False]
@@ -77,6 +77,29 @@ class IndicatorApplet(Application):
 
         for handler, indicator in handlers:
             indicator.disconnect(handler)
+
+        return displayed[0]
+
+    def wait_for_server_display(self, timeout=5):
+        displayed = [False]
+        handler = 0
+
+        def _display_cb(indicator):
+            indicator.hide() # This is just normal behavior, so why not?
+            displayed[0] = True
+            gtk.main_quit()
+            
+        def _timeout_cb():
+            gtk.main_quit()
+            return False
+
+        handler = self.server.connect("server-display", _display_cb)
+
+        glib.timeout_add_seconds(timeout, _timeout_cb)
+
+        gtk.main()
+
+        self.server.disconnect(handler)
 
         return displayed[0]
 

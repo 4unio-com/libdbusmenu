@@ -17,6 +17,7 @@ class IndicatorAppletTest(IndicatorApplet):
     def messageTest(self, desktop_file=None, sender=None):
         self.add_server(os.path.abspath(desktop_file))
         self.show_indicator(sender)
+        sleep(1)
         if not ldtp.objectexist(TOP_PANEL, 'mnu' + sender.replace(' ','')):
             raise AssertionError('indicator did not appear in applet.')
 
@@ -38,4 +39,11 @@ class IndicatorAppletTest(IndicatorApplet):
         self.select_indicator(sender)
         if not self.wait_for_indicator_display(sender):
             raise AssertionError('Indicator did not get a callback')
+
+    def displayServerTest(self, desktop_file=None):
+        self.add_server(os.path.abspath(desktop_file))
+        sleep(1)
+        ldtp.selectmenuitem(TOP_PANEL, 'mnuPhonyInternetMessenger')
+        if not self.wait_for_server_display():
+            raise AssertionError('Server did not get a callback')
         
