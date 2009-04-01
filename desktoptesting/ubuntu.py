@@ -35,17 +35,6 @@ class UbuntuMenu(Application):
                  
             Example: For the menu Disk Usage Analyzer, the menu name would be mnuDiskUsageAnalyzer.
             
-        @type window_title_txt: string 
-        @param window_title_txt: The name of the window to recognize once opened.
-            
-            The naming convention is the following:
-            
-            E{-} Prepend 'frm' if the window is a form, or 'dlg' if the window is a dialog.
-            
-            E{-} Append the window name with no spaces.
-                  
-            Example: For the window Disk Usage Analyzer, the window name would be frmDiskUsageAnalyzer.
-        
         """
        
         topPanel = ooldtp.context(self.__class__.TOP_PANEL)
