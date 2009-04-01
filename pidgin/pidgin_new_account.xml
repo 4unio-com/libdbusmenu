@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<suite name="pidgin new accounts">
+  <class>pidgin_new_account.PidginNewAccountTest</class>
+  <description>
+    Walks pidgin through setting up a new account.
+  </description>
+  <case name="AccountXMPP">
+    <method>testNewAccount</method>
+    <description>Test the creation of an XMPP account.</description>
+    <args>
+      <credentials>./pidgin/data/credentials.ini</credentials>
+      <protocol>XMPP</protocol>
+    </args>
+  </case>
+  <case name="AccountMSN">
+    <method>testNewAccount</method>
+    <description>Test the creation of an MSN account.</description>
+    <args>
+      <credentials>./pidgin/data/credentials.ini</credentials>
+      <protocol>MSN</protocol>
+    </args>
+  </case>
+  <case name="AccountAIM">
+    <method>testNewAccount</method>
+    <description>Test the creation of an AIM account.</description>
+    <args>
+      <credentials>./pidgin/data/credentials.ini</credentials>
+      <protocol>AIM</protocol>
+    </args>
+  </case>
+  <case name="AccountICQ">
+    <method>testNewAccount</method>
+    <description>Test the creation of an ICQ account.</description>
+    <args>
+      <credentials>./pidgin/data/credentials.ini</credentials>
+      <protocol>ICQ</protocol>
+    </args>
+  </case>
+  <case name="AccountYahoo">
+    <method>testNewAccount</method>
+    <description>Test the creation of a Yahoo! account.</description>
+    <args>
+      <credentials>./pidgin/data/credentials.ini</credentials>
+      <protocol>Yahoo</protocol>
+    </args>
+  </case>
+</suite>

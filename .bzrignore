@@ -8,3 +8,4 @@ debian/desktop-testing-library
 debian/stamp-patched
 debian/ubuntu-desktop-tests
 python-build-stamp-2.5
+pidgin/data/credentials.ini
