@@ -5,7 +5,6 @@ import pynotify
 import ldtp, ldtputils
 import os
 import gtk, glib
-from deskex_constants import *
 
 try:
     import indicate
@@ -13,6 +12,7 @@ except ImportError:
     indicate = None
 
 class IndicatorApplet(Application):
+    IA_TOPLEVEL = "embindicator-applet"
     def __init__(self):
         Application.__init__(self, 'indicator-applet')
         self.indicators = []
@@ -44,14 +44,14 @@ class IndicatorApplet(Application):
             gtk.main_iteration()
 
     def capture_applet_icon(self):
-        x, y, w, h = ldtp.getobjectsize(TOP_PANEL, IA_TOPLEVEL)
+        x, y, w, h = ldtp.getobjectsize(self.TOP_PANEL, self.IA_TOPLEVEL)
         screeny = ldtputils.imagecapture(
             outFile=tempfile.mktemp('.png', 'ia_'),
             x=x, y=y, resolution1=w, resolution2=h)        
         return screeny
 
     def select_indicator(self, sender):
-        ldtp.selectmenuitem(TOP_PANEL, 'mnu' + sender.replace(' ',''))
+        ldtp.selectmenuitem(self.TOP_PANEL, 'mnu' + sender.replace(' ',''))
 
     def wait_for_indicator_display(self, sender, timeout=5):
         handlers = []
