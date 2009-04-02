@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<suite name="pidgin use">
+  <class>pidgin_use.PidginUseTest</class>
+  <description>
+    Normal Pidgin use.
+  </description>
+  <case name="BasicTest">
+    <method>testBasic</method>
+    <description>Basic test</description>
+    <args>
+    </args>
+  </case>
+</suite>

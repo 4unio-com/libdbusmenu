@@ -18,16 +18,17 @@ class Pidgin(Application):
         self.open()
 
     def open(self, clean_profile=True):
-        self._clean_profile = clean_profile
+        self.backup_config()
+        Application.open_and_check_app(self)
+
+    def backup_config(self):
         try:
             move(os.path.expanduser('~/.purple'), 
                  os.path.expanduser('~/.purple.bak'))
         except IOError:
-            raise
+            pass
 
-        Application.open_and_check_app(self)
-
-    def exit(self):
+    def restore_config(self):
         try:
             rmtree('~/.purple')
         except OSError:
@@ -39,5 +40,7 @@ class Pidgin(Application):
         except IOError:
             pass
         
+
+    def exit(self):
         Application.exit(self)
         

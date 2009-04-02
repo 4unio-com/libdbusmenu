@@ -84,4 +84,4 @@ class PidginNewAccountTest(Pidgin):
         if fails:
             raise AssertionError(','.join(fails)+'.', ldtputils.imagecapture())
 
-        
+        # TODO: Should we test successful connection too?
