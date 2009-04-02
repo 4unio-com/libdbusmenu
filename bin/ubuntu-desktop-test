@@ -21,6 +21,10 @@ TESTS_SHARE = "."
 TESTS_HOME  = os.environ["HOME"] + "/.ubuntu-desktop-test"
 SCREENSHOTS_SHARE = "/tmp/ldtp-screenshots"
 
+# For the moment, all applications should be running in English
+ldtp.setlocale("C")
+
+
 def error(message, *args):
     message = "Error: %s\n" % message
     sys.stderr.write(message % args)
