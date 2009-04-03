@@ -4,11 +4,6 @@ import ldtp, ooldtp, ldtputils
 from time import sleep
 
 class PidginNewAccountTest(Pidgin):
-    DLG_ACCOUNTS = "dlgAccounts"
-    DLG_ADD_ACCOUNT = "dlgAddAccount"
-    BTN_ADD = "btnAdd"
-    CBO_PROTOCOL = "cboProtocol"
-    TBL_ACCOUNTS = "tbl0"
     def testNewAccount(self, credentials=None, protocol=None):
         cp = ConfigParser()
         cp.read(credentials)

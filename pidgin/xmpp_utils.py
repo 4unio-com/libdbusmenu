@@ -24,7 +24,7 @@ class _Client(JabberClient):
 
         # if bare JID is provided add a resource -- it is required
         if not jid.resource:
-            jid=JID(jid.node, jid.domain, "Echobot")
+            jid=JID(jid.node, jid.domain, "UDT")
 
         # setup client with provided connection information
         # and identity data
@@ -72,7 +72,7 @@ class _Client(JabberClient):
             self.messages.append((stanza.get_from().as_unicode(), 
                                   stanza.get_subject(), 
                                   stanza.get_body()))
-        
+
     def loop_iter(self, timeout=1):
         if self.stream:
             try:
@@ -114,6 +114,8 @@ class _Client(JabberClient):
 
 class Buddy(object):
     def __init__(self, jid, passwd):
+        if isinstance(jid, str) or isinstance(jid, unicode):
+            jid = JID(jid)
         self.client = _Client(jid, passwd)
         
     def connect(self, register=False, name='', email=''):
@@ -211,7 +213,8 @@ if __name__ == "__main__":
     #b.client.loop()
     while True:
         msg = b.wait_for_message(timeout=1)
-        print msg
+        if msg:
+            print msg
 
     #sleep(1)
     #print b.wait_for_message(timeout=5)

@@ -5,9 +5,11 @@
     Normal Pidgin use.
   </description>
   <case name="BasicTest">
-    <method>testBasic</method>
+    <method>testSendMessage</method>
     <description>Basic test</description>
     <args>
+      <credentials>./pidgin/data/credentials.ini</credentials>
+      <msg>Hello World!</msg>
     </args>
   </case>
 </suite>
