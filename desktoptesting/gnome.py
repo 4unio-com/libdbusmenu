@@ -5,6 +5,7 @@ The gnome module provides wrappers for LDTP to make the write of Gnome tests eas
 """
 import ooldtp
 import ldtp 
+from utils import enable_a11y
 
 class Application:
     """
@@ -84,7 +85,9 @@ class Application:
         Given an application, it tries to open it.
          
         """
+        enable_a11y(True)
         ldtp.launchapp(self.LAUNCHER)
+        enable_a11y(False)
 
         ldtp.wait(2)
         response = ldtp.waittillguiexist(self.name, '', 20)

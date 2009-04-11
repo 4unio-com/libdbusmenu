@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 
 import os
+
+os.environ['NO_GAIL'] = '1'
+os.environ['NO_AT_BRIDGE'] = '1'
+
 import re
 import sys
 import logging
