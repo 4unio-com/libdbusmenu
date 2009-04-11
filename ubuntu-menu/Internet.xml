@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<suite name="Internet">
+  <class>ubuntu_menu.UbuntuMenuTest</class>
+  <description>
+    Tests that verify Internet applications in the Ubuntu menu
+  </description>
+  <case name="Open Ekiga">
+    <method>testOpenMenu</method>
+    <description>It opens the Ekiga Softphone menu and closes the application.</description>
+    <args>
+      <menuitem>mnuEkigaSoftphone</menuitem>
+      <windowname>frmFirstTimeConfigurationAssistant</windowname>
+      <closetype>menu</closetype>
+      <closename>Close</closename>
+    </args>
+   </case>
+   <case name="Open Evolution Mail">
+    <method>testOpenMenu</method>
+    <description>It opens the Evolution Mail menu and closes the application.</description>
+    <args>
+      <menuitem>mnuEvolutionMail</menuitem>
+      <windowname>frmEvolution*</windowname>
+    </args>
+   </case>
+   <case name="Open Firefox">
+    <method>testOpenMenu</method>
+    <description>It opens the Firefox Browser menu and closes the application.</description>
+    <args>
+      <menuitem>mnuFirefoxWebBrowser</menuitem>
+      <windowname>frm*MozillaFirefox</windowname>
+    </args>
+   </case>
+   <case name="Open Pidgin">
+    <method>testOpenMenu</method>
+    <description>It opens the Pidgin menu and closes the application.</description>
+    <args>
+      <menuitem>mnuPidginInternetMessenger</menuitem>
+      <windowname>dlgAccounts</windowname>
+    </args>
+   </case>
+   <case name="Open Terminal Server Client">
+    <method>testOpenMenu</method>
+    <description>It opens the Termina Server Client menu and closes the application.</description>
+    <args>
+      <menuitem>mnuTerminalServerClient</menuitem>
+      <windowname>frmTerminalServerClient</windowname>
+      <closetype>button</closetype>
+      <closename>Close</closename>
+    </args>
+   </case>
+   <case name="Open Transmission BitTorrent Client">
+    <method>testOpenMenu</method>
+    <description>It opens the Transmission BitTorrent Client menu and closes the application.</description>
+    <args>
+      <menuitem>mnuTransmissionBitTorrentClient</menuitem>
+      <windowname>frmTransmission</windowname>
+    </args>
+   </case>
+</suite>
