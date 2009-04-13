@@ -18,6 +18,8 @@ class Pidgin(Application):
     CBO_PROTOCOL = "cboProtocol"
     TBL_ACCOUNTS = "tbl0"
 
+    MNU_CLOSE = "mnuClose"
+    
     def emptyTest(self):
         print 'empty test'
 
@@ -28,7 +30,6 @@ class Pidgin(Application):
         self.exit()
 
     def cleanup(self):
-        #TODO: it should delete all the "My Personal Keys"
         self.exit()
         self.open()
 
@@ -154,3 +155,16 @@ class Pidgin(Application):
             self.restore_config()
         Application.exit(self)
         
+    def get_all_windows(self):
+        windows = []
+        print self.name
+        for w in ldtp.getwindowlist():
+            try:
+                if ldtp.getobjectproperty(w, w, 'parent') == 'pidgin':
+                    windows.append(w)
+            except LdtpExecutionError:
+                continue
+        return windows
+    
+    def close_conversation(self, window_name):
+        ldtp.selectmenuitem(window_name, self.MNU_CLOSE)

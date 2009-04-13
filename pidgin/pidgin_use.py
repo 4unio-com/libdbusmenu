@@ -7,7 +7,19 @@ from os.path import expanduser
 from xmpp_utils import Buddy
 
 class PidginUseTest(Pidgin):
-    def testSendMessage(self, msg='', connect_timeout=5):
+    def cleanup(self):
+        return
+        # close all windows except buddy list
+        #windows = filter(lambda x: x != self.WINDOW, self.get_all_windows())
+        #while windows:
+        #    for w in windows:
+        #        self.close_conversation(w)
+        #    windows = filter(lambda x: x != self.WINDOW, 
+        #                     self.get_all_windows())
+            
+
+    def open(self):
+        Pidgin.open(self)
         cp = self.credentials
 
         buddy_info = dict(cp.items('OtherXMPP'))
@@ -16,10 +28,11 @@ class PidginUseTest(Pidgin):
             'alias', '%s@%s' % (buddy_info['username'], buddy_info['domain']))
 
 
-        buddy = Buddy('%s@%s' % (buddy_info['username'], buddy_info['domain']),
-                      buddy_info['password'])
+        self.buddy = \
+            Buddy('%s@%s' % (buddy_info['username'], buddy_info['domain']),
+                  buddy_info['password'])
         print 'connecting buddy'
-        buddy.connect()
+        self.buddy.connect()
         print 'connected buddy'
 
         ldtp.waittillguiexist(self.WINDOW)
@@ -36,10 +49,16 @@ class PidginUseTest(Pidgin):
 
         print 'wait for buddy'
         self.wait_for_buddy(buddy_info['alias'])
+        
+    def exit(self):
+        self.buddy.disconnect()
+        Pidgin.exit(self)
+
+    def testSendMessage(self, msg=''):
+        buddy_alias = self.credentials.get('OtherXMPP', 'alias')
 
         print 'sending message'
-        self.send_message(buddy_info['alias'], msg)
+        self.send_message(buddy_alias, msg)
 
-        buddy.wait_for_message(body=msg, timeout=5)
+        self.buddy.wait_for_message(body=msg, timeout=5)
 
-        buddy.disconnect()

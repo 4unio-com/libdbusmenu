@@ -15,7 +15,7 @@
     <method>testSendMessage</method>
     <description>Send Unicode test</description>
     <args>
-      <msg>שלום חבר.</msg>
+      <msg>שלום, חבר.</msg>
     </args>
   </case>
 </suite>
