@@ -150,6 +150,12 @@ class Pidgin(Application):
 
         ldtp.generatekeyevent('<return>')
 
+    def get_conversation_log(self, alias):
+        if not ldtp.guiexist('frm' + alias.replace(' ', '')):
+            return ''
+
+        return ldtp.gettextvalue('frm' + alias.replace(' ', ''), 'txt0')
+
     def exit(self):
         if hasattr(self, 'backup_path'):
             self.restore_config()

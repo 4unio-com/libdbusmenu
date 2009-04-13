@@ -62,3 +62,24 @@ class PidginUseTest(Pidgin):
 
         self.buddy.wait_for_message(body=msg, timeout=5)
 
+    def testRecieveMessage(self, msg='', timeout=5):
+        jid = '%s@%s' % (self.credentials.get('XMPP', 'username'), 
+                         self.credentials.get('XMPP', 'domain'))
+
+        buddy_alias = self.credentials.get('OtherXMPP', 'alias')
+
+        prev_log = self.get_conversation_log(buddy_alias)
+
+        self.buddy.send_message(jid, '', msg)
+        
+        for i in xrange(timeout):
+            log = self.get_conversation_log(buddy_alias)
+            recent_ims = log[len(prev_log):].split('\n')
+            for im in recent_ims:
+                if im.split(buddy_alias+': ')[-1] == msg:
+                    return
+            sleep(1)
+        
+        raise AssertionError("Did not recieve matching message", 
+                             ldtputils.imagecapture())
+
