@@ -4,13 +4,15 @@ import ldtp, ooldtp, ldtputils
 from time import sleep
 
 class PidginNewAccountTest(Pidgin):
-    def testNewAccount(self, credentials=None, protocol=None):
-        cp = ConfigParser()
-        cp.read(credentials)
+    def open(self):
+        Pidgin.open(self, True, None)
+
+    def testNewAccount(self, protocol=None):
+        cp = self.credentials
 
         if not cp.has_section(protocol):
             raise Exception(
-                'no %s protocol configured in %s' % (protocol, credentials))
+                'no %s protocol configured in %s' % (protocol, creds_fn))
 
         dlg_accounts = ooldtp.context(self.DLG_ACCOUNTS)
 

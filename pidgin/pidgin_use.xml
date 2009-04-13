@@ -8,7 +8,6 @@
     <method>testSendMessage</method>
     <description>Basic test</description>
     <args>
-      <credentials>./pidgin/data/credentials.ini</credentials>
       <msg>Hello World!</msg>
     </args>
   </case>

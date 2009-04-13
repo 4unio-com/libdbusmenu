@@ -1,6 +1,6 @@
 #!/usr/bin/python -u
 
-import gobject
+import gobject, gtk
 import sys
 from time import sleep
 import traceback

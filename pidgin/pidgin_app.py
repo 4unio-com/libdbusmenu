@@ -1,8 +1,10 @@
 from desktoptesting.gnome import Application
-from shutil import move, rmtree
+from shutil import move, rmtree, copytree
 import ldtp, ooldtp
 import os, traceback
 from time import time, sleep
+from ConfigParser import ConfigParser
+from string import Formatter
 
 class Pidgin(Application):
     WINDOW = "frmBuddyList"
@@ -16,6 +18,10 @@ class Pidgin(Application):
     CBO_PROTOCOL = "cboProtocol"
     TBL_ACCOUNTS = "tbl0"
 
+    def emptyTest(self):
+        print 'empty test'
+        print os.path.exists(os.path.expanduser('~/.purple'))
+
     def setup(self):
         self.open()
 
@@ -27,9 +33,47 @@ class Pidgin(Application):
         self.exit()
         self.open()
 
-    def open(self, clean_profile=True):
-        self.backup_config()
+    def open(self, clean_profile=True, 
+             profile_template='./data/purple',
+             credentials='./data/credentials.ini'):
+        self.creds_fn = self.normalize_path(credentials)
+        self.credentials = ConfigParser()
+        self.credentials.read(self.creds_fn)
+
+        if clean_profile:
+            self.backup_config()
+            if profile_template:
+                self.generate_profile(self.normalize_path(profile_template))
+
         Application.open_and_check_app(self)
+
+    def generate_profile(self, profile_template):
+        os.mkdir(os.path.expanduser('~/.purple'))
+        flat_dict = {}
+        if self.credentials:
+            for s in self.credentials.sections():
+                for k, v in self.credentials.items(s):
+                    flat_dict[s+'_'+k] = v
+
+        formatter = Formatter()
+        for fn in os.listdir(profile_template):
+            if os.path.isdir(os.path.join(profile_template, fn)):
+                copytree(os.path.join(profile_template, fn),
+                         os.path.join(os.path.expanduser('~/.purple'), fn))
+                continue
+            buf = open(os.path.join(profile_template, fn)).read()
+            f = open(os.path.join(os.path.expanduser('~/.purple'), fn), 'w')
+            try:
+                buf = formatter.format(buf, **flat_dict)
+            except KeyError, e:
+                raise Exception, \
+                    'no section/key in %s: %s' % (self.creds_fn, e)
+            f.write(buf)
+            f.close()
+
+    def normalize_path(self, path):
+        return os.path.normpath(
+            os.path.join(os.path.dirname(__file__), path))
 
     def backup_config(self):
         p = os.path.expanduser('~/.purple.bak')
@@ -38,32 +82,35 @@ class Pidgin(Application):
         while os.path.exists(backup_path):
             backup_path = '%s.%d' % (p, i)
             i += 1
+            
+        print 'moving', os.path.expanduser('~/.purple'), 'to', backup_path
 
         try:
             move(os.path.expanduser('~/.purple'), backup_path)
         except IOError:
             pass
+        else:
+            self.backup_path = backup_path
 
     def restore_config(self):
         try:
             rmtree('~/.purple')
         except OSError:
-            traceback.print_exc()
             pass
 
         try:
-            move(os.path.expanduser('~/.purple.bak'), 
+            print 'move', self.backup_path, os.path.expanduser('~/.purple')
+            move(self.backup_path,
                  os.path.expanduser('~/.purple'))
         except IOError:
             traceback.print_exc()
-            pass
 
-    def wait_for_account_connect(self, account_name, protocol, timeout=5):
+    def wait_for_account_connect(self, account_name, protocol, timeout=15):
         starttime = time()
-        while not self.account_connected(protocol, protocol):
-            sleep(1)
-            if time() - starttime >= connect_timeout:
+        while not self.account_connected(account_name, protocol):
+            if time() - starttime >= timeout:
                 raise Exception('IM server connection timed out')
+            sleep(1)
 
     def account_connected(self, account_name, protocol):
         '''Checks to see if a specified account is connected, it parsed the 
@@ -84,6 +131,16 @@ class Pidgin(Application):
                     return False
         return True
 
+    def buddy_available(self, alias):
+        return ldtp.doesrowexist(self.WINDOW, self.TTBL_BUDDIES, alias)
+
+    def wait_for_buddy(self, alias, timeout=15):
+        starttime = time()
+        while not self.buddy_available(alias):
+            if time() - starttime >= timeout:
+                raise Exception('waiting for buddy timed out')
+            sleep(1)
+
     def send_message(self, alias, msg):
         if not ldtp.doesrowexist(self.WINDOW, self.TTBL_BUDDIES, alias):
             raise Exception("user %s is not online" % alias)
@@ -91,7 +148,7 @@ class Pidgin(Application):
         ldtp.generatekeyevent('<return>')
 
         ldtp.waittillguiexist('frm' + alias.replace(' ', ''))
-
+        
         frame = ooldtp.context('frm' + alias.replace(' ', ''))
 
         frame.settextvalue('txt1', msg)
@@ -99,5 +156,7 @@ class Pidgin(Application):
         ldtp.generatekeyevent('<return>')
 
     def exit(self):
+        if hasattr(self, 'backup_path'):
+            self.restore_config()
         Application.exit(self)
         

@@ -3,8 +3,8 @@
 <account version='1.0'>
 	<account>
 		<protocol>prpl-jabber</protocol>
-		<name>eitan@sparky/</name>
-		<password>password</password>
+		<name>{XMPP_username}@{XMPP_domain}/{XMPP_resource}</name>
+		<password>{XMPP_password}</password>
 		<statuses>
 			<status type='available' name='Available' active='true'>
 				<attributes/>

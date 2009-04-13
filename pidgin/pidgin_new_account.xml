@@ -8,7 +8,6 @@
     <method>testNewAccount</method>
     <description>Test the creation of an XMPP account.</description>
     <args>
-      <credentials>./pidgin/data/credentials.ini</credentials>
       <protocol>XMPP</protocol>
     </args>
   </case>
@@ -16,7 +15,6 @@
     <method>testNewAccount</method>
     <description>Test the creation of an MSN account.</description>
     <args>
-      <credentials>./pidgin/data/credentials.ini</credentials>
       <protocol>MSN</protocol>
     </args>
   </case>
@@ -24,7 +22,6 @@
     <method>testNewAccount</method>
     <description>Test the creation of an AIM account.</description>
     <args>
-      <credentials>./pidgin/data/credentials.ini</credentials>
       <protocol>AIM</protocol>
     </args>
   </case>
@@ -32,7 +29,6 @@
     <method>testNewAccount</method>
     <description>Test the creation of an ICQ account.</description>
     <args>
-      <credentials>./pidgin/data/credentials.ini</credentials>
       <protocol>ICQ</protocol>
     </args>
   </case>
@@ -40,7 +36,6 @@
     <method>testNewAccount</method>
     <description>Test the creation of a Yahoo! account.</description>
     <args>
-      <credentials>./pidgin/data/credentials.ini</credentials>
       <protocol>Yahoo</protocol>
     </args>
   </case>
