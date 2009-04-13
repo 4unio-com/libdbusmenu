@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 
 import os
+
+os.environ['NO_GAIL'] = '1'
+os.environ['NO_AT_BRIDGE'] = '1'
+
 import re
 import sys
 import logging
@@ -20,6 +24,10 @@ from shutil import move
 TESTS_SHARE = "."
 TESTS_HOME  = os.environ["HOME"] + "/.ubuntu-desktop-test"
 SCREENSHOTS_SHARE = "/tmp/ldtp-screenshots"
+
+# For the moment, all applications should be running in English
+ldtp.setlocale("C")
+
 
 def error(message, *args):
     message = "Error: %s\n" % message
