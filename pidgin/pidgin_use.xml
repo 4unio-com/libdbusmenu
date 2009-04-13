@@ -11,4 +11,11 @@
       <msg>Hello World!</msg>
     </args>
   </case>
+  <case name="UnicodeTest">
+    <method>testSendMessage</method>
+    <description>Send Unicode test</description>
+    <args>
+      <msg>שלום חבר.</msg>
+    </args>
+  </case>
 </suite>

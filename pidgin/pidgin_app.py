@@ -20,7 +20,6 @@ class Pidgin(Application):
 
     def emptyTest(self):
         print 'empty test'
-        print os.path.exists(os.path.expanduser('~/.purple'))
 
     def setup(self):
         self.open()
@@ -83,8 +82,6 @@ class Pidgin(Application):
             backup_path = '%s.%d' % (p, i)
             i += 1
             
-        print 'moving', os.path.expanduser('~/.purple'), 'to', backup_path
-
         try:
             move(os.path.expanduser('~/.purple'), backup_path)
         except IOError:
@@ -99,7 +96,6 @@ class Pidgin(Application):
             pass
 
         try:
-            print 'move', self.backup_path, os.path.expanduser('~/.purple')
             move(self.backup_path,
                  os.path.expanduser('~/.purple'))
         except IOError:
@@ -123,8 +119,6 @@ class Pidgin(Application):
         for obj in objs:
             if obj.startswith('mnuNoactionsavailable'):
                 parent = ldtp.getobjectproperty(self.WINDOW,obj, 'parent')
-                print parent, parent.startswith('mnu%s' % account_name), \
-                    parent.endswith('(%s)' % protocol), account_name, protocol
                 # TODO, put in resource and protocol for more accuracy.
                 if parent.startswith('mnu%s' % account_name) and \
                         parent.endswith('(%s)' % protocol):
