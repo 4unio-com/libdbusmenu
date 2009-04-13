@@ -35,6 +35,8 @@ class PidginNewAccountTest(Pidgin):
         details = dict(cp.items(protocol))
 
         for name, value in details.items():
+            if name not in ('username', 'domain', 'resource', 'password'):
+                continue
             dlg_add_account.settextvalue('txt%s' % name.capitalize(), value)
 
         btn_add = dlg_add_account.getchild(self.BTN_ADD)

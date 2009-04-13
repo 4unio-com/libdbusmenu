@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
-<suite name="pidgin use">
+<suite name="pidgin messagine">
   <class>pidgin_use.PidginUseTest</class>
   <description>
-    Normal Pidgin use.
+    Basic pidgin XMPP messaging.
   </description>
   <case name="BasicTest">
     <method>testSendMessage</method>
