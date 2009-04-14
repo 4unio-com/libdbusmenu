@@ -22,6 +22,8 @@ class Pidgin(Application):
     
     def emptyTest(self):
         print 'empty test'
+        ldtp.generatekeyevent('<alt><F9>')
+        sleep(3)
 
     def setup(self):
         self.open()

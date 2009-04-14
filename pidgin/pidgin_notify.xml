@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<suite name="pidgin messaging">
+  <class>pidgin_notify.PidginNotifyTest</class>
+  <description>
+    pidgin-libnotify tests.
+  </description>
+  <case name="LoginTest">
+    <method>testBuddyLogin</method>
+    <description>Buddy login test</description>
+    <args>
+    </args>
+  </case>
+  <case name="MessageTest">
+    <method>testRecieveMessage</method>
+    <description>Buddy login test</description>
+    <args>
+      <msg1>Hi there.</msg1>
+      <msg2>Are you around?</msg2>
+    </args>
+  </case>
+</suite>

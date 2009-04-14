@@ -437,10 +437,11 @@ class TestSuiteRunner(TestRunner):
             self.append_result('message', str(e))
             self.append_result('stacktrace', traceback.format_exc())
             self.set_result('error', 1)
+            print 'FAIL'
             try:
                 self.testsuite.teardown()
             except:
-                pass
+                print 'failed to fail'
 
         self.add_results_to_node(self.dom.documentElement)
 

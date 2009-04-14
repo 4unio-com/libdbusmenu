@@ -20,6 +20,9 @@ class PidginUseTest(Pidgin):
 
     def open(self):
         Pidgin.open(self)
+        self.buddy_login()
+        
+    def buddy_login(self):
         cp = self.credentials
 
         buddy_info = dict(cp.items('OtherXMPP'))
@@ -50,6 +53,7 @@ class PidginUseTest(Pidgin):
         print 'wait for buddy'
         self.wait_for_buddy(buddy_info['alias'])
         
+
     def exit(self):
         self.buddy.disconnect()
         Pidgin.exit(self)
