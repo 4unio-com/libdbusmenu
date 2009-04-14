@@ -17,7 +17,7 @@ class UbuntuMenu(Application):
         self.cleanup() 
 
     def cleanup(self):
-        self.exit()
+        self.close()
         Application.cleanup(self)
 
     def open_and_check_menu_item(self, menu_item_txt):
@@ -122,7 +122,7 @@ class UpdateManager(Application):
                 raise ldtp.LdtpExecutionError, "The " + self.name + " window was not found."    
 
         else:
-            self.open_and_check_app()
+            Application.open(self)
 
         # Wait the population of the list
         updateManager = ooldtp.context(self.name)
