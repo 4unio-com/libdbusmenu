@@ -6,8 +6,7 @@ from time import time, sleep
 from ConfigParser import ConfigParser
 from string import Formatter
 
-class Pidgin(Application):
-    
+class Pidgin(Application):    
     # Pidgin constants
     WINDOW = "frmBuddyList"
     LAUNCHER = "pidgin"

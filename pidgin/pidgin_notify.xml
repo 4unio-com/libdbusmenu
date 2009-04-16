@@ -16,13 +16,29 @@
     <args>
     </args>
   </case>
-  <case name="MessageTest">
-    <method>testRecieveMessage</method>
-    <description>Buddy login test</description>
+  <case name="MessageSimpleTest">
+    <method>testRecieveMessageSimple</method>
+    <description>Simple message notification test.</description>
+    <args>
+      <msg1>Hi there.</msg1>
+      <msg2>What's up?</msg2>
+    </args>
+  </case>
+  <case name="MessageAppendTest">
+    <method>testRecieveMessageAppend</method>
+    <description>Message notifiaction append test.</description>
     <args>
       <msg1>Hi there.</msg1>
       <msg2>Are you around?</msg2>
       <msg3>IM me when you are back.</msg3>
+    </args>
+  </case>
+  <case name="MessageLongTest">
+    <method>testRecieveMessageSimple</method>
+    <description>Very long message notification test.</description>
+    <args>
+      <msg1>Hi there.</msg1>
+      <msg2>This is a really long message. I am trying to express something that is not simple in few words, but I am failing, please forgive me. I would draw a picture for you, but it would still be a very comlicated picture. Anyway, I'll send you an e-mail later to explain further what I mean.</msg2>
     </args>
   </case>
 </suite>
