@@ -4,6 +4,12 @@
   <description>
     pidgin-libnotify tests.
   </description>
+  <case name="IndicatorServerTest">
+    <method>testIndicatorServer</method>
+    <description>Test the indicator server menu item. see that the buddy lists shows and hides.</description>
+    <args>
+    </args>
+  </case>
   <case name="LoginTest">
     <method>testBuddyLogin</method>
     <description>Buddy login test</description>
@@ -16,6 +22,7 @@
     <args>
       <msg1>Hi there.</msg1>
       <msg2>Are you around?</msg2>
+      <msg3>IM me when you are back.</msg3>
     </args>
   </case>
 </suite>
