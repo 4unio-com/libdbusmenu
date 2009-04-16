@@ -27,7 +27,8 @@ class PidginNotifyTest(Pidgin):
 
         # The notify plugin only starts working after 15 seconds.
         # We use 20 here to be safe.
-        sleep(20 - (time() - starttime))
+        #sleep(20 - (time() - starttime))
+        sleep(15)
 
     def click_in_indicator(self, name):
         objs = ldtp.getobjectlist(self.TOP_PANEL)
@@ -38,7 +39,7 @@ class PidginNotifyTest(Pidgin):
                     ldtp.selectmenuitem(self.TOP_PANEL, obj)
                     return
 
-        raise Exception('pidgin does not appear in indicator applet')
+        raise Exception('%s does not appear in indicator applet' % name)
 
     def is_in_indicator(self, obj):
         parent = ldtp.getobjectproperty(self.TOP_PANEL, obj, 'parent')
@@ -97,6 +98,7 @@ class PidginNotifyTest(Pidgin):
 
         result = 1
         count = 0
+        frm_name = ''
 
         while result:
             frm_name = 'dlg%s' % alias.replace(' ', '')
@@ -112,6 +114,21 @@ class PidginNotifyTest(Pidgin):
 
         if not result:
             raise AssertionError, 'did not recieve a notification bubble.'
+        
+        ldtp.remap(self.TOP_PANEL)
+        try:
+            self.click_in_indicator('mnu%s' % alias.replace(' ', ''))
+        except Exception, e:
+            raise AssertionError(e[-1])
+        
+        print 'success'
+        result = ldtp.waittillguiexist('frm%s' % alias.replace(' ', ''))
+        
+        if not result:
+            AssertionError, \
+                'clicking on buddy indicator did not bring up chat dialog'
+
+        self.close_conversation('frm%s' % alias.replace(' ', ''))
 
     def is_bubble(self, frm_name):
         return ldtp.getobjectproperty(
