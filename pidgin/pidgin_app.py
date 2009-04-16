@@ -7,6 +7,8 @@ from ConfigParser import ConfigParser
 from string import Formatter
 
 class Pidgin(Application):
+    
+    # Pidgin constants
     WINDOW = "frmBuddyList"
     LAUNCHER = "pidgin"
 
@@ -36,6 +38,20 @@ class Pidgin(Application):
     def open(self, clean_profile=True, 
              profile_template='./data/purple',
              credentials='./data/credentials.ini'):
+        """
+        It saves the old profile (if needed) and
+        set up a new one. After this initial process,
+        it opens the application
+
+        @type clean_profile: boolean
+        @param clean_profile: True, to back up the old profile and create a 
+            new one (default)
+        @type profile_template: string
+        @param profile_template: Path to the template of the new profile
+        @type credentials: string
+        @param credentials: Path to the config file with accounts information
+        """
+         
         self.creds_fn = self.normalize_path(credentials)
         self.credentials = ConfigParser()
         self.credentials.read(self.creds_fn)
@@ -48,6 +64,10 @@ class Pidgin(Application):
         Application.open_and_check_app(self)
 
     def generate_profile(self, profile_template):
+        """
+        It uses the profile_template and the
+        credentials to build a new profile folder
+        """
         os.mkdir(os.path.expanduser('~/.purple'))
         flat_dict = {}
         if self.credentials:
@@ -76,6 +96,10 @@ class Pidgin(Application):
             os.path.join(os.path.dirname(__file__), path))
 
     def backup_config(self):
+        """
+        It saves the configuration of Pidgin in a path
+        called ~/.purple.bak{.n}
+        """
         p = os.path.expanduser('~/.purple.bak')
         backup_path = p
         i = 2
@@ -91,6 +115,10 @@ class Pidgin(Application):
             self.backup_path = backup_path
 
     def restore_config(self):
+        """
+        It deletes the configuration folder and restore then
+        one backed up (at backup_path)
+        """
         try:
             rmtree('~/.purple')
         except OSError:
@@ -103,6 +131,19 @@ class Pidgin(Application):
             traceback.print_exc()
 
     def wait_for_account_connect(self, account_name, protocol, timeout=15):
+        """
+        It waits for an account to be connected.
+        A timeout value can be passed, being default 15secs.
+
+        It raises an exception if the timeout expires.
+
+        @type account_name: string 
+        @param account: The name of the account (user name)
+        @type protocol: string
+        @param protocol: The protocol of the account to wait to be connected
+        @type timeout: integer
+        @param timeout: Number of seconds to wait for the accout to be connected (default:15s)
+        """
         starttime = time()
         while not self.account_connected(account_name, protocol):
             if time() - starttime >= timeout:
@@ -110,13 +151,20 @@ class Pidgin(Application):
             sleep(1)
 
     def account_connected(self, account_name, protocol):
-        '''Checks to see if a specified account is connected, it parsed the 
-        account's submenu, if there is a menu item "no actions available", then
-        the account is not yet connected.
+        '''
+        Checks to see if a specified account is connected,
+        @type account_name: string
+        @param account_name: The name of the account (user name)
+        @type protocol: string
+        @param protocol: The name of the protocol used 
+
+        @return True, if the account if connected, False if not.
         '''
         ldtp.remap(self.WINDOW)
         window = ooldtp.context(self.WINDOW)
         objs = window.getobjectlist()
+        # It parses the account's submenu, if there is a menu 
+        # item "no actions available", then the account is not yet connected.
         for obj in objs:
             if obj.startswith('mnuNoactionsavailable'):
                 parent = ldtp.getobjectproperty(self.WINDOW,obj, 'parent')
@@ -127,9 +175,28 @@ class Pidgin(Application):
         return True
 
     def buddy_available(self, alias):
+        """
+        It searches for a given alias to be in the buddy list
+
+        @type alias: string
+        @param alias: The name of the buddy to search
+
+        @return 1, if the buddy is available, 0 otherwise.
+        """
         return ldtp.doesrowexist(self.WINDOW, self.TTBL_BUDDIES, alias)
 
     def wait_for_buddy(self, alias, timeout=15):
+        """
+        It waits for a buddy to be connected.
+        A timeout value can be passed, being default 15secs.
+
+        It raises an exception if the timeout expires.
+
+        @type alias: string 
+        @param alias: The name of the buddy to wait to be available
+        @type timeout: integer
+        @param timeout: Number of seconds to wait for the buddy to be connected (default:15s)
+        """
         starttime = time()
         while not self.buddy_available(alias):
             if time() - starttime >= timeout:
@@ -137,6 +204,16 @@ class Pidgin(Application):
             sleep(1)
 
     def send_message(self, alias, msg):
+        """
+        It sends a message to a particular buddy.
+
+        It raises an exception if the particuar buddy is not online.
+
+        @type alias: string
+        @param alias: The name of the buddy to send the message to
+        @type msg: string
+        @param msg: The message to send to the buddy
+        """
         if not ldtp.doesrowexist(self.WINDOW, self.TTBL_BUDDIES, alias):
             raise Exception("user %s is not online" % alias)
         ldtp.selectrow(self.WINDOW, self.TTBL_BUDDIES, alias)
@@ -151,17 +228,33 @@ class Pidgin(Application):
         ldtp.generatekeyevent('<return>')
 
     def get_conversation_log(self, alias):
+        """
+        It gets the text of a on-going conversation (no backlog)
+
+        @type alias: string
+        @param alias: The buddy to get the conversation text
+
+        @return The text of the conversion. '' if the conversation does not exist
+        """
         if not ldtp.guiexist('frm' + alias.replace(' ', '')):
             return ''
 
         return ldtp.gettextvalue('frm' + alias.replace(' ', ''), 'txt0')
 
     def exit(self):
+        """
+        It restore the previous configuration of Pidgin and exists
+        """
         if hasattr(self, 'backup_path'):
             self.restore_config()
         Application.exit(self)
         
     def get_all_windows(self):
+        """
+        It gets the list of the pidgin windows
+
+        @return A list containing the name of the windows
+        """
         windows = []
         print self.name
         for w in ldtp.getwindowlist():
@@ -173,4 +266,10 @@ class Pidgin(Application):
         return windows
     
     def close_conversation(self, window_name):
+        """
+        It closes a conversation window
+
+        @type window_name: string
+        @param window_name: The name of the conversation to close
+        """
         ldtp.selectmenuitem(window_name, self.MNU_CLOSE)
