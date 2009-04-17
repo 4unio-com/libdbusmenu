@@ -1,33 +1,21 @@
-from pidgin_app import Pidgin
+from desktoptesting.pidgin import Pidgin
 from ConfigParser import ConfigParser
 import ldtp, ooldtp, ldtputils
 from time import sleep, time
 from shutil import copytree, move
 from os.path import expanduser
-from xmpp_utils import Buddy
 
 class PidginNotifyTest(Pidgin):
     MNU_INDICATOR_SERVER = "mnuPidginInternetMessenger"
     EMB_INDICATOR_APPLET = "embindicator-applet"
     def cleanup(self):
-        alias = self.credentials.get('OtherXMPP', 'alias')
+        alias = self.get_account_alias('OtherXMPP')
         if ldtp.guiexist('frm%s' % alias.replace(' ', '')):
             self.close_conversation('frm%s' % alias.replace(' ', ''))
 
     def open(self):
-        starttime = time()
         Pidgin.open(self)
-        self.buddy = None
-        ldtp.waittillguiexist(self.WINDOW)
-
-        cp = self.credentials
-        account_info = dict(cp.items('XMPP'))
-        account_info['name'] = '%s@%s' % (account_info['username'],
-                                          account_info['domain'])
-                                             
-        frm_buddy_list = ooldtp.context(self.WINDOW)
-
-        self.wait_for_account_connect(account_info['name'], 'XMPP')
+        self.wait_for_account_connect(self.get_account_name('XMPP'), 'XMPP')
 
         # The notify plugin only starts working after 15 seconds.
         # We start waiting from now to be safe.
@@ -36,24 +24,12 @@ class PidginNotifyTest(Pidgin):
     def exit(self):
         if self.buddy:
             self.buddy.disconnect()
+
         if not ldtp.hasstate(self.WINDOW, self.WINDOW, ldtp.state.SHOWING):
             self._click_in_indicator(self.MNU_INDICATOR_SERVER)
             sleep(1)
+
         Pidgin.exit(self)
-
-    def _login_buddy(self):
-        """
-        Login buddy account, the contact should show up on the buddy list.
-        """
-        buddy_info = dict(self.credentials.items('OtherXMPP'))
-        buddy_info['alias'] = buddy_info.get(
-            'alias', '%s@%s' % (buddy_info['username'], buddy_info['domain']))
-
-
-        self.buddy = \
-            Buddy('%s@%s' % (buddy_info['username'], buddy_info['domain']),
-                  buddy_info['password'])
-        self.buddy.connect()
 
     def _click_in_indicator(self, name):
         objs = ldtp.getobjectlist(self.TOP_PANEL)
@@ -107,8 +83,8 @@ class PidginNotifyTest(Pidgin):
                 'indicator server menu item did not show/hide the buddy list'
 
     def testBuddyLogin(self):
-        self._login_buddy()
-        alias = self.credentials.get('OtherXMPP', 'alias')
+        self.buddy_login()
+        alias = self.get_account_alias('OtherXMPP')
 
         result = 1
         count = 0
@@ -144,13 +120,12 @@ class PidginNotifyTest(Pidgin):
 
     def testRecieveMessageAppend(self, msg1='', msg2='', msg3='', timeout=5):
         if not self.buddy:
-            self._login_buddy()
+            self.buddy_login()
             sleep(1)
 
-        jid = '%s@%s' % (self.credentials.get('XMPP', 'username'), 
-                         self.credentials.get('XMPP', 'domain'))
+        jid = self.get_account_name('XMPP')
 
-        alias = self.credentials.get('OtherXMPP', 'alias')
+        alias = self.get_account_alias('OtherXMPP')
 
         #https://bugs.launchpad.net/ubuntu/+source/pidgin-libnotify/+bug/362248
         ldtp.waittillguinotexist(self._bubble_name_from_alias(alias))
@@ -196,13 +171,12 @@ class PidginNotifyTest(Pidgin):
 
     def testRecieveMessageSimple(self, msg1='', msg2='', timeout=5):
         if not self.buddy:
-            self._login_buddy()
+            self.buddy_login()
             sleep(1)
 
-        jid = '%s@%s' % (self.credentials.get('XMPP', 'username'), 
-                         self.credentials.get('XMPP', 'domain'))
+        jid = self.get_account_name('XMPP')
 
-        alias = self.credentials.get('OtherXMPP', 'alias')
+        alias = self.get_account_alias('OtherXMPP')
 
         #https://bugs.launchpad.net/ubuntu/+source/pidgin-libnotify/+bug/362248
         ldtp.waittillguinotexist(self._bubble_name_from_alias(alias))

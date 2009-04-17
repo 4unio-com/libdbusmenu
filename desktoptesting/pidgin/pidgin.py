@@ -5,8 +5,10 @@ import os, traceback
 from time import time, sleep
 from ConfigParser import ConfigParser
 from string import Formatter
+from xmpp_utils import Buddy
+from inspect import getsourcefile
 
-class Pidgin(Application):    
+class Pidgin(Application):
     # Pidgin constants
     WINDOW = "frmBuddyList"
     LAUNCHER = "pidgin"
@@ -53,14 +55,15 @@ class Pidgin(Application):
         @param credentials: Path to the config file with accounts information
         """
          
-        self.creds_fn = self.normalize_path(credentials)
+        self.creds_fn = self._normalize_path(credentials)
         self.credentials = ConfigParser()
         self.credentials.read(self.creds_fn)
+        self.buddy = None
 
         if clean_profile:
             self.backup_config()
             if profile_template:
-                self.generate_profile(self.normalize_path(profile_template))
+                self.generate_profile(self._normalize_path(profile_template))
 
         Application.open_and_check_app(self)
 
@@ -92,9 +95,10 @@ class Pidgin(Application):
             f.write(buf)
             f.close()
 
-    def normalize_path(self, path):
+    def _normalize_path(cls, path):
         return os.path.normpath(
-            os.path.join(os.path.dirname(__file__), path))
+            os.path.join(os.path.dirname(getsourcefile(cls)), path))
+    _normalize_path = classmethod(_normalize_path)
 
     def backup_config(self):
         """
@@ -274,3 +278,37 @@ class Pidgin(Application):
         @param window_name: The name of the conversation to close
         """
         ldtp.selectmenuitem(window_name, self.MNU_CLOSE)
+
+    def get_account_name(self, protocol, include_resource=False):
+        account_info = dict(self.credentials.items(protocol))
+        if 'XMPP' in protocol:
+            name = '%s@%s' % (account_info['username'],
+                              account_info['domain'])
+            if include_resource:
+                name += '/%s' % account_info['resource']
+        else:
+            name = account_info['username']
+        return name
+
+    def get_account_alias(self, protocol):
+        account_info = dict(self.credentials.items(protocol))
+        if account_info.has_key('alias'):
+            return account_info['alias']
+
+        return self.get_account_name(protocol)
+
+
+    def buddy_login(self):
+        buddy_info = dict(self.credentials.items('OtherXMPP'))
+
+        buddy_info['alias'] = buddy_info.get(
+            'alias', '%s@%s' % (buddy_info['username'], buddy_info['domain']))
+
+
+        self.buddy = \
+            Buddy('%s@%s' % (buddy_info['username'], buddy_info['domain']),
+                  buddy_info['password'])
+        print 'connecting buddy'
+        self.buddy.connect()
+        print 'connected buddy'
+

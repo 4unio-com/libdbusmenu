@@ -1,4 +1,4 @@
-from pidgin_app import Pidgin
+from desktoptesting.pidgin import Pidgin
 from ConfigParser import ConfigParser
 import ldtp, ooldtp, ldtputils
 from time import sleep
@@ -53,12 +53,7 @@ class PidginNewAccountTest(Pidgin):
             raise AssertionError("no new accounts in view.", 
                                  ldtputils.imagecapture())
 
-        if protocol == "XMPP":
-            username = '%s@%s/%s' % (details['username'], 
-                                     details['domain'],
-                                     details.get('resource', ''))
-        else:
-            username = details['username']
+        username = self.get_account_name(protocol, True)
 
         try:
             dlg_accounts.getcellvalue(self.TBL_ACCOUNTS, 0, 1)
