@@ -9,17 +9,6 @@ from desktoptesting.gnome import Application, PolicyKit
 import re
 
 class UbuntuMenu(Application):
-    
-    def setup(self):
-        pass
-
-    def teardown(self):
-        self.cleanup() 
-
-    def cleanup(self):
-        self.close()
-        Application.cleanup(self)
-
     def open_and_check_menu_item(self, menu_item_txt):
         """
         Given a menu item, it tries to open the application associated with it.

@@ -4,13 +4,13 @@ from time import time
 
 from desktoptesting.ubuntu import UbuntuMenu
 
-class UbuntuMenuTest(UbuntuMenu):
+class UbuntuMenuTest(UbuntuMenuTestSuite):
        
     def testOpenMenu(self, menuitem=None, windowname=None, closetype=None, closename=None):
-        self.set_name(windowname)
-        self.set_close_type(closetype)
-        self.set_close_name(closename)
-        self.open_and_check_menu_item(menuitem)
+        self.application.set_name(windowname)
+        self.application.set_close_type(closetype)
+        self.application.set_close_name(closename)
+        self.application.open_and_check_menu_item(menuitem)
         
 if __name__ == "__main__":
     ubuntu_menu_test = UbuntuMenuTest()

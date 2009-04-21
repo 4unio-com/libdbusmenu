@@ -45,22 +45,6 @@ class Application:
             self.close_name = self.CLOSE_NAME
 
 
-    def setup(self):
-        pass
-
-    def teardown(self):
-        pass
-
-    def cleanup(self):
-        self.set_name(self.WINDOW)
-        self.set_close_type(self.CLOSE_TYPE)
-        self.set_close_name(self.CLOSE_NAME)
-
-    def recover(self):
-        self.teardown()
-        sleep(1)
-        self.setup()
-
     def set_name(self, name):
         if name is not None:
             self.name = name
@@ -189,16 +173,6 @@ class Seahorse(Application):
 
     def __init__(self):
         Application.__init__(self)
-
-    def setup(self):
-        self.open()
-
-    def teardown(self):
-        self.close()
-
-    def cleanup(self):
-        #TODO: it should delete all the "My Personal Keys"
-        pass
 
 
     def new_key(self, key_type):
@@ -528,44 +502,6 @@ class GEdit(Application):
     def __init__(self):
         Application.__init__(self)
 
-    def setup(self):
-        self.open()
-
-    def teardown(self):
-        self.close()
-
-    def cleanup(self):
-        # Exit using the Quit menu 
-        try:
-            try:
-                gedit = ooldtp.context(self.name)
-                quit_menu = gedit.getchild(self.MNU_CLOSE)
-            except ldtp.LdtpExecutionError:
-                raise ldtp.LdtpExecutionError, "The quit menu was not found."
-            quit_menu.selectmenuitem()
-        except ldtp.LdtpExecutionError:
-            raise ldtp.LdtpExecutionError, "Mmm, something went wrong when closing the application."
-
-        result = ldtp.waittillguiexist(self.QUESTION_DLG,
-                                       guiTimeOut = 2)
-
-        if result == 1:
-            question_dialog = ooldtp.context(self.QUESTION_DLG)
-            question_dlg_btn_close = question_dialog.getchild(self.QUESTION_DLG_BTN_CLOSE)
-            question_dlg_btn_close.click()
-        
-        try:
-            gedit = ooldtp.context(self.name)
-            new_menu = gedit.getchild(self.MNU_NEW)
-        except ldtp.LdtpExecutionError:
-            raise ldtp.LdtpExecutionError, "The new menu was not found."
-        new_menu.selectmenuitem()
-        
-        result = ldtp.waittillguiexist(
-            self.name, self.TXT_FIELD)
-        if result != 1:
-            raise ldtp.LdtpExecutionError, "Failed to set up new document."
-        
 
     def write_text(self, text):
         """
@@ -760,7 +696,3 @@ class PolicyKit(Application):
           
         cancelButton.click()
         ldtp.waittillguinotexist (self.name)
-        
-
-        
-    
