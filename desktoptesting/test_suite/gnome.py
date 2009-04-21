@@ -1,39 +1,10 @@
 """
-test_suite module contains the definition of the TestSuite class that
-must be used by all test suites written for the desktoptesting package
+gnome module contains the definition of the test suites used for gnome
+applications
 """
 import ldtp, ooldtp
-from gnome import Application, Seahorse, GEdit
-from ubuntu import UbuntuMenu, UpdateManager
-
-class TestSuite:
-    """
-    TestSuite that implements all the test suite methods desired in a
-    test suite
-    """
-    def setup(self):
-        pass
-
-    def teardown(self):
-        pass
-
-    def cleanup(self):
-        pass
-
-
-class SingleApplicationTestSuite(TestSuite):
-    """
-    Test suite intended to make sure that a single application is
-    running
-    """
-    def __init__(self, application_factory):
-        self.application = application_factory()
-
-    def cleanup(self):
-        self.application.set_name(self.WINDOW)
-        self.application.set_close_type(self.CLOSE_TYPE)
-        self.application.set_close_name(self.CLOSE_NAME)
-
+from .main import SingleApplicationTestSuite
+from ..aplication.gnome import Application, Seahorse, GEdit
 
 class SeahorseTestSuite(SingleApplicationTestSuite):
     """
@@ -97,19 +68,3 @@ class GEditTestSuite(SingleApplicationTestSuite):
             self.application.name, self.application.TXT_FIELD)
         if result != 1:
             raise ldtp.LdtpExecutionError, "Failed to set up new document."
-        
-
-class UbuntuMenuTestSuite(SingleApplicationTestSuite):
-    def __init__(self):
-        SingleApplicationTestSuite.__init__(self, UbuntuMenu)
-
-    def teardown(self):
-        self.cleanup() 
-
-    def cleanup(self):
-        self.application.close()
-        SingleApplicationTestSuite.cleanup(self)
-
-class UpdateManagerTestSuite(SingleApplicationTestSuite):
-    def __init__(self):
-        SingleApplicationTestSuite.__init__(self, UpdateManager)
