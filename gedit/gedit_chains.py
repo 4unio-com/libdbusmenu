@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from time import time, gmtime, strftime
 
-from desktoptesting.test_suite import GEditTestSuite
+from desktoptesting.test_suite.gnome import GEditTestSuite
 from desktoptesting.check import FileComparison, FAIL
 
 class GEditChain(GEditTestSuite):

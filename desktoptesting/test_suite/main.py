@@ -26,6 +26,6 @@ class SingleApplicationTestSuite(TestSuite):
         self.application = application_factory()
 
     def cleanup(self):
-        self.application.set_name(self.WINDOW)
-        self.application.set_close_type(self.CLOSE_TYPE)
-        self.application.set_close_name(self.CLOSE_NAME)
+        self.application.set_name(self.application.WINDOW)
+        self.application.set_close_type(self.application.CLOSE_TYPE)
+        self.application.set_close_name(self.application.CLOSE_NAME)

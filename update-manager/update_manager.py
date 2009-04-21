@@ -1,5 +1,4 @@
-from desktoptesting.ubuntu import UpdateManager
-from desktoptesting.test_suite import UpdateManagerTestSuite
+from desktoptesting.test_suite.ubuntu import UpdateManagerTestSuite
 
 class UpdateManagerTest(UpdateManagerTestSuite):
     def test_update_first(self, password):

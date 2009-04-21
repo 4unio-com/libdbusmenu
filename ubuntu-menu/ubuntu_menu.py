@@ -1,5 +1,4 @@
-from desktoptesting.ubuntu import UbuntuMenu
-from desktoptesting.test_suite import UbuntuMenuTestSuite
+from desktoptesting.test_suite.ubuntu import UbuntuMenuTestSuite
 
 class UbuntuMenuTest(UbuntuMenuTestSuite):
        
@@ -12,5 +11,3 @@ class UbuntuMenuTest(UbuntuMenuTestSuite):
 if __name__ == "__main__":
     ubuntu_menu_test = UbuntuMenuTest()
     ubuntu_menu_test.run()
-
-

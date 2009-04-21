@@ -1,5 +1,4 @@
-from desktoptesting.gnome import Seahorse
-from desktoptesting.test_suite import TestSuite
+from desktoptesting.test_suite.gnome import SeahorseTestSuite
     
 class SeahorsePGP(SeahorseTestSuite):
     def test_generate_pgp(self, name, email, comment, passphrase):

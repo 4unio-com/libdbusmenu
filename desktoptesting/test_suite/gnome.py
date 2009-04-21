@@ -4,7 +4,7 @@ applications
 """
 import ldtp, ooldtp
 from .main import SingleApplicationTestSuite
-from ..aplication.gnome import Application, Seahorse, GEdit
+from ..application.gnome import Application, Seahorse, GEdit
 
 class SeahorseTestSuite(SingleApplicationTestSuite):
     """
