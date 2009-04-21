@@ -2,6 +2,7 @@
 test_suite module contains the definition of the TestSuite class that
 must be used by all test suites written for the desktoptesting package
 """
+import ldtp, ooldtp
 from gnome import Application, Seahorse, GEdit
 from ubuntu import UbuntuMenu, UpdateManager
 
@@ -91,7 +92,7 @@ class GEditTestSuite(SingleApplicationTestSuite):
         except ldtp.LdtpExecutionError:
             raise ldtp.LdtpExecutionError, "The new menu was not found."
         new_menu.selectmenuitem()
-        
+
         result = ldtp.waittillguiexist(
             self.application.name, self.application.TXT_FIELD)
         if result != 1:

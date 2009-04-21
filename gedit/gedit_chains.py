@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-
-import ldtp
-import ldtputils
-
 from time import time, gmtime, strftime
 
 from desktoptesting.test_suite import GEditTestSuite

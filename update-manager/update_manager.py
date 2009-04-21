@@ -1,6 +1,3 @@
-import ldtp
-import ldtputils
-
 from desktoptesting.ubuntu import UpdateManager
 from desktoptesting.test_suite import UpdateManagerTestSuite
 

@@ -1,8 +1,5 @@
-import ldtp 
-import ldtputils
-from time import time 
-
 from desktoptesting.ubuntu import UbuntuMenu
+from desktoptesting.test_suite import UbuntuMenuTestSuite
 
 class UbuntuMenuTest(UbuntuMenuTestSuite):
        

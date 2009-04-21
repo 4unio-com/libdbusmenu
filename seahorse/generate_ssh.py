@@ -1,7 +1,3 @@
-import ldtp 
-import ldtputils 
-from time import time 
-
 from desktoptesting.gnome import Seahorse
 from desktoptesting.test_suite import SeahorseTestSuite
 
@@ -14,4 +10,3 @@ class SeahorseSSH(SeahorseTestSuite):
         # Check that the key was successfully created
         if self.application.assert_exists_key(description) == False:
             raise AssertionError, "The key was not succesfully created."
-
