@@ -6,6 +6,7 @@ from time import time, sleep
 from ConfigParser import ConfigParser
 from string import Formatter
 from xmpp_utils import Buddy
+from msn_utils import BuddyMSN
 from inspect import getsourcefile
 
 class Pidgin(Application):
@@ -202,12 +203,13 @@ class Pidgin(Application):
         @type timeout: integer
         @param timeout: Number of seconds to wait for the buddy to be connected (default:15s)
         """
+        print alias
         starttime = time()
         while not self.buddy_available(alias):
             if time() - starttime >= timeout:
                 raise Exception('waiting for buddy timed out')
             sleep(1)
-
+        print "alias"
     def send_message(self, alias, msg):
         """
         It sends a message to a particular buddy.
@@ -308,6 +310,17 @@ class Pidgin(Application):
         self.buddy = \
             Buddy('%s@%s' % (buddy_info['username'], buddy_info['domain']),
                   buddy_info['password'])
+        print 'connecting buddy'
+        self.buddy.connect()
+        print 'connected buddy'
+
+    def buddy_msn_login(self):
+        print "hey"
+        buddy_info = dict(self.credentials.items('OtherMSN'))
+        print buddy_info
+        self.buddy = BuddyMSN(buddy_info['username'], buddy_info['password'])
+        print buddy_info['username']
+        print buddy_info['password']
         print 'connecting buddy'
         self.buddy.connect()
         print 'connected buddy'

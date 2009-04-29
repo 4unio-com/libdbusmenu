@@ -106,7 +106,7 @@ This project provides a library and scripts for desktop testing.
         ("share/ubuntu-desktop-tests/seahorse", ["seahorse/*.*"]),
         ("share/ubuntu-desktop-tests/seahorse/data", ["seahorse/data/*"])],
     scripts = ["bin/ubuntu-desktop-test"],
-    packages = ["desktoptesting"],
+    packages = ["desktoptesting", "desktoptesting/pidgin"],
     cmdclass = {
         "install_data": testing_install_data,
         "install_scripts": testing_install_scripts,
