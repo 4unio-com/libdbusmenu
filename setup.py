@@ -2,7 +2,6 @@
 
 import os
 import re
-import shutil
 
 from glob import glob
 from tempfile import mkstemp
@@ -51,6 +50,7 @@ class testing_install_data(install_data, object):
                     i += 1
 
     def run(self):
+
         """Run substitutions on files."""
         super(testing_install_data, self).run()
 
@@ -69,7 +69,8 @@ class testing_install_data(install_data, object):
             tmpfile = mkstemp()[1]
             substitute_variables(xmlfile, tmpfile, {
                 ">.": ">%s" % sharedir})
-            shutil.move(tmpfile, xmlfile)
+            os.rename(tmpfile, xmlfile)
+            os.chmod(xmlfile, 0644)
 
 class testing_install_scripts(install_scripts, object):
 
