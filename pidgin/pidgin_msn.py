@@ -16,7 +16,9 @@ class PidginMSNUseTest(Pidgin):
         self.wait_for_buddy(self.get_account_alias('OtherMSN'))
     
     def exit(self):
-        self.buddy.disconnect()
+        #TODO: The logout method in pymsn is causing the whole suite to exit
+        # as it conflicts with the transport protocol of LDTP. Any ideas?
+        #self.buddy.disconnect()
         Pidgin.exit(self)
 
     def testSendMessage(self, msg=''):
