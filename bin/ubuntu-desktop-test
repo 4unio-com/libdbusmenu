@@ -370,6 +370,7 @@ class TestCaseRunner(TestRunner):
             self.set_result('pass', 0)
         except Exception, e:
             # There was an unrelated error.
+            logging.warning(traceback.format_exc())
             if len(e.args) > 1:
                 self.append_result('message', e.args[0])
                 self.append_screenshot(e.args[1])
@@ -429,6 +430,7 @@ class TestSuiteRunner(TestRunner):
         try:
             self._run(loggerclass, setup_once, cases)
         except Exception, e:
+            logging.warning(traceback.format_exc())
             # There was an unrelated error.
             self.append_result('message', str(e))
             self.append_result('stacktrace', traceback.format_exc())
