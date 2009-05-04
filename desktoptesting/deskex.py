@@ -23,7 +23,11 @@ class IndicatorApplet(Application):
     
     def add_server(self, desktop_file):
         if not self.server:
-            self.server = indicate.indicate_server_ref_default()
+            try:
+                self.server = indicate.indicate_server_ref_default()
+            except AttributeError:
+                raise Exception, \
+                    "no libindicate Python bindings, install python-indicate."
         self.server.set_type("message.im")
         self.server.set_desktop_file(desktop_file)
         self.server.show()
