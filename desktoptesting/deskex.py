@@ -35,6 +35,10 @@ class IndicatorApplet(Application):
             gtk.main_iteration()
 
     def show_indicator(self, sender):
+        def _timeout_cb():
+            gtk.main_quit()
+            return False
+
         indicator = indicate.IndicatorMessage()
         indicator.set_property("subtype", "im")
         indicator.set_property("sender", sender)
@@ -44,8 +48,8 @@ class IndicatorApplet(Application):
         indicator.set_property_icon("icon", pixbuf)
         indicator.show()
         self.indicators.append(indicator)
-        while gtk.events_pending():
-            gtk.main_iteration()
+        glib.timeout_add_seconds(1, _timeout_cb)
+        gtk.main()
 
     def capture_applet_icon(self):
         x, y, w, h = ldtp.getobjectsize(self.TOP_PANEL, self.IA_TOPLEVEL)
@@ -189,6 +193,8 @@ if __name__ == "__main__":
     from time import sleep
     test = IndicatorApplet()
     test.open()
-    test.add_server('/usr/share/applications/pidgin.desktop')
+    test.add_server('/usr/share/applications/transmission.desktop')
     test.show_indicator('Elmer Fud')
-    print test.wait_for_indicator_display('Elmer Fud', 20)
+    print 'sleeping'
+    sleep(20)
+    #print test.wait_for_indicator_display('Elmer Fud', 20)
