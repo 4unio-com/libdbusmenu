@@ -5,6 +5,7 @@ The gnome module provides wrappers for LDTP to make the write of Gnome tests eas
 """
 import ooldtp
 import ldtp 
+from utils import enable_a11y
 
 class Application:
     """
@@ -27,7 +28,7 @@ class Application:
         @type close_type: string
         @param close_type: The type of close widget of the application. Types: menu, button.
         @type close_name: string
-        @param close_name: The name of the exit widget of the application. If not mentioned the default will be used ("Quit")
+        @param close_name: The name of the close widget of the application. If not mentioned the default will be used ("Quit")
         """
         if name:
             self.name = name
@@ -79,14 +80,14 @@ class Application:
         """
         ldtp.remap(self.name)
 
-    def open_and_check_app(self):
+    def open(self):
         """
         Given an application, it tries to open it.
          
-        @type app_name: string
-        @param app_name: The command to start the application.
         """
+        enable_a11y(True)
         ldtp.launchapp(self.LAUNCHER)
+        enable_a11y(False)
 
         ldtp.wait(2)
         response = ldtp.waittillguiexist(self.name, '', 20)
@@ -94,9 +95,9 @@ class Application:
         if response == 0:
             raise ldtp.LdtpExecutionError, "The " + self.name + " window was not found."    
 
-    def exit(self):
+    def close(self):
         """
-        Given an application, it tries to quit it. 
+        Given an application, it tries to close it. 
         """
         try:
             app = ooldtp.context(self.name)
@@ -196,14 +197,12 @@ class Seahorse(Application):
         self.open()
 
     def teardown(self):
-        self.exit()
+        self.close()
 
     def cleanup(self):
         #TODO: it should delete all the "My Personal Keys"
         pass
 
-    def open(self):
-        self.open_and_check_app()
 
     def new_key(self, key_type):
         """
@@ -536,7 +535,7 @@ class GEdit(Application):
         self.open()
 
     def teardown(self):
-        self.exit()
+        self.close()
 
     def cleanup(self):
         # Exit using the Quit menu 
@@ -619,21 +618,13 @@ class GEdit(Application):
 
         ldtp.waittillguinotexist(self.SAVE_DLG)
         
-    def open(self):
+    def close(self, save=False, filename=''):
         """
-        It opens the gedit application and raises an error if the application
-        didn't start properly.
-
-        """
-        self.open_and_check_app()
-
-    def exit(self, save=False, filename=''):
-        """
-        Given a gedit window, it tries to exit the application.
-        By default, it exits without saving. This behaviour can be changed to save (or save as) on exit.
+        Given a gedit window, it tries to close the application.
+        By default, it closes without saving. This behaviour can be changed to save (or save as) on close.
          
         @type save: boolean
-        @param save: If True, the edited file will be saved on exit.
+        @param save: If True, the edited file will be saved on close.
 
         @type filename: string
         @param filename: The file name to save the buffer to 
