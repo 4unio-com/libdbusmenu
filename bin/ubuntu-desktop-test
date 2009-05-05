@@ -308,6 +308,14 @@ def main(args=sys.argv):
 class TestRunner:
     def __init__(self):
         self.result = {}
+        self.args = {}
+
+    def get_args(self, node):
+        for n in node.childNodes:
+            if n.nodeType != n.ELEMENT_NODE or not n.hasChildNodes():
+                continue
+            self.args[n.tagName.encode('ascii')] = n.firstChild.data
+
     def add_results_to_node(self, node):
         if self.result == {}: return
         result = node.ownerDocument.createElement("result")
@@ -344,19 +352,12 @@ class TestCaseRunner(TestRunner):
     def __init__(self, obj, xml_node):
         TestRunner.__init__(self)
         self.xml_node = xml_node
-        self.args = {}
         self.name = xml_node.getAttribute('name')
         self.test_func = getattr(
             obj, xml_node.getElementsByTagName('method')[0].firstChild.data)
         args_element = xml_node.getElementsByTagName('args')
         if args_element:
-            self._get_args(args_element[0])
-
-    def _get_args(self, node):
-        for n in node.childNodes:
-            if n.nodeType != n.ELEMENT_NODE or not n.hasChildNodes():
-                continue
-            self.args[n.tagName.encode('ascii')] = n.firstChild.data
+            self.get_args(args_element[0])
 
     def run(self, logger):
         starttime = time()
@@ -411,9 +412,12 @@ class TestSuiteRunner(TestRunner):
                 continue
             if node.tagName == 'class':
                 modname, clsname = node.firstChild.data.rsplit('.', 1)
-            if node.tagName == 'case':
-                logging.debug("Adding case %s to current test suite.", node.getAttribute("name"))
+            elif node.tagName == 'case':
+                logging.debug("Adding case %s to current test suite.", 
+                              node.getAttribute("name"))
                 case_runners.append(node)
+            elif node.tagName == 'args':
+                self.get_args(node)
         if None in (clsname, modname):
             raise Exception, "Missing a suite class"
 
@@ -425,7 +429,7 @@ class TestSuiteRunner(TestRunner):
 
         cls = getattr(mod, clsname)
         
-        self.testsuite = cls()
+        self.testsuite = cls(**self.args)
         
         self.case_runners = \
             [TestCaseRunner(self.testsuite, c) for c in case_runners]
