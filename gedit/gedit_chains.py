@@ -1,20 +1,16 @@
 # -*- coding: utf-8 -*-
-
-import ldtp
-import ldtputils
-
 from time import time, gmtime, strftime
 
-from desktoptesting.gnome import GEdit
+from desktoptesting.test_suite.gnome import GEditTestSuite
 from desktoptesting.check import FileComparison, FAIL
 
-class GEditChain(GEdit):
+class GEditChain(GEditTestSuite):
     def testChain(self, oracle=None, chain=None):
         test_file = strftime(
             "/tmp/" + "%Y%m%d_%H%M%S" + ".txt", gmtime((time())))
 
-        self.write_text(chain)
-        self.save(test_file)
+        self.application.write_text(chain)
+        self.application.save(test_file)
 
         testcheck = FileComparison(oracle, test_file)
 
