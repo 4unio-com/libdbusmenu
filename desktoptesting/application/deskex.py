@@ -1,4 +1,4 @@
-from desktoptesting.gnome import Application
+from .main import Application
 from time import time, sleep
 import tempfile
 import pynotify
@@ -111,21 +111,12 @@ class IndicatorApplet(Application):
 
         return displayed[0]
 
-    def cleanup(self):
+    def close(self):
         for indicator in self.indicators:
             indicator.hide()
         # BUG: 351537
         # self.server.hide()
         sleep(1)
-
-    def close(self):
-        self.cleanup()
-
-    def setup(self):
-        self.open()
-
-    def teardown(self):
-        self.close()
 
 class NotifyOSD(Application):
     def __init__(self):
@@ -148,7 +139,7 @@ class NotifyOSD(Application):
         if self.focus_desktop:
             ldtp.generatekeyevent('<alt><ctrl>d')
 
-    def exit(self):
+    def close(self):
         if self.focus_desktop:
             ldtp.generatekeyevent('<alt><ctrl>d')
         for screenshot in self.screenshots:
