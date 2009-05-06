@@ -3,6 +3,7 @@ main module contains the definition of the main Application class
 that is used to wrap applications functionality
 """
 import ldtp, ooldtp
+import os
 
 class Application:
     """
@@ -66,7 +67,9 @@ class Application:
         Given an application, it tries to open it.
          
         """
+        self._enable_a11y(True)
         ldtp.launchapp(self.LAUNCHER)
+        self._enable_a11y(False)
 
         ldtp.wait(2)
         response = ldtp.waittillguiexist(self.name, '', 20)
@@ -136,3 +139,7 @@ class Application:
                 app_txt_field.settextvalue(text)
             except ldtp.LdtpExecutionError:
                 raise ldtp.LdtpExecutionError, "We couldn't write text."
+
+    def _enable_a11y(self, enable):
+        os.environ['NO_GAIL'] = str(int(not enable))
+        os.environ['NO_AT_BRIDGE'] = str(int(not enable))

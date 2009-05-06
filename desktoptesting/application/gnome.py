@@ -5,7 +5,6 @@ The gnome module provides wrappers for LDTP to make the write of Gnome tests eas
 """
 import ooldtp
 import ldtp 
-from utils import enable_a11y
 from .main import Application
 
 class Seahorse(Application):
