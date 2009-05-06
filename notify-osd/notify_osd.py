@@ -5,13 +5,13 @@ import ldtputils
 
 from time import time, gmtime, strftime, sleep
 
-from desktoptesting.deskex import NotifyOSD
+from desktoptesting.test_suite.deskex import NotifyOSDTestSuite
 from desktoptesting.check import ScreenshotCompare, FAIL
 
-class NotifyOSDTest(NotifyOSD):
+class NotifyOSDTest(NotifyOSDTestSuite):
     def layoutTest(self, oracle=None, summary=None, body=None, icon=None):
-        self.notify(summary, body, icon)
-        elapsed, screeny = self.grab_image_and_wait(summary)
+        self.application.notify(summary, body, icon)
+        elapsed, screeny = self.application.grab_image_and_wait(summary)
 
         checker = ScreenshotCompare(oracle, screeny)
 
@@ -37,10 +37,11 @@ class NotifyOSDTest(NotifyOSD):
             bubbles.append(_Bubble(oracle, summary, body, icons))
 
         for b in bubbles:
-            self.notify(b.summary, b.body, b.icon)
+            self.application.notify(b.summary, b.body, b.icon)
 
         for b in bubbles:
-            b.elapsed, b.screeny = self.grab_image_and_wait(b.summary)
+            b.elapsed, b.screeny = \
+                self.application.grab_image_and_wait(b.summary)
             
         for b in bubbles:
             testcheck = ScreenshotCompare(b.oracle, b.screeny)
@@ -58,12 +59,12 @@ class NotifyOSDTest(NotifyOSD):
                         summary2=None, body2=None, icon2=None, value2=None):
         ALLOWED_OVERLAP = 14
 
-        self.notify(summary1, body1, icon1)
+        self.application.notify(summary1, body1, icon1)
         sleep(1)
-        self.notify_synchronous(summary2, body2, icon2, int(value2))
+        self.application.notify_synchronous(summary2, body2, icon2, int(value2))
 
-        x2, y2, w2, h2 = self.get_extents(summary2, True)
-        x1, y1, w1, h1 = self.get_extents(summary1)
+        x2, y2, w2, h2 = self.application.get_extents(summary2, True)
+        x1, y1, w1, h1 = self.application.get_extents(summary1)
 
         if w1 == -1:
             # First bubble does not exist anymore, this could mean 
