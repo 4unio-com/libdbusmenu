@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<data>
-    <oracle>./notify-osd/data/icons_summary.png</oracle>
-    <summary>WiFi connection lost</summary>
-    <body></body>
-    <icon>notification-network-wireless-disconnected</icon>
-</data>

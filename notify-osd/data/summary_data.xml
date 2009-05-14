@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<data>
-    <oracle>./notify-osd/data/summary.png</oracle>
-    <summary>Summary-only</summary>
-    <body></body>
-    <icon></icon>
-</data>

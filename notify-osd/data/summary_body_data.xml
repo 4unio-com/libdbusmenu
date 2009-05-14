@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<data>
-    <oracle>./notify-osd/data/summary_body.png</oracle>
-    <summary>Totem</summary>
-    <body>This is a superfluous notification</body>
-    <icon></icon>
-</data>
