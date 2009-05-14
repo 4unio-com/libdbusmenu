@@ -130,7 +130,7 @@ class NotifyOSD(Application):
         info = pynotify.get_server_info()
         if info.get('name', None) != 'notify-osd':
             raise ldtp.LdtpExecutionError, \
-                "The notify service is '%s', expected 'notify-dameon'" % \
+                "The notify service is '%s', expected 'notify-osd'" % \
                 info.get('name', None)
 
     def open(self, focus_desktop=True):
@@ -143,7 +143,8 @@ class NotifyOSD(Application):
         if self.focus_desktop:
             ldtp.generatekeyevent('<alt><ctrl>d')
         for screenshot in self.screenshots:
-            os.remove(screenshot)
+            if os.path.exists(screenshot):
+                os.remove(screenshot)
 
     def notify(self, summary, body="", icon=None):
 	n = pynotify.Notification (summary, body, icon)
