@@ -4,6 +4,12 @@
   <description>
     Walks pidgin through setting up a new account.
   </description>
+  <args>
+    <!-- If you want this as false, keep it empty -->
+    <clean_profile>1</clean_profile> 
+    <profile_template></profile_template>
+    <credentials>./pidgin/data/credentials.ini</credentials>
+  </args>
   <case name="AccountXMPP">
     <method>testNewAccount</method>
     <description>Test the creation of an XMPP account.</description>

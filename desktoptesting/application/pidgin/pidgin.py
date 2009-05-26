@@ -1,4 +1,4 @@
-from desktoptesting.gnome import Application
+from ..main import Application
 from shutil import move, rmtree, copytree
 import ldtp, ooldtp
 import os, traceback
@@ -29,19 +29,7 @@ class Pidgin(Application):
         ldtp.generatekeyevent('<alt><F9>')
         sleep(3)
 
-    def setup(self):
-        self.open()
-
-    def teardown(self):
-        self.exit()
-
-    def cleanup(self):
-        self.exit()
-        self.open()
-
-    def open(self, clean_profile=True, 
-             profile_template='./data/purple',
-             credentials='./data/credentials.ini'):
+    def open(self, clean_profile=True, profile_template='',credentials=''):
         """
         It saves the old profile (if needed) and
         set up a new one. After this initial process,
@@ -66,7 +54,7 @@ class Pidgin(Application):
             if profile_template:
                 self.generate_profile(self._normalize_path(profile_template))
 
-        Application.open_and_check_app(self)
+        Application.open(self)
 
     def generate_profile(self, profile_template):
         """
@@ -97,8 +85,9 @@ class Pidgin(Application):
             f.close()
 
     def _normalize_path(cls, path):
-        return os.path.normpath(
-            os.path.join(os.path.dirname(getsourcefile(cls)), path))
+        return path
+#        return os.path.normpath(
+#            os.path.join(os.path.dirname(getsourcefile(cls)), path))
     _normalize_path = classmethod(_normalize_path)
 
     def backup_config(self):
@@ -248,13 +237,13 @@ class Pidgin(Application):
 
         return ldtp.gettextvalue('frm' + alias.replace(' ', ''), 'txt0')
 
-    def exit(self):
+    def close(self):
         """
         It restore the previous configuration of Pidgin and exists
         """
         if hasattr(self, 'backup_path'):
             self.restore_config()
-        Application.exit(self)
+        Application.close(self)
         
     def get_all_windows(self):
         """
