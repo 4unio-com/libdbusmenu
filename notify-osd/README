@@ -1,0 +1,3 @@
+The first time that notify_osd test suite is run it will just get the necessary oracle files (calibration).
+Once the oracle files are there, the test suite can be run as many times as necessary in the machine.
+

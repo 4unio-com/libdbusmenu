@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Phony Internet Messenger
+GenericName=Internet Messenger
+Comment=Send instant messages over phony protocols
+Exec=phony
+StartupNotify=true
+Terminal=false
+Type=Application
+Categories=Network;InstantMessaging;

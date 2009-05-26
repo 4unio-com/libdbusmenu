@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<suite name="notify-osd">
+  <class>notify_osd.NotifyOSDTest</class>
+  <description>notify-osd tests</description>
+  <case name="IconSummaryBody">
+    <method>layoutTest</method>
+    <description>
+      Test the layout of a bubble with an icon, summary and body
+    </description>
+    <args>
+      <oracle>./notify-osd/data/icons_summary_body.png</oracle>
+      <summary>Nat King Cole</summary>
+      <body>Hey pal, what's up with the party next weekend? Will you join me and Anna?</body>
+      <icon>notification-message-IM</icon>
+    </args>
+  </case>
+  <case name="IconSummary">
+    <method>layoutTest</method>
+    <description>
+      Test the layout of a bubble with an icon and summary.
+    </description>
+    <args>
+      <oracle>./notify-osd/data/icons_summary.png</oracle>
+      <summary>WiFi connection lost</summary>
+      <body></body>
+      <icon>notification-network-wireless-disconnected</icon>
+    </args>
+  </case>
+  <case name="SummaryBody">
+    <method>layoutTest</method>
+    <description>
+      Test the layout of a bubble with a summary only.
+    </description>
+    <args>
+      <oracle>./notify-osd/data/summary_body.png</oracle>
+      <summary>Totem</summary>
+      <body>This is a superfluous notification</body>
+      <icon></icon>
+    </args>
+  </case>
+  <case name="Summary">
+    <method>layoutTest</method>
+    <description>
+      Test the layout of a bubble with a summary only.
+    </description>
+    <args>
+      <oracle>./notify-osd/data/summary.png</oracle>
+      <summary>Summary-only</summary>
+      <body></body>
+      <icon></icon>
+    </args>
+  </case>
+  <case name="Queue">
+    <method>queueTest</method>
+    <description>
+      Test the bubble queue.
+    </description>
+    <args>
+      <oracle>./notify-osd/data/icons_summary_body.png|./notify-osd/data/icons_summary.png|./notify-osd/data/summary.png</oracle>
+      <summary>Nat King Cole|WiFi connection lost|Summary-only</summary>
+      <body>Hey pal, what's up with the party next weekend? Will you join me and Anna?||</body>
+      <icon>notification-message-IM|notification-network-wireless-disconnected|</icon>
+    </args>
+  </case>
+  <case name="Synchronous">
+    <method>synchronousTest</method>
+    <description>
+      Test synchronous bubbles.
+    </description>
+    <args>
+    <summary1>Nat King Cole</summary1>
+    <body1>Hey pal, what's up with the party next weekend? Will you join me and Anna?</body1>
+    <icon1>notification-message-IM</icon1>
+    <summary2>Volume</summary2>
+    <body2></body2>
+    <icon2>notification-audio-volume-medium</icon2>
+    <value2>75</value2>
+    </args>
+  </case>
+</suite>

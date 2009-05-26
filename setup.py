@@ -2,7 +2,6 @@
 
 import os
 import re
-import shutil
 
 from glob import glob
 from tempfile import mkstemp
@@ -51,6 +50,7 @@ class testing_install_data(install_data, object):
                     i += 1
 
     def run(self):
+
         """Run substitutions on files."""
         super(testing_install_data, self).run()
 
@@ -69,7 +69,8 @@ class testing_install_data(install_data, object):
             tmpfile = mkstemp()[1]
             substitute_variables(xmlfile, tmpfile, {
                 ">.": ">%s" % sharedir})
-            shutil.move(tmpfile, xmlfile)
+            os.rename(tmpfile, xmlfile)
+            os.chmod(xmlfile, 0644)
 
 class testing_install_scripts(install_scripts, object):
 
@@ -99,6 +100,10 @@ This project provides a library and scripts for desktop testing.
         ("share/ubuntu-desktop-tests", ["report.xsl", "conffile.ini"]),
         ("share/ubuntu-desktop-tests/gedit", ["gedit/*.*"]),
         ("share/ubuntu-desktop-tests/gedit/data", ["gedit/data/*"]),
+        ("share/ubuntu-desktop-tests/notify-osd", ["notify-osd/*.*"]),
+        ("share/ubuntu-desktop-tests/notify-osd/data", ["notify-osd/data/*"]),
+        ("share/ubuntu-desktop-tests/indicator-applet", ["indicator-applet/*.*"]),
+        ("share/ubuntu-desktop-tests/indicator-applet/data", ["indicator-applet/data/*"]),
         ("share/ubuntu-desktop-tests/gnome-panel", ["gnome-panel/*.*"]),
         ("share/ubuntu-desktop-tests/gnome-panel/data", ["gnome-panel/data/*"]),
         ("share/ubuntu-desktop-tests/update-manager", ["update-manager/*.*"]),
@@ -106,7 +111,9 @@ This project provides a library and scripts for desktop testing.
         ("share/ubuntu-desktop-tests/seahorse", ["seahorse/*.*"]),
         ("share/ubuntu-desktop-tests/seahorse/data", ["seahorse/data/*"])],
     scripts = ["bin/ubuntu-desktop-test"],
-    packages = ["desktoptesting", "desktoptesting/pidgin"],
+    packages = ["desktoptesting",
+                "desktoptesting.application",
+                "desktoptesting.test_suite"],
     cmdclass = {
         "install_data": testing_install_data,
         "install_scripts": testing_install_scripts,

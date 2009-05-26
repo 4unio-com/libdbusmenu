@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<suite name="indicator-applet">
+  <class>indicator_applet.IndicatorAppletTest</class>
+  <description>indicator-applet tests</description>
+  <case name="Server">
+    <method>serverTest</method>
+    <description>
+      Add a server to the indicator applet.
+    </description>
+    <args>
+      <desktop_file>
+        ./indicator-applet/data/indicator_test.desktop
+      </desktop_file>
+    </args>
+  </case>
+  <case name="MessageIndicator">
+    <method>messageTest</method>
+    <description>
+      Add a message indicator to the indicator applet.
+    </description>
+    <args>
+      <desktop_file>
+        ./indicator-applet/data/indicator_test.desktop
+      </desktop_file>
+      <sender>
+        Elmer Fud
+      </sender>
+    </args>
+  </case>
+  <case name="IconChange">
+    <method>iconChangeTest</method>
+    <description>
+      Test to see if the applet's icon changes when a new message arrives.
+    </description>
+    <args>
+      <desktop_file>
+        ./indicator-applet/data/indicator_test.desktop
+      </desktop_file>
+      <sender>
+        Elmer Fud
+      </sender>
+    </args>
+  </case>
+  <case name="DisplayIndicator">
+    <method>displayIndicatorTest</method>
+    <description>
+      Test to see if the display callback is called when message
+      indicator is selected.
+    </description>
+    <args>
+      <desktop_file>
+        ./indicator-applet/data/indicator_test.desktop
+      </desktop_file>
+      <sender>
+        Elmer Fud
+      </sender>
+    </args>
+  </case>
+  <case name="DisplayServer">
+    <method>displayServerTest</method>
+    <description>
+      Test to see if the display callback is called when a server is selected.
+    </description>
+    <args>
+      <desktop_file>
+        ./indicator-applet/data/indicator_test.desktop
+      </desktop_file>
+    </args>
+  </case>
+</suite>
