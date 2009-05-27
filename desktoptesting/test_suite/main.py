@@ -23,6 +23,9 @@ class SingleApplicationTestSuite(TestSuite):
     """
     Test suite intended to make sure that a single application is
     running
+
+    APPLICATION_FACTORY: A class attribute that stores the factory for an
+    Application instance.
     """
     APPLICATION_FACTORY = Application
     def __init__(self):
