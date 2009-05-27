@@ -3,23 +3,13 @@ This is the "ubuntu" module.
 
 The ubuntu module provides wrappers for LDTP to make the write of Ubuntu tests easier. 
 """
-import ooldtp 
-import ldtp 
-from desktoptesting.gnome import Application, PolicyKit
+import ldtp , ooldtp
 import re
 
+from .main import Application
+from .gnome import PolicyKit
+
 class UbuntuMenu(Application):
-    
-    def setup(self):
-        pass
-
-    def teardown(self):
-        self.cleanup() 
-
-    def cleanup(self):
-        self.close()
-        Application.cleanup(self)
-
     def open_and_check_menu_item(self, menu_item_txt):
         """
         Given a menu item, it tries to open the application associated with it.
