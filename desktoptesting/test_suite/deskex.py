@@ -10,9 +10,7 @@ class IndicatorAppletTestSuite(SingleApplicationTestSuite):
     """
     Default test suite for Seahorse
     """
-    def __init__(self):
-        SingleApplicationTestSuite.__init__(self, IndicatorApplet)
-
+    APPLICATION_FACTORY = IndicatorApplet
     def setup(self):
         self.application.open()
 
@@ -26,9 +24,7 @@ class NotifyOSDTestSuite(SingleApplicationTestSuite):
     """
     Default test suite for Seahorse
     """
-    def __init__(self):
-        SingleApplicationTestSuite.__init__(self, NotifyOSD)
-
+    APPLICATION_FACTORY = NotifyOSD
     def setup(self):
         self.application.open()
 
