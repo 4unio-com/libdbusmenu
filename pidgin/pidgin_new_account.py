@@ -12,6 +12,9 @@ class PidginNewAccountTest(PidginTestSuite):
                 'no %s protocol configured in %s' % (protocol, 
                                                      self.application.creds_fn))
 
+        ldtp.waittillguiexist(self.application.DLG_ACCOUNTS, 
+                              self.application.BTN_ADD)
+
         dlg_accounts = ooldtp.context(self.application.DLG_ACCOUNTS)
 
         btn_add = dlg_accounts.getchild(self.application.BTN_ADD)
