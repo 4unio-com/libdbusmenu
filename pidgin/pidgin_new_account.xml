@@ -5,8 +5,7 @@
     Walks pidgin through setting up a new account.
   </description>
   <args>
-    <!-- If you want this as false, keep it empty -->
-    <clean_profile>1</clean_profile> 
+    <clean_profile>True</clean_profile> 
     <profile_template></profile_template>
     <credentials>./pidgin/data/credentials.ini</credentials>
   </args>

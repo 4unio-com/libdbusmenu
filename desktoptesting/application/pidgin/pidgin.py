@@ -43,6 +43,8 @@ class Pidgin(Application):
         @type credentials: string
         @param credentials: Path to the config file with accounts information
         """
+        clean_profile = clean_profile not in ('False', '0')
+        print 'clean_profile', clean_profile
         self.creds_fn = self._normalize_path(credentials)
         self.credentials = ConfigParser()
         self.credentials.read(self.creds_fn)
@@ -142,7 +144,10 @@ class Pidgin(Application):
         while not self.account_connected(account_name, protocol):
             if time() - starttime >= timeout:
                 raise Exception('IM server connection timed out')
-            sleep(1)
+            exists = ldtp.waittillguiexist('dlgSSLCertificateVerification',
+                                           guiTimeOut=1)
+            if exists:
+                ldtp.click('dlgSSLCertificateVerification', 'btnAccept')
 
     def account_connected(self, account_name, protocol):
         '''
