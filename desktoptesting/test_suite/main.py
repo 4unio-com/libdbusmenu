@@ -2,6 +2,8 @@
 test_suite module contains the definition of the TestSuite class that
 must be used by all test suites written for the desktoptesting package
 """
+from ..application.main import Application
+
 class TestSuite:
     """
     TestSuite that implements all the test suite methods desired in a
@@ -21,9 +23,13 @@ class SingleApplicationTestSuite(TestSuite):
     """
     Test suite intended to make sure that a single application is
     running
+
+    APPLICATION_FACTORY: A class attribute that stores the factory for an
+    Application instance.
     """
-    def __init__(self, application_factory):
-        self.application = application_factory()
+    APPLICATION_FACTORY = Application
+    def __init__(self):
+        self.application = self.APPLICATION_FACTORY()
 
     def cleanup(self):
         self.application.set_name(self.application.WINDOW)

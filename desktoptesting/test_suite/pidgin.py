@@ -13,13 +13,14 @@ class PidginTestSuite(SingleApplicationTestSuite):
     """
     Default test suite for Pidgin
     """
+    APPLICATION_FACTORY = Pidgin
     def __init__(self, clean_profile=True, 
                  profile_template='',
                  credentials=''):
         self.clean_profile = clean_profile
         self.profile_template = profile_template
         self.credentials = credentials
-        SingleApplicationTestSuite.__init__(self, Pidgin)
+        SingleApplicationTestSuite.__init__(self)
 
     def setup(self):
         self.application.open(

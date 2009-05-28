@@ -43,7 +43,6 @@ class Pidgin(Application):
         @type credentials: string
         @param credentials: Path to the config file with accounts information
         """
-         
         self.creds_fn = self._normalize_path(credentials)
         self.credentials = ConfigParser()
         self.credentials.read(self.creds_fn)
@@ -61,6 +60,7 @@ class Pidgin(Application):
         It uses the profile_template and the
         credentials to build a new profile folder
         """
+        print 'GENERATE PROFILE', profile_template
         os.mkdir(os.path.expanduser('~/.purple'))
         flat_dict = {}
         if self.credentials:
@@ -81,6 +81,7 @@ class Pidgin(Application):
             except KeyError, e:
                 raise Exception, \
                     'no section/key in %s: %s' % (self.creds_fn, e)
+            print buf
             f.write(buf)
             f.close()
 

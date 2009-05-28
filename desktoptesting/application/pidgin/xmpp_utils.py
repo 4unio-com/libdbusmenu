@@ -199,7 +199,7 @@ def unregister(jid, passwd):
     xmpp_do(jid, passwd, _remove)
 
 def register(jid, passwd):
-    b = Buddy(JID(sys.argv[1]), sys.argv[2])
+    b = Buddy(JID(jid), passwd)
     try:
         b.connect(True)
     except LegacyAuthenticationError:
@@ -210,6 +210,7 @@ def register(jid, passwd):
 if __name__ == "__main__":
     b = Buddy(JID(sys.argv[1]), sys.argv[2])
     b.connect()
+    print 'connected?'
     #b.client.loop()
     while True:
         msg = b.wait_for_message(timeout=1)
