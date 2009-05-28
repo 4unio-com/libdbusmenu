@@ -1,5 +1,4 @@
 from desktoptesting.test_suite.pidgin import PidginTestSuite
-from desktoptesting.test_suite.main import SingleApplicationTestSuite
 from desktoptesting.application.pidgin import Pidgin
 from ConfigParser import ConfigParser
 import ldtp, ooldtp, ldtputils
