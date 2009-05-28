@@ -4,6 +4,11 @@
   <description>
     pidgin-libnotify tests.
   </description>
+  <args>
+    <clean_profile>True</clean_profile> 
+    <profile_template>./pidgin/data/purple/</profile_template>
+    <credentials>./pidgin/data/credentials.ini</credentials>
+  </args>
   <case name="IndicatorServerTest">
     <method>testIndicatorServer</method>
     <description>Test the indicator server menu item. see that the buddy lists shows and hides.</description>

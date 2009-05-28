@@ -1,27 +1,24 @@
-from desktoptesting.pidgin import Pidgin
+from desktoptesting.test_suite.pidgin import PidginTestSuite
+from desktoptesting.application.pidgin import Pidgin
 from ConfigParser import ConfigParser
 import ldtp, ooldtp, ldtputils
 from time import sleep, time
 from shutil import copytree, move
 from os.path import expanduser
 
-class PidginNotifyTest(Pidgin):
+class PidginNotifyApp(Pidgin):
     MNU_INDICATOR_SERVER = "mnuPidginInternetMessenger"
     EMB_INDICATOR_APPLET = "embindicator-applet"
-    def cleanup(self):
-        alias = self.get_account_alias('OtherXMPP')
-        if ldtp.guiexist('frm%s' % alias.replace(' ', '')):
-            self.close_conversation('frm%s' % alias.replace(' ', ''))
 
-    def open(self):
-        Pidgin.open(self)
+    def open(self, clean_profile=True, profile_template='',credentials=''):
+        Pidgin.open(self, clean_profile, profile_template, credentials)
         self.wait_for_account_connect(self.get_account_name('XMPP'), 'XMPP')
 
         # The notify plugin only starts working after 15 seconds.
         # We start waiting from now to be safe.
         sleep(15)
 
-    def exit(self):
+    def close(self):
         if self.buddy:
             self.buddy.disconnect()
 
@@ -29,25 +26,33 @@ class PidginNotifyTest(Pidgin):
             self._click_in_indicator(self.MNU_INDICATOR_SERVER)
             sleep(1)
 
-        Pidgin.exit(self)
+        Pidgin.close(self)
+    
+
+class PidginNotifyTest(PidginTestSuite):
+    APPLICATION_FACTORY = PidginNotifyApp
+    def cleanup(self):
+        alias = self.application.get_account_alias('OtherXMPP')
+        if ldtp.guiexist('frm%s' % alias.replace(' ', '')):
+            self.application.close_conversation('frm%s' % alias.replace(' ', ''))
 
     def _click_in_indicator(self, name):
-        objs = ldtp.getobjectlist(self.TOP_PANEL)
+        objs = ldtp.getobjectlist(self.application.TOP_PANEL)
 
         for obj in objs:
             if obj.startswith(name):
                 if self._is_in_indicator(obj):
-                    ldtp.selectmenuitem(self.TOP_PANEL, obj)
+                    ldtp.selectmenuitem(self.application.TOP_PANEL, obj)
                     return
 
         raise Exception('%s does not appear in indicator applet' % name)
 
     def _is_in_indicator(self, obj):
-        parent = ldtp.getobjectproperty(self.TOP_PANEL, obj, 'parent')
-        while parent != self.TOP_PANEL:
-            if parent == self.EMB_INDICATOR_APPLET:
+        parent = ldtp.getobjectproperty(self.application.TOP_PANEL, obj, 'parent')
+        while parent != self.application.TOP_PANEL:
+            if parent == self.application.EMB_INDICATOR_APPLET:
                 return True
-            parent = ldtp.getobjectproperty(self.TOP_PANEL, 
+            parent = ldtp.getobjectproperty(self.application.TOP_PANEL, 
                                             parent, 'parent')
         return False
         
@@ -64,27 +69,27 @@ class PidginNotifyTest(Pidgin):
     def testIndicatorServer(self):
         flipflop = []
         flipflop.append(
-            ldtp.hasstate(self.WINDOW, self.WINDOW, ldtp.state.SHOWING))
+            ldtp.hasstate(self.application.WINDOW, self.application.WINDOW, ldtp.state.SHOWING))
 
-        self._click_in_indicator(self.MNU_INDICATOR_SERVER)
+        self._click_in_indicator(self.application.MNU_INDICATOR_SERVER)
         sleep(2)
 
         flipflop.append(
-            ldtp.hasstate(self.WINDOW, self.WINDOW, ldtp.state.SHOWING))
+            ldtp.hasstate(self.application.WINDOW, self.application.WINDOW, ldtp.state.SHOWING))
 
-        self._click_in_indicator(self.MNU_INDICATOR_SERVER)
+        self._click_in_indicator(self.application.MNU_INDICATOR_SERVER)
         sleep(2)
             
         flipflop.append(
-            ldtp.hasstate(self.WINDOW, self.WINDOW, ldtp.state.SHOWING))
+            ldtp.hasstate(self.application.WINDOW, self.application.WINDOW, ldtp.state.SHOWING))
 
         if flipflop not in ([1, 0, 1], [0, 1, 0]):
             raise AssertionError, \
                 'indicator server menu item did not show/hide the buddy list'
 
     def testBuddyLogin(self):
-        self.buddy_login()
-        alias = self.get_account_alias('OtherXMPP')
+        self.application.buddy_login()
+        alias = self.application.get_account_alias('OtherXMPP')
 
         result = 1
         count = 0
@@ -105,7 +110,7 @@ class PidginNotifyTest(Pidgin):
         if not result:
             raise AssertionError, 'did not recieve a notification bubble.'
         
-        ldtp.remap(self.TOP_PANEL)
+        ldtp.remap(self.application.TOP_PANEL)
         try:
             self._click_in_indicator('mnu%s' % alias.replace(' ', ''))
         except Exception, e:
@@ -119,20 +124,20 @@ class PidginNotifyTest(Pidgin):
                 'clicking on buddy indicator did not bring up chat dialog'
 
     def testRecieveMessageAppend(self, msg1='', msg2='', msg3='', timeout=5):
-        if not self.buddy:
-            self.buddy_login()
+        if not self.application.buddy:
+            self.application.buddy_login()
             sleep(1)
 
-        jid = self.get_account_name('XMPP')
+        jid = self.application.get_account_name('XMPP')
 
-        alias = self.get_account_alias('OtherXMPP')
+        alias = self.application.get_account_alias('OtherXMPP')
 
         #https://bugs.launchpad.net/ubuntu/+source/pidgin-libnotify/+bug/362248
         ldtp.waittillguinotexist(self._bubble_name_from_alias(alias))
 
-        self.buddy.send_message(jid, '', msg1)
+        self.application.buddy.send_message(jid, '', msg1)
         sleep(2)
-        self.buddy.send_message(jid, '', msg2)
+        self.application.buddy.send_message(jid, '', msg2)
 
         result = 1
         count = 0
@@ -153,7 +158,7 @@ class PidginNotifyTest(Pidgin):
             raise AssertionError, \
                 'did not recieve a message notification bubble.'
 
-        self.buddy.send_message(jid, '', msg3)
+        self.application.buddy.send_message(jid, '', msg3)
 
         for i in xrange(timeout):
             ldtp.remap(frm_name)
@@ -170,20 +175,20 @@ class PidginNotifyTest(Pidgin):
         raise AssertionError, 'second message was not appended'
 
     def testRecieveMessageSimple(self, msg1='', msg2='', timeout=5):
-        if not self.buddy:
-            self.buddy_login()
+        if not self.application.buddy:
+            self.application.buddy_login()
             sleep(1)
 
-        jid = self.get_account_name('XMPP')
+        jid = self.application.get_account_name('XMPP')
 
-        alias = self.get_account_alias('OtherXMPP')
+        alias = self.application.get_account_alias('OtherXMPP')
 
         #https://bugs.launchpad.net/ubuntu/+source/pidgin-libnotify/+bug/362248
         ldtp.waittillguinotexist(self._bubble_name_from_alias(alias))
 
-        self.buddy.send_message(jid, '', msg1)
+        self.application.buddy.send_message(jid, '', msg1)
         sleep(2)
-        self.buddy.send_message(jid, '', msg2)
+        self.application.buddy.send_message(jid, '', msg2)
 
         result = 1
         count = 0
