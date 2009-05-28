@@ -60,7 +60,6 @@ class Pidgin(Application):
         It uses the profile_template and the
         credentials to build a new profile folder
         """
-        print 'GENERATE PROFILE', profile_template
         os.mkdir(os.path.expanduser('~/.purple'))
         flat_dict = {}
         if self.credentials:
@@ -81,7 +80,6 @@ class Pidgin(Application):
             except KeyError, e:
                 raise Exception, \
                     'no section/key in %s: %s' % (self.creds_fn, e)
-            print buf
             f.write(buf)
             f.close()
 
@@ -193,13 +191,12 @@ class Pidgin(Application):
         @type timeout: integer
         @param timeout: Number of seconds to wait for the buddy to be connected (default:15s)
         """
-        print alias
         starttime = time()
         while not self.buddy_available(alias):
             if time() - starttime >= timeout:
                 raise Exception('waiting for buddy timed out')
             sleep(1)
-        print "alias"
+
     def send_message(self, alias, msg):
         """
         It sends a message to a particular buddy.
