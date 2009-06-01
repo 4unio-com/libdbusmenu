@@ -428,7 +428,9 @@ class TestSuiteRunner(TestRunner):
         sys.path.pop(1)
 
         cls = getattr(mod, clsname)
-        
+       
+        logging.debug("Class: %s", cls)
+        logging.debug("Arguments: %s", self.args)
         self.testsuite = cls(**self.args)
         
         self.case_runners = \

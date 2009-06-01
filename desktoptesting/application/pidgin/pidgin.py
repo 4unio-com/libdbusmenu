@@ -5,8 +5,7 @@ import os, traceback
 from time import time, sleep
 from ConfigParser import ConfigParser
 from string import Formatter
-from xmpp_utils import Buddy
-from msn_utils import BuddyMSN
+from .buddy import Buddy
 from inspect import getsourcefile
 
 class Pidgin(Application):
@@ -291,8 +290,8 @@ class Pidgin(Application):
         return self.get_account_name(protocol)
 
 
-    def buddy_login(self):
-        buddy_info = dict(self.credentials.items('OtherXMPP'))
+    def buddy_login(self, buddy_credentials, protocol):
+        buddy_info = dict(self.credentials.items(str(buddy_credentials)))
 
         buddy_info['alias'] = buddy_info.get(
             'alias', '%s@%s' % (buddy_info['username'], buddy_info['domain']))
@@ -300,18 +299,8 @@ class Pidgin(Application):
 
         self.buddy = \
             Buddy('%s@%s' % (buddy_info['username'], buddy_info['domain']),
-                  buddy_info['password'])
-        print 'connecting buddy'
-        self.buddy.connect()
-        print 'connected buddy'
+                  buddy_info['password'], protocol)
 
-    def buddy_msn_login(self):
-        print "hey"
-        buddy_info = dict(self.credentials.items('OtherMSN'))
-        print buddy_info
-        self.buddy = BuddyMSN(buddy_info['username'], buddy_info['password'])
-        print buddy_info['username']
-        print buddy_info['password']
         print 'connecting buddy'
         self.buddy.connect()
         print 'connected buddy'
