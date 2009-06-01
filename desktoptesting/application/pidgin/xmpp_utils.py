@@ -4,6 +4,7 @@ import gobject, gtk
 import sys
 from time import sleep
 import traceback
+
 from pyxmpp.all import JID,Iq,Presence,Message,StreamError
 from pyxmpp.jabber.client import JabberClient
 from pyxmpp.jabber.clientstream import LegacyAuthenticationError
@@ -11,8 +12,11 @@ from pyxmpp.jabber.clientstream import LegacyAuthenticationError
 from pyxmpp.jabber.simple import xmpp_do
 from pyxmpp.jabber.register import Register
 
-class _Client(JabberClient):
+class ClientXMPP(JabberClient):
     def __init__(self, jid, password, debug=False):
+        if isinstance(jid, str) or isinstance(jid, unicode):
+            jid = JID(jid)
+
         self.main_loop = gobject.MainLoop()
         self.is_connected = False
         self.messages = []
@@ -111,79 +115,6 @@ class _Client(JabberClient):
                 self.messages.pop(0)
             except IndexError:
                 break
-
-class Buddy(object):
-    def __init__(self, jid, passwd):
-        if isinstance(jid, str) or isinstance(jid, unicode):
-            jid = JID(jid)
-        self.client = _Client(jid, passwd)
-        
-    def connect(self, register=False, name='', email=''):
-        def _idle_cb(client):
-            client.loop_iter()
-            if client.session_established:
-                client.main_loop.quit()
-                return False
-            else:
-                return True
-
-        if register and name:
-            self.client.name = name
-        if register and email:
-            self.client.email = email
-
-        self.client.connect(register)
-        gobject.idle_add(_idle_cb, self.client)
-        self.client.loop()
-
-    def disconnect(self):
-        def _idle_cb(client):
-            client.loop_iter()
-            if not client.is_connected:
-                client.main_loop.quit()
-                return False
-            else:
-                return True
-
-        self.client.disconnect()
-        gobject.idle_add(_idle_cb, self.client)
-        self.client.loop()
-        
-    def send_message(self, jid, subject, body):
-        m=Message(
-            to_jid=unicode(jid),
-            from_jid=self.client.jid.as_unicode(),
-            stanza_type="chat",
-            subject=unicode(subject),
-            body=unicode(body))
-        self.client.stream.send(m)
-
-    def wait_for_message(self, jid=None, subject=None, body=None, timeout=5):
-        pattern = [jid, subject, body]
-        recieved = []
-
-        def _idle_cb(client):
-            client.loop_iter()
-            matched = client.match_messages(*pattern)
-            client.flush_messages()
-            if matched:
-                for m in matched:
-                    recieved.append(m)
-                client.main_loop.quit()
-                return False
-            else:
-                return True
-
-        def _timeout_cb(client):
-            client.main_loop.quit()
-            return False
-
-        gobject.idle_add(_idle_cb, self.client)
-        if timeout > 0:
-            gobject.timeout_add_seconds(timeout, _timeout_cb, self.client)
-        self.client.loop()
-
-        return recieved
         
 def unregister(jid, passwd):
     if not jid.resource:
