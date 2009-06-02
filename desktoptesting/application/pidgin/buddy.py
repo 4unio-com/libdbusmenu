@@ -5,31 +5,24 @@ import gobject, gtk
 from xmpp_utils import ClientXMPP
 from msn_utils import ClientMSN
 
-class Buddy(object):
+class _Buddy(object):
     def __init__(self, userid, passwd, protocol):
-        self.protocol = protocol
-
-        if protocol == 'XMPP':
-            self.protocolbuddy = _BuddyXMPP(userid, passwd)
-        elif protocol == 'MSN':
-            self.protocolbuddy = _BuddyMSN(userid, passwd)
-        else:
-            pass
+        pass
 
     def connect(self, register=False, name='', email=''):
-        self.protocolbuddy.connect(register, name, email)        
+        raise NotImplementedError
         
     def disconnect(self):
-        self.protocolbuddy.disconnect() 
+        raise NotImplementedError
 
     def send_message(self, userid, body='', subject='') :
-        self.protocolbuddy.send_message(userid, body, subject)
+        raise NotImplementedError
 
     def wait_for_message(self, userid=None, body=None, timeout=5):
-        self.protocolbuddy.wait_for_message(userid, body, timeout)
+        raise NotImplementedError
 
 
-class _BuddyXMPP(object):
+class _BuddyXMPP(_Buddy):
     def __init__(self, userid, passwd):
                 
         self.account = (userid, passwd)
@@ -67,13 +60,7 @@ class _BuddyXMPP(object):
         self.client.loop()
         
     def send_message(self, userid, subject, body):
-        m=Message(
-            to_jid=unicode(userid),
-            from_jid=self.client.jid.as_unicode(),
-            stanza_type="chat",
-            subject=unicode(subject),
-            body=unicode(body))
-        self.client.stream.send(m)
+        self.client.send_message(userid, subject, body)
 
     def wait_for_message(self, userid=None, subject=None, body=None, timeout=5):
         pattern = [userid, subject, body]
@@ -102,7 +89,7 @@ class _BuddyXMPP(object):
 
         return recieved
 
-class _BuddyMSN(object):
+class _BuddyMSN(_Buddy):
     def __init__(self, userid, passwd):
         self.account = (userid, passwd)
         self.client  = ClientMSN(self.account)
@@ -192,3 +179,9 @@ class _BuddyMSN(object):
 
         return recieved
 
+
+buddy_protocols = {'XMPP' : _BuddyXMPP,
+                   'MSN' : _BuddyMSN}
+
+def new_buddy(userid, passwd, protocol):
+    return buddy_protocols[protocol](userid, passwd)

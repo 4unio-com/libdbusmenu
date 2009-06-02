@@ -116,6 +116,16 @@ class ClientXMPP(JabberClient):
             except IndexError:
                 break
         
+
+    def send_message(self, userid, subject, body):
+        m=Message(
+            to_jid=unicode(userid),
+            from_jid=self.jid.as_unicode(),
+            stanza_type="chat",
+            subject=unicode(subject),
+            body=unicode(body))
+        self.stream.send(m)
+
 def unregister(jid, passwd):
     if not jid.resource:
         jid=JID(jid.node, jid.domain, "remover")
