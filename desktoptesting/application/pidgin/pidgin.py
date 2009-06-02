@@ -5,8 +5,60 @@ import os, traceback
 from time import time, sleep
 from ConfigParser import ConfigParser
 from string import Formatter
-from .buddy import Buddy
+from buddy import new_buddy
 from inspect import getsourcefile
+
+class AccountInfo(object):
+    PURPLE_PROTOCOLS = {
+        'XMPP' : 'prpl-jabber'
+        }
+    def __init__(self, name, credentials):
+        if not isinstance(credentials, ConfigParser):
+            creds_fn = credentials
+            credentials = ConfigParser()
+            credentials.read(creds_fn)
+        self.details = dict(credentials.items(name))
+        self.name = name
+
+    def __getattr__(self, name):
+        try:
+            return self.details[name]
+        except KeyError:
+            raise AttributeError
+
+    @property
+    def prpl_protocol(self):
+        return self.PURPLE_PROTOCOLS[self.protocol]
+
+    @property
+    def username(self):
+        return self._get_username(False)
+
+    @property
+    def alias(self):
+        return self.details.get('alias', self._get_username(False))
+
+    @property
+    def username_and_domain(self):
+        return self._get_username(True)
+
+    @property
+    def template_args(self):
+        args = {}
+        for arg in ('prpl_protocol', 'username_and_domain', 
+                    'password', 'alias'):
+            args[arg] = getattr(self, arg)
+        return args
+
+    def _get_username(self, include_resource=False):
+        if self.protocol == 'XMPP':
+            username = '%s@%s' % (self.details['username'],
+                                  self.details['domain'])
+            if include_resource:
+                username += '/%s' % self.details['resource']
+        else:
+            username = self.details['username']
+        return username
 
 class Pidgin(Application):
     # Pidgin constants
@@ -28,7 +80,7 @@ class Pidgin(Application):
         ldtp.generatekeyevent('<alt><F9>')
         sleep(3)
 
-    def open(self, clean_profile=True, profile_template='',credentials=''):
+    def open(self, clean_profile=True, credentials=''):
         """
         It saves the old profile (if needed) and
         set up a new one. After this initial process,
@@ -37,8 +89,6 @@ class Pidgin(Application):
         @type clean_profile: boolean
         @param clean_profile: True, to back up the old profile and create a 
             new one (default)
-        @type profile_template: string
-        @param profile_template: Path to the template of the new profile
         @type credentials: string
         @param credentials: Path to the config file with accounts information
         """
@@ -50,22 +100,15 @@ class Pidgin(Application):
 
         if clean_profile:
             self.backup_config()
-            if profile_template:
-                self.generate_profile(self._normalize_path(profile_template))
 
         Application.open(self)
 
-    def generate_profile(self, profile_template):
+    def generate_profile(self, profile_template, template_args=None):
         """
         It uses the profile_template and the
         credentials to build a new profile folder
         """
         os.mkdir(os.path.expanduser('~/.purple'))
-        flat_dict = {}
-        if self.credentials:
-            for s in self.credentials.sections():
-                for k, v in self.credentials.items(s):
-                    flat_dict[s+'_'+k] = v
 
         formatter = Formatter()
         for fn in os.listdir(profile_template):
@@ -76,7 +119,7 @@ class Pidgin(Application):
             buf = open(os.path.join(profile_template, fn)).read()
             f = open(os.path.join(os.path.expanduser('~/.purple'), fn), 'w')
             try:
-                buf = formatter.format(buf, **flat_dict)
+                buf = formatter.format(buf, **template_args)
             except KeyError, e:
                 raise Exception, \
                     'no section/key in %s: %s' % (self.creds_fn, e)
@@ -124,36 +167,34 @@ class Pidgin(Application):
         except IOError:
             traceback.print_exc()
 
-    def wait_for_account_connect(self, account_name, protocol, timeout=15):
+    def wait_for_account_connect(self, account_info, timeout=15):
         """
         It waits for an account to be connected.
         A timeout value can be passed, being default 15secs.
 
         It raises an exception if the timeout expires.
 
-        @type account_name: string 
-        @param account: The name of the account (user name)
-        @type protocol: string
-        @param protocol: The protocol of the account to wait to be connected
-        @type timeout: integer
+        @param account_info: The account information.
+        @type account_info: L{AccountInfo}
         @param timeout: Number of seconds to wait for the accout to be connected (default:15s)
+        @type timeout: integer
         """
         starttime = time()
-        while not self.account_connected(account_name, protocol):
+        print 'wait_for_account_connect'
+        while not self.account_connected(account_info):
             if time() - starttime >= timeout:
                 raise Exception('IM server connection timed out')
             exists = ldtp.waittillguiexist('dlgSSLCertificateVerification',
                                            guiTimeOut=1)
+            print exists, time() - starttime
             if exists:
                 ldtp.click('dlgSSLCertificateVerification', 'btnAccept')
 
-    def account_connected(self, account_name, protocol):
+    def account_connected(self, account_info):
         '''
         Checks to see if a specified account is connected,
-        @type account_name: string
-        @param account_name: The name of the account (user name)
-        @type protocol: string
-        @param protocol: The name of the protocol used 
+        @param account_info: The account information.
+        @type account_info: L{AccountInfo}
 
         @return True, if the account if connected, False if not.
         '''
@@ -166,9 +207,13 @@ class Pidgin(Application):
             if obj.startswith('mnuNoactionsavailable'):
                 parent = ldtp.getobjectproperty(self.WINDOW,obj, 'parent')
                 # TODO, put in resource and protocol for more accuracy.
-                if parent.startswith('mnu%s' % account_name) and \
-                        parent.endswith('(%s)' % protocol):
+                print 'mnu%s' % account_info.username_and_domain
+                if parent.startswith(
+                    'mnu%s' % account_info.username_and_domain) and \
+                    parent.endswith('(%s)' % account_info.protocol):
+                    print 'False?'
                     return False
+        print 'True?'
         return True
 
     def buddy_available(self, alias):
@@ -271,35 +316,11 @@ class Pidgin(Application):
         """
         ldtp.selectmenuitem(window_name, self.MNU_CLOSE)
 
-    def get_account_name(self, protocol, include_resource=False):
-        account_info = dict(self.credentials.items(protocol))
-        if 'XMPP' in protocol:
-            name = '%s@%s' % (account_info['username'],
-                              account_info['domain'])
-            if include_resource:
-                name += '/%s' % account_info['resource']
-        else:
-            name = account_info['username']
-        return name
-
-    def get_account_alias(self, protocol):
-        account_info = dict(self.credentials.items(protocol))
-        if account_info.has_key('alias'):
-            return account_info['alias']
-
-        return self.get_account_name(protocol)
-
-
-    def buddy_login(self, buddy_credentials, protocol):
-        buddy_info = dict(self.credentials.items(str(buddy_credentials)))
-
-        buddy_info['alias'] = buddy_info.get(
-            'alias', '%s@%s' % (buddy_info['username'], buddy_info['domain']))
-
-
+    def buddy_login(self, account_info):
         self.buddy = \
-            Buddy('%s@%s' % (buddy_info['username'], buddy_info['domain']),
-                  buddy_info['password'], protocol)
+            new_buddy(account_info.username,
+                      account_info.password,
+                      account_info.protocol)
 
         print 'connecting buddy'
         self.buddy.connect()

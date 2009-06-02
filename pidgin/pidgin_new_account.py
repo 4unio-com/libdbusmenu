@@ -1,16 +1,22 @@
 from desktoptesting.test_suite.pidgin import PidginTestSuite
+from desktoptesting.application.pidgin import AccountInfo
 from ConfigParser import ConfigParser
 import ldtp, ooldtp, ldtputils
 from time import sleep
 
 class PidginNewAccountTest(PidginTestSuite):
-    def testNewAccount(self, protocol=None):
-        cp = self.application.credentials
+    def __init__(self, credentials):
+        PidginTestSuite.__init__(
+            self, clean_profile=True, credentials=credentials)
 
-        if not cp.has_section(protocol):
+    def testNewAccount(self, account_name=None):
+
+        if not self.application.credentials.has_section(account_name):
             raise Exception(
-                'no %s protocol configured in %s' % (protocol, 
-                                                     self.application.creds_fn))
+                'no %s account configured in %s' % (account_name, 
+                                                    self.application.creds_fn))
+
+        account_info = AccountInfo(account_name, self.application.credentials)
 
         ldtp.waittillguiexist(self.application.DLG_ACCOUNTS, 
                               self.application.BTN_ADD)
@@ -27,13 +33,13 @@ class PidginNewAccountTest(PidginTestSuite):
 
         cbo_protocol = dlg_add_account.getchild(self.application.CBO_PROTOCOL)
 
-        cbo_protocol.comboselect(protocol)
+        cbo_protocol.comboselect(account_info.protocol)
 
         sleep(1)
 
         ldtp.remap(self.application.DLG_ADD_ACCOUNT)
 
-        details = dict(cp.items(protocol))
+        details = account_info.details
 
         for name, value in details.items():
             if name not in ('username', 'domain', 'resource', 'password'):
@@ -54,7 +60,7 @@ class PidginNewAccountTest(PidginTestSuite):
             raise AssertionError("no new accounts in view.", 
                                  ldtputils.imagecapture())
 
-        username = self.application.get_account_name(protocol, True)
+        username = account_info.username_and_domain
 
         try:
             dlg_accounts.getcellvalue(self.application.TBL_ACCOUNTS, 0, 1)
@@ -71,10 +77,10 @@ class PidginNewAccountTest(PidginTestSuite):
                     (username, cellval))
 
         cellval = dlg_accounts.getcellvalue(self.application.TBL_ACCOUNTS, 0, 2)
-        if  cellval != protocol:
+        if  cellval != account_info.protocol:
             fails.append(
                 'wrong protocol in accounts view (expected %s, got %s)' % \
-                    (protocol, cellval))
+                    (account_info.protocol, cellval))
 
         if fails:
             raise AssertionError(','.join(fails)+'.', ldtputils.imagecapture())

@@ -5,43 +5,41 @@
     Walks pidgin through setting up a new account.
   </description>
   <args>
-    <clean_profile>True</clean_profile> 
-    <profile_template></profile_template>
     <credentials>./pidgin/data/credentials.ini</credentials>
   </args>
   <case name="AccountXMPP">
     <method>testNewAccount</method>
     <description>Test the creation of an XMPP account.</description>
     <args>
-      <protocol>XMPP</protocol>
+      <account_name>XMPP</account_name>
     </args>
   </case>
   <case name="AccountMSN">
     <method>testNewAccount</method>
     <description>Test the creation of an MSN account.</description>
     <args>
-      <protocol>MSN</protocol>
+      <account_name>MSN</account_name>
     </args>
   </case>
   <case name="AccountAIM">
     <method>testNewAccount</method>
     <description>Test the creation of an AIM account.</description>
     <args>
-      <protocol>AIM</protocol>
+      <account_name>AIM</account_name>
     </args>
   </case>
   <case name="AccountICQ">
     <method>testNewAccount</method>
     <description>Test the creation of an ICQ account.</description>
     <args>
-      <protocol>ICQ</protocol>
+      <account_name>ICQ</account_name>
     </args>
   </case>
   <case name="AccountYahoo">
     <method>testNewAccount</method>
     <description>Test the creation of a Yahoo! account.</description>
     <args>
-      <protocol>Yahoo</protocol>
+      <account_name>Yahoo</account_name>
     </args>
   </case>
 </suite>

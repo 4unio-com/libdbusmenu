@@ -2,10 +2,10 @@
 
 <account version='1.0'>
 	<account>
-		<protocol>prpl-jabber</protocol>
-		<name>{XMPP_username}@{XMPP_domain}/{XMPP_resource}</name>
-		<password>{XMPP_password}</password>
-		<alias>{XMPP_alias}</alias>
+		<protocol>{prpl_protocol}</protocol>
+		<name>{username_and_domain}</name>
+		<password>{password}</password>
+		<alias>{alias}</alias>
 		<statuses>
 			<status type='available' name='Available' active='true'>
 				<attributes/>

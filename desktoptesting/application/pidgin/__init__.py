@@ -1,1 +1,1 @@
-from pidgin import Pidgin
+from pidgin import Pidgin, AccountInfo
