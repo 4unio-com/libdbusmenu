@@ -10,7 +10,8 @@ from inspect import getsourcefile
 
 class AccountInfo(object):
     PURPLE_PROTOCOLS = {
-        'XMPP' : 'prpl-jabber'
+        'XMPP' : 'prpl-jabber',
+        'MSN' : 'prpl-msn'
         }
     def __init__(self, name, credentials):
         if not isinstance(credentials, ConfigParser):
@@ -76,7 +77,6 @@ class Pidgin(Application):
     MNU_CLOSE = "mnuClose"
     
     def emptyTest(self):
-        print 'empty test'
         ldtp.generatekeyevent('<alt><F9>')
         sleep(3)
 
@@ -180,13 +180,11 @@ class Pidgin(Application):
         @type timeout: integer
         """
         starttime = time()
-        print 'wait_for_account_connect'
         while not self.account_connected(account_info):
             if time() - starttime >= timeout:
                 raise Exception('IM server connection timed out')
             exists = ldtp.waittillguiexist('dlgSSLCertificateVerification',
                                            guiTimeOut=1)
-            print exists, time() - starttime
             if exists:
                 ldtp.click('dlgSSLCertificateVerification', 'btnAccept')
 
@@ -207,13 +205,10 @@ class Pidgin(Application):
             if obj.startswith('mnuNoactionsavailable'):
                 parent = ldtp.getobjectproperty(self.WINDOW,obj, 'parent')
                 # TODO, put in resource and protocol for more accuracy.
-                print 'mnu%s' % account_info.username_and_domain
                 if parent.startswith(
                     'mnu%s' % account_info.username_and_domain) and \
                     parent.endswith('(%s)' % account_info.protocol):
-                    print 'False?'
                     return False
-        print 'True?'
         return True
 
     def buddy_available(self, alias):
@@ -298,7 +293,6 @@ class Pidgin(Application):
         @return A list containing the name of the windows
         """
         windows = []
-        print self.name
         for w in ldtp.getwindowlist():
             try:
                 if ldtp.getobjectproperty(w, w, 'parent') == 'pidgin':

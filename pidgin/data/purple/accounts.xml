@@ -6,37 +6,6 @@
 		<name>{username_and_domain}</name>
 		<password>{password}</password>
 		<alias>{alias}</alias>
-		<statuses>
-			<status type='available' name='Available' active='true'>
-				<attributes/>
-			</status>
-			<status type='freeforchat' name='Chatty' active='false'>
-				<attributes/>
-			</status>
-			<status type='away' name='Away' active='false'>
-				<attributes/>
-			</status>
-			<status type='extended_away' name='Extended away' active='false'>
-				<attributes/>
-			</status>
-			<status type='dnd' name='Do Not Disturb' active='false'>
-				<attributes/>
-			</status>
-			<status type='offline' name='Offline' active='false'>
-				<attributes/>
-			</status>
-		</statuses>
-		<settings>
-			<setting name='check-mail' type='bool'>0</setting>
-			<setting name='connect_server' type='string'></setting>
-			<setting name='old_ssl' type='bool'>0</setting>
-			<setting name='auth_plain_in_clear' type='bool'>0</setting>
-			<setting name='require_tls' type='bool'>0</setting>
-			<setting name='ft_proxies' type='string'>proxy.jabber.org</setting>
-			<setting name='use-global-buddyicon' type='bool'>1</setting>
-			<setting name='custom_smileys' type='bool'>1</setting>
-			<setting name='port' type='int'>5222</setting>
-		</settings>
 		<settings ui='gtk-gaim'>
 			<setting name='auto-login' type='bool'>1</setting>
 		</settings>
