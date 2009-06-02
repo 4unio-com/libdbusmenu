@@ -7,24 +7,17 @@ from .main import SingleApplicationTestSuite
 from ..application.gnome import Application
 from ..application.pidgin import Pidgin
 
-
-
 class PidginTestSuite(SingleApplicationTestSuite):
     """
     Default test suite for Pidgin
     """
     APPLICATION_FACTORY = Pidgin
-    def __init__(self, clean_profile=True, 
-                 profile_template='',
-                 credentials=''):
-        self.clean_profile = clean_profile
-        self.profile_template = profile_template
-        self.credentials = credentials
+    def __init__(self, **kwargs):
+        self.app_args = kwargs
         SingleApplicationTestSuite.__init__(self)
 
     def setup(self):
-        self.application.open(
-            self.clean_profile, self.profile_template, self.credentials)
+        self.application.open(**self.app_args)
 
     def teardown(self):
         self.application.close()
@@ -32,6 +25,5 @@ class PidginTestSuite(SingleApplicationTestSuite):
     def cleanup(self):
         #TODO: it should delete all the "My Personal Keys"
         self.application.close()
-        self.application.open(
-            self.clean_profile, self.profile_template, self.credentials)
+        self.application.open(**self.app_args)
 
