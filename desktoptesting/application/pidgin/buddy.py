@@ -6,6 +6,7 @@ from xmpp_utils import ClientXMPP
 from msn_utils import ClientMSN
 
 class _Buddy(object):
+
     def __init__(self, userid, passwd, protocol):
         pass
 
@@ -129,7 +130,7 @@ class _BuddyMSN(_Buddy):
         def _idle_cb(client, userid, body):
             client.loop_iter()
             if client.current == userid:
-                client.conv.send_text_message(pymsn.ConversationMessage(body))
+                client.send_text_message_to_current_conversation(body)
             else:
                 client.start_conversation(userid, body)
 

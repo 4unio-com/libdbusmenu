@@ -56,11 +56,8 @@ class AnnoyingConversation(pymsn.event.ConversationEventInterface):
         gobject.timeout_add(5000, self.annoy_user)
 
     def annoy_user(self):
-        formatting = pymsn.TextFormat("Comic Sans MS", 
-                         pymsn.TextFormat.UNDERLINE | pymsn.TextFormat.BOLD,
-                         'FF0000')
         if self.body != '':
-            self._client.send_text_message(pymsn.ConversationMessage(self.body, formatting))
+            self._client.send_text_message(pymsn.ConversationMessage(self.body))
         self.talking = False
         return False 
 
@@ -122,6 +119,9 @@ class ClientMSN(pymsn.Client):
                     self._convo_events = AnnoyingConversation(self.conv, body)
                     self._convo_events.talking = True
             return False
+
+    def send_text_message_to_current_conversation(self, body):
+        self.conv.send_text_message(pymsn.ConversationMessage(body))
 
     def loop_iter(self):
         pass
