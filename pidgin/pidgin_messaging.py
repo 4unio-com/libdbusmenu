@@ -45,7 +45,7 @@ class PidginUseTest(PidginTestSuite):
         prev_log = self.application.get_conversation_log(buddy_alias)
 
         self.application.buddy.send_message(
-            self.application.me_account.username, '', msg)
+            self.application.me_account.username, msg)
         
         for i in xrange(timeout):
             log = self.application.get_conversation_log(

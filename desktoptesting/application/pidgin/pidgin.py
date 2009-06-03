@@ -62,6 +62,9 @@ class AccountInfo(object):
         return username
 
 class Pidgin(Application):
+    """
+    Class that manages the Pidgin IM application
+    """
     # Pidgin constants
     WINDOW = "frmBuddyList"
     LAUNCHER = "pidgin"

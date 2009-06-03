@@ -117,7 +117,7 @@ class ClientXMPP(JabberClient):
                 break
         
 
-    def send_message(self, userid, subject, body):
+    def send_message(self, userid, body, subject=''):
         m=Message(
             to_jid=unicode(userid),
             from_jid=self.jid.as_unicode(),

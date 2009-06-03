@@ -105,8 +105,8 @@ class _BuddyXMPP(_Buddy):
         gobject.idle_add(_idle_cb, self.client)
         self.client.loop()
         
-    def send_message(self, userid, subject, body):
-        self.client.send_message(userid, subject, body)
+    def send_message(self, userid, body, subject=''):
+        self.client.send_message(userid, body, subject)
 
     def wait_for_message(self, userid=None, subject=None, body=None, timeout=5):
         pattern = [userid, subject, body]

@@ -29,8 +29,6 @@ class ClientEvents(pymsn.event.ClientEventInterface):
             self._client.quit()
         elif state == pymsn.event.ClientState.OPEN:
             self._client.profile.presence = pymsn.Presence.ONLINE
-            for contact in self._client.address_book.contacts:
-                print contact
             print "Connected"
 
     def on_client_error(self, error_type, error):
@@ -40,7 +38,6 @@ class InviteEvents(pymsn.event.InviteEventInterface):
     def __init__(self, client):
         self.conv = ''
     def on_invite_conversation(self, conversation):
-        print "being invited"
         self.conv = conversation
 
 class AnnoyingConversation(pymsn.event.ConversationEventInterface):
