@@ -6,20 +6,65 @@ from xmpp_utils import ClientXMPP
 from msn_utils import ClientMSN
 
 class _Buddy(object):
+    """
+    The Buddy class is a class to mimic a Buddy behaviour in IM
+    applications. It is intended to be use as "VirtualBuddy" in any
+    test for IMs. It could be used in tests for Pidgin, Empathy, etc.
 
+    Buddy is an interface for the different IMs protocol
+    """
     def __init__(self, userid, passwd, protocol):
+        """
+        To init the buddy class, use the new_buddy method instead
+        """
         pass
 
     def connect(self, register=False, name='', email=''):
+        """
+        It connects the buddy to the specific protocol server.
+
+        @type register: boolean
+        @param register: True, to register the name and the email
+            of the buddy. False, otherwise. It defaults to false.
+        @type name: string
+        @param name: The name of the buddy to register
+        @type email: string
+        @param email: The email of the buddy to register
+        """
         raise NotImplementedError
         
     def disconnect(self):
+        """
+        It disconnects the buddy from the specific protocol server.
+        """
         raise NotImplementedError
 
-    def send_message(self, userid, body='', subject='') :
+    def send_message(self, userid, body='', subject=''):
+        """
+        It sends a message to a specific user.
+
+        @type userid: string
+        @param userid: The userid of the recipient of the message.
+        @type body: string
+        @param body: The contents of the message, if any.
+        @type subject: string
+        @param subject: The subject of the message, if any.
+        """
         raise NotImplementedError
 
-    def wait_for_message(self, userid=None, body=None, timeout=5):
+    def wait_for_message(self, userid=None, body=None, subject=None, timeout=5):
+        """
+        It waits for a message of a specific user.
+
+        @type userid: string
+        @param userid: The user account from whom we are wating the message.
+        @type body: string
+        @param body: The contents of the message, if specified.
+        @type subject: string
+        @param subject: The subject of the message, if specified.
+        @type timeout: integer
+        @param timeout: Number of seconds to wait for the message.
+        """
         raise NotImplementedError
 
 
@@ -150,7 +195,7 @@ class _BuddyMSN(_Buddy):
         self.client.loop()
 
 
-    def wait_for_message(self, userid=None, body=None, timeout=5):
+    def wait_for_message(self, userid=None, body=None, subject=None, timeout=5):
         recieved = "" 
 
         def _idle_cb(client):
@@ -185,4 +230,14 @@ buddy_protocols = {'XMPP' : _BuddyXMPP,
                    'MSN' : _BuddyMSN}
 
 def new_buddy(userid, passwd, protocol):
+    """
+    Factory method to create a new buddy instance.
+
+    @type userid: string
+    @param userid: The user id of the new buddy.
+    @type passwd: string
+    @param passwd: The password of the new buddy.
+    @type protocol: string 
+    @param protocol: The IM protocol to use
+    """
     return buddy_protocols[protocol](userid, passwd)
