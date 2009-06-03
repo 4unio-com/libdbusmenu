@@ -10,20 +10,6 @@
     <me_account>MSN</me_account>
     <buddy_account>OtherMSN</buddy_account>
   </args>
-  <case name="BasicSendTest">
-    <method>testSendMessage</method>
-    <description>Basic send test</description>
-    <args>
-      <msg>Hello World!</msg>
-    </args>
-  </case>
-  <case name="UnicodeSendTest">
-    <method>testSendMessage</method>
-    <description>Unicode send test</description>
-    <args>
-      <msg>שלום, חבר.</msg>
-    </args>
-  </case>
   <case name="BasicRecieveTest">
     <method>testRecieveMessage</method>
     <description>Basic recieve test</description>
@@ -34,6 +20,20 @@
   <case name="UnicodeRecieveTest">
     <method>testRecieveMessage</method>
     <description>Unicode recieve test</description>
+    <args>
+      <msg>שלום, חבר.</msg>
+    </args>
+  </case>
+ <case name="BasicSendTest">
+    <method>testSendMessage</method>
+    <description>Basic send test</description>
+    <args>
+      <msg>Hello World!</msg>
+    </args>
+  </case>
+  <case name="UnicodeSendTest">
+    <method>testSendMessage</method>
+    <description>Unicode send test</description>
     <args>
       <msg>שלום, חבר.</msg>
     </args>
