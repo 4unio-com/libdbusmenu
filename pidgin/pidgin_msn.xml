@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<suite name="pidgin messaging">
+  <class>pidgin_messaging.PidginUseTest</class>
+  <description>
+    Basic pidgin MSN messaging.
+  </description>
+  <args>
+    <profile_template>./pidgin/data/purple/</profile_template>
+    <credentials>./pidgin/data/credentials.ini</credentials>
+    <me_account>MSN</me_account>
+    <buddy_account>OtherMSN</buddy_account>
+  </args>
+  <case name="BasicRecieveTest">
+    <method>testRecieveMessage</method>
+    <description>Basic recieve test</description>
+    <args>
+      <msg>Hello World!</msg>
+    </args>
+  </case>
+  <case name="UnicodeRecieveTest">
+    <method>testRecieveMessage</method>
+    <description>Unicode recieve test</description>
+    <args>
+      <msg>שלום, חבר.</msg>
+    </args>
+  </case>
+ <case name="BasicSendTest">
+    <method>testSendMessage</method>
+    <description>Basic send test</description>
+    <args>
+      <msg>Hello World!</msg>
+    </args>
+  </case>
+  <case name="UnicodeSendTest">
+    <method>testSendMessage</method>
+    <description>Unicode send test</description>
+    <args>
+      <msg>שלום, חבר.</msg>
+    </args>
+  </case>
+</suite>

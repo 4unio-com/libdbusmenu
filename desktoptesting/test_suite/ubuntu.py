@@ -6,9 +6,7 @@ from .main import SingleApplicationTestSuite
 from ..application.ubuntu import UbuntuMenu, UpdateManager
 
 class UbuntuMenuTestSuite(SingleApplicationTestSuite):
-    def __init__(self):
-        SingleApplicationTestSuite.__init__(self, UbuntuMenu)
-
+    APPLICATION_FACTORY = UbuntuMenu
     def teardown(self):
         self.cleanup() 
 
@@ -18,5 +16,4 @@ class UbuntuMenuTestSuite(SingleApplicationTestSuite):
 
 
 class UpdateManagerTestSuite(SingleApplicationTestSuite):
-    def __init__(self):
-        SingleApplicationTestSuite.__init__(self, UpdateManager)
+    APPLICATION_FACTORY = UpdateManager

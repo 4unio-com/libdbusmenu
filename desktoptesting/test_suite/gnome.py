@@ -10,9 +10,7 @@ class SeahorseTestSuite(SingleApplicationTestSuite):
     """
     Default test suite for Seahorse
     """
-    def __init__(self):
-        SingleApplicationTestSuite.__init__(self, Seahorse)
-
+    APPLICATION_FACTORY = Seahorse
     def setup(self):
         self.application.open()
 
@@ -28,9 +26,7 @@ class GEditTestSuite(SingleApplicationTestSuite):
     """
     Default test suite for GEdit
     """
-    def __init__(self):
-        SingleApplicationTestSuite.__init__(self, GEdit)
-
+    APPLICATION_FACTORY = GEdit
     def setup(self):
         self.application.open()
 
