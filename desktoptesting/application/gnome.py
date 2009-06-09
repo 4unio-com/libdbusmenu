@@ -418,7 +418,8 @@ class GEdit(Application):
             raise ldtp.LdtpExecutionError, "There was an error when pushing the Save button."
 
         ldtp.waittillguinotexist(self.SAVE_DLG)
-        
+        ldtp.wait(1)
+
     def close(self, save=False, filename=''):
         """
         Given a gedit window, it tries to close the application.
