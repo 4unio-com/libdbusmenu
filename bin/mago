@@ -22,7 +22,7 @@ from shutil import move
 
 # Globals
 TESTS_SHARE = "."
-TESTS_HOME  = os.environ["HOME"] + "/.ubuntu-desktop-test"
+TESTS_HOME  = os.environ["HOME"] + "/.mago"
 SCREENSHOTS_SHARE = "/tmp/ldtp-screenshots"
 
 # For the moment, all applications should be running in English
@@ -224,7 +224,7 @@ def main(args=sys.argv):
     usage = "%prog [OPTIONS]"
     parser = OptionParser(usage=usage)
 
-    default_target = "~/.ubuntu-desktop-test"
+    default_target = "~/.mago"
     default_log_level = "critical"
 
     parser.add_option("-l", "--log",
