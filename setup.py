@@ -94,7 +94,7 @@ setup(
     license = "LGPL",
     description = "Mago",
     long_description = """
-This project provides a library and scripts for desktop testing.
+This project provides a library and scripts for mago.
 """,
     data_files = [
         ("share/mago", ["report.xsl", "conffile.ini"]),
@@ -111,9 +111,9 @@ This project provides a library and scripts for desktop testing.
         ("share/mago/seahorse", ["seahorse/*.*"]),
         ("share/mago/seahorse/data", ["seahorse/data/*"])],
     scripts = ["bin/mago"],
-    packages = ["desktoptesting",
-                "desktoptesting.application",
-                "desktoptesting.test_suite"],
+    packages = ["mago",
+                "mago.application",
+                "mago.test_suite"],
     cmdclass = {
         "install_data": testing_install_data,
         "install_scripts": testing_install_scripts,

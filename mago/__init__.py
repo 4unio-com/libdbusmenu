@@ -1,5 +1,5 @@
 """
-desktop testing package
+mago package
 
 Package that provides a testing API for some applications that are
 wrapped using LDTP library together with some test facilities to write
