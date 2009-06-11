@@ -4,7 +4,7 @@
     <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
       <head>
         <title>
-    Ubuntu LDTP Tests Report
+    Mago Tests Report
     </title>
         <!-- Launchpad style sheet -->
         <style type="text/css" media="screen, print">@import url(https://edge.launchpad.net/+icing/rev7667/+style-slimmer.css);</style>
@@ -93,10 +93,10 @@
               <p>
                 <br/>
               </p>
-              <h1>Ubuntu LDTP Tests Report</h1>
+              <h1>Mago Tests Report</h1>
               <p>
-                  This are the results from a run of Ubuntu Desktop Tests. <br/>
-                  If you find false positives, please, report bugs against <a href="https://launchpad.net/ubuntu-desktop-testing/+filebug">ubuntu-desktop-testing</a> project.
+                  This are the results from a run of Mago Desktop Tests. <br/>
+                  If you find false positives, please, report bugs against <a href="https://launchpad.net/mago/+filebug">Mago</a> project.
               </p>
               <h2><b>Suite: <xsl:value-of select="suite/@name" /></b> (Class: <xsl:value-of select="suite/class" />)</h2>
               <h2>Description: <xsl:value-of select="suite/description" /></h2>

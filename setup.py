@@ -83,37 +83,37 @@ class testing_install_scripts(install_scripts, object):
             infile = os.path.join("bin", os.path.basename(outfile))
             substitute_variables(infile, outfile, {
                 'TESTS_SHARE = "."':
-                'TESTS_SHARE = "/usr/share/ubuntu-desktop-tests"'})
+                'TESTS_SHARE = "/usr/share/mago"'})
 
 
 setup(
-    name = "ubuntu-desktop-testing",
+    name = "mago",
     version = changelog_version(),
     author = "Ara Pulido",
     author_email = "ara.pulido@canonical.com",
     license = "LGPL",
-    description = "Ubuntu Desktop Testing",
+    description = "Mago",
     long_description = """
-This project provides a library and scripts for desktop testing.
+This project provides a library and scripts for mago.
 """,
     data_files = [
-        ("share/ubuntu-desktop-tests", ["report.xsl", "conffile.ini"]),
-        ("share/ubuntu-desktop-tests/gedit", ["gedit/*.*"]),
-        ("share/ubuntu-desktop-tests/gedit/data", ["gedit/data/*"]),
-        ("share/ubuntu-desktop-tests/notify-osd", ["notify-osd/*.*"]),
-        ("share/ubuntu-desktop-tests/notify-osd/data", ["notify-osd/data/*"]),
-        ("share/ubuntu-desktop-tests/indicator-applet", ["indicator-applet/*.*"]),
-        ("share/ubuntu-desktop-tests/indicator-applet/data", ["indicator-applet/data/*"]),
-        ("share/ubuntu-desktop-tests/gnome-panel", ["gnome-panel/*.*"]),
-        ("share/ubuntu-desktop-tests/gnome-panel/data", ["gnome-panel/data/*"]),
-        ("share/ubuntu-desktop-tests/update-manager", ["update-manager/*.*"]),
-        ("share/ubuntu-desktop-tests/update-manager/data", ["update-manager/data/*"]),
-        ("share/ubuntu-desktop-tests/seahorse", ["seahorse/*.*"]),
-        ("share/ubuntu-desktop-tests/seahorse/data", ["seahorse/data/*"])],
-    scripts = ["bin/ubuntu-desktop-test"],
-    packages = ["desktoptesting",
-                "desktoptesting.application",
-                "desktoptesting.test_suite"],
+        ("share/mago", ["report.xsl", "conffile.ini"]),
+        ("share/mago/gedit", ["gedit/*.*"]),
+        ("share/mago/gedit/data", ["gedit/data/*"]),
+        ("share/mago/notify-osd", ["notify-osd/*.*"]),
+        ("share/mago/notify-osd/data", ["notify-osd/data/*"]),
+        ("share/mago/indicator-applet", ["indicator-applet/*.*"]),
+        ("share/mago/indicator-applet/data", ["indicator-applet/data/*"]),
+        ("share/mago/gnome-panel", ["gnome-panel/*.*"]),
+        ("share/mago/gnome-panel/data", ["gnome-panel/data/*"]),
+        ("share/mago/update-manager", ["update-manager/*.*"]),
+        ("share/mago/update-manager/data", ["update-manager/data/*"]),
+        ("share/mago/seahorse", ["seahorse/*.*"]),
+        ("share/mago/seahorse/data", ["seahorse/data/*"])],
+    scripts = ["bin/mago"],
+    packages = ["mago",
+                "mago.application",
+                "mago.test_suite"],
     cmdclass = {
         "install_data": testing_install_data,
         "install_scripts": testing_install_scripts,
