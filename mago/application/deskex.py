@@ -1,4 +1,5 @@
 from .main import Application
+from ..utils import minimize_all_windows
 from time import time, sleep
 import tempfile
 import pynotify
@@ -137,11 +138,11 @@ class NotifyOSD(Application):
         self.focus_desktop = focus_desktop
 
         if self.focus_desktop:
-            ldtp.generatekeyevent('<alt><ctrl>d')
+            minimize_all_windows()
 
     def close(self):
         if self.focus_desktop:
-            ldtp.generatekeyevent('<alt><ctrl>d')
+            minimize_all_windows()
         for screenshot in self.screenshots:
             if os.path.exists(screenshot):
                 os.remove(screenshot)
