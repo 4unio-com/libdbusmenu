@@ -1,4 +1,4 @@
-from desktoptesting.test_suite.ubuntu import UpdateManagerTestSuite
+from mago.test_suite.ubuntu import UpdateManagerTestSuite
 
 class UpdateManagerTest(UpdateManagerTestSuite):
     def test_update_first(self, password):

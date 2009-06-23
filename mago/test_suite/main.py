@@ -1,6 +1,6 @@
 """
 test_suite module contains the definition of the TestSuite class that
-must be used by all test suites written for the desktoptesting package
+must be used by all test suites written for the mago package
 """
 from ..application.main import Application
 

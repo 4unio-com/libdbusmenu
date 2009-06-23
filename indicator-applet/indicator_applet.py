@@ -5,8 +5,8 @@ import ldtputils
 import os
 
 from time import time, gmtime, strftime, sleep
-from desktoptesting.check import ScreenshotCompare, FAIL
-from desktoptesting.test_suite.deskex import IndicatorAppletTestSuite
+from mago.check import ScreenshotCompare, FAIL
+from mago.test_suite.deskex import IndicatorAppletTestSuite
 
 class IndicatorAppletTest(IndicatorAppletTestSuite):
     def serverTest(self, desktop_file=None):

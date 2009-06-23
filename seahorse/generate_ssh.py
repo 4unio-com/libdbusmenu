@@ -1,4 +1,4 @@
-from desktoptesting.test_suite.gnome import SeahorseTestSuite
+from mago.test_suite.gnome import SeahorseTestSuite
 
 class SeahorseSSH(SeahorseTestSuite):
     def test_generate_ssh(self, description, set_up, passphrase, computer='', login=''):
