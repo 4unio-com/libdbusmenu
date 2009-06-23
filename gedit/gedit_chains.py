@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from time import time, gmtime, strftime
 
-from desktoptesting.test_suite.gnome import GEditTestSuite
-from desktoptesting.check import FileComparison, FAIL
+from mago.test_suite.gnome import GEditTestSuite
+from mago.check import FileComparison, FAIL
 
 class GEditChain(GEditTestSuite):
     def testChain(self, oracle=None, chain=None):

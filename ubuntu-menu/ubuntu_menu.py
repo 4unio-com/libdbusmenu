@@ -1,4 +1,4 @@
-from desktoptesting.test_suite.ubuntu import UbuntuMenuTestSuite
+from mago.test_suite.ubuntu import UbuntuMenuTestSuite
 
 class UbuntuMenuTest(UbuntuMenuTestSuite):
        

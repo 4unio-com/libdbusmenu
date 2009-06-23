@@ -1,5 +1,5 @@
-from desktoptesting.test_suite.pidgin import PidginTestSuite
-from desktoptesting.application.pidgin import Pidgin, AccountInfo
+from mago.test_suite.pidgin import PidginTestSuite
+from mago.application.pidgin import Pidgin, AccountInfo
 from ConfigParser import ConfigParser
 import ldtp, ooldtp, ldtputils
 from time import sleep, time

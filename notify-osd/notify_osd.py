@@ -5,8 +5,8 @@ import ldtputils
 
 from time import time, gmtime, strftime, sleep
 
-from desktoptesting.test_suite.deskex import NotifyOSDTestSuite
-from desktoptesting.check import ScreenshotCompare, FAIL
+from mago.test_suite.deskex import NotifyOSDTestSuite
+from mago.check import ScreenshotCompare, FAIL
 
 class NotifyOSDTest(NotifyOSDTestSuite):
     def layoutTest(self, oracle=None, summary=None, body=None, icon=None):
