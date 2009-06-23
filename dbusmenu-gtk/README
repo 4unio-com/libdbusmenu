@@ -1,0 +1,4 @@
+Tests for dbusmenu-gtk.
+
+In order to run the tests, edit dbusMenuTest script and put the correct paths to test-gtk-label-client and test-gtk-label-server.
+
