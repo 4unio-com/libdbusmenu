@@ -22,6 +22,12 @@ AC_CONFIG_MACRO_DIR([m4])
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
 
 ###########################
+# GTK Doc 
+###########################
+
+GTK_DOC_CHECK([1.9])
+
+###########################
 # Dependencies - GLib
 ###########################
 
@@ -108,6 +114,13 @@ libdbusmenu-qt/Makefile
 libdbusmenu-qt/dbusmenu-qt.pc
 tools/Makefile
 tests/Makefile
+docs/Makefile
+docs/reference/libdbusmenu-glib/Makefile
+docs/reference/libdbusmenu-glib/version.xml
+docs/reference/libdbusmenu-gtk/Makefile
+docs/reference/libdbusmenu-gtk/version.xml
+docs/reference/libdbusmenu-qt/Makefile
+docs/reference/libdbusmenu-qt/version.xml
 ])
 
 ###########################
