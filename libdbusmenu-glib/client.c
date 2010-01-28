@@ -99,7 +99,7 @@ static void layout_update (DBusGProxy * proxy, gint revision, guint parent, Dbus
 static void id_prop_update (DBusGProxy * proxy, guint id, gchar * property, GValue * value, DbusmenuClient * client);
 static void id_update (DBusGProxy * proxy, guint id, DbusmenuClient * client);
 static void build_proxies (DbusmenuClient * client);
-static guint parse_node_get_id (xmlNodePtr node);
+static guint parse_node_get_id (xmlNodePtr node, gboolean *ok);
 static DbusmenuMenuitem * parse_layout_xml(DbusmenuClient * client, xmlNodePtr node, DbusmenuMenuitem * item, DbusmenuMenuitem * parent, DBusGProxy * proxy);
 static gint parse_layout (DbusmenuClient * client, const gchar * layout);
 static void update_layout_cb (DBusGProxy * proxy, guint rev, gchar * xml, GError * in_error, void * data);
@@ -518,8 +518,9 @@ build_proxies (DbusmenuClient * client)
    return it.  Also we're checking to ensure the node
    is a 'menu' here. */
 static guint
-parse_node_get_id (xmlNodePtr node)
+parse_node_get_id (xmlNodePtr node, gboolean *ok)
 {
+	*ok = FALSE;
 	if (g_strcmp0((gchar *)node->name, "menu") != 0) {
 		/* This kills some nodes early */
 		g_warning("XML Node is not 'menu' it is '%s'", node->name);
@@ -532,6 +533,7 @@ parse_node_get_id (xmlNodePtr node)
 			if (attrib->children != NULL) {
 				guint id = (guint)g_ascii_strtoull((gchar *)attrib->children->content, NULL, 10);
 				/* g_debug ("Found ID: %d", id); */
+				*ok = TRUE;
 				return id;
 			}
 			break;
@@ -591,7 +593,11 @@ menuitem_get_properties_new_cb (DBusGProxy * proxy, GHashTable * properties, GEr
 	
 	type = dbusmenu_menuitem_property_get(propdata->item, DBUSMENU_MENUITEM_PROP_TYPE);
 	if (type != NULL) {
-		newfunc = g_hash_table_lookup(priv->type_handlers, type);
+		if (g_strcmp0(type, "action") == 0 || g_strcmp0(type, "checkbox") == 0) {
+			newfunc = g_hash_table_lookup(priv->type_handlers, "menuitem");
+		} else {
+			newfunc = g_hash_table_lookup(priv->type_handlers, type);
+		}
 	} else {
 		newfunc = g_hash_table_lookup(priv->type_handlers, DBUSMENU_CLIENT_TYPES_DEFAULT);
 	}
@@ -642,22 +648,21 @@ menuitem_activate (DbusmenuMenuitem * mi, DbusmenuClient * client)
 static DbusmenuMenuitem *
 parse_layout_xml(DbusmenuClient * client, xmlNodePtr node, DbusmenuMenuitem * item, DbusmenuMenuitem * parent, DBusGProxy * proxy)
 {
-	guint id = parse_node_get_id(node);
+	gboolean ok;
+	guint id = parse_node_get_id(node, &ok);
 	#ifdef MASSIVEDEBUGGING
 	g_debug("Client looking at node with id: %d", id);
 	#endif
-	if (item == NULL || dbusmenu_menuitem_get_id(item) != id || id == 0) {
+	if (!ok) {
+		return NULL;
+	}
+	if (item == NULL || dbusmenu_menuitem_get_id(item) != id) {
 		if (item != NULL) {
 			if (parent != NULL) {
 				dbusmenu_menuitem_child_delete(parent, item);
 			}
 			g_object_unref(G_OBJECT(item));
 			item = NULL;
-		}
-
-		if (id == 0) {
-			g_warning("ID from XML file is zero");
-			return NULL;
 		}
 
 		/* Build a new item */
@@ -675,7 +680,8 @@ parse_layout_xml(DbusmenuClient * client, xmlNodePtr node, DbusmenuMenuitem * it
 			propdata->item    = item;
 			propdata->parent  = parent;
 
-			gchar * properties[1] = {NULL}; /* This gets them all */
+			//gchar * properties[1] = {NULL}; /* This gets them all */
+			gchar * properties[] = {"label", "type", "icon", NULL};
 			org_ayatana_dbusmenu_get_properties_async(proxy, id, (const gchar **)properties, menuitem_get_properties_new_cb, propdata);
 		} else {
 			g_warning("Unable to allocate memory to get properties for menuitem.  This menuitem will never be realized.");
@@ -689,7 +695,11 @@ parse_layout_xml(DbusmenuClient * client, xmlNodePtr node, DbusmenuMenuitem * it
 
 	for (children = node->children, position = 0; children != NULL; children = children->next, position++) {
 		/* g_debug("Looking at child: %d", position); */
-		guint childid = parse_node_get_id(children);
+		gboolean ok;
+		guint childid = parse_node_get_id(children, &ok);
+		if (!ok) {
+			continue;
+		}
 		DbusmenuMenuitem * childmi = NULL;
 
 		GList * childsearch = NULL;

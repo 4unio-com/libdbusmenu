@@ -332,9 +332,6 @@ get_property (GObject * obj, guint id, GValue * value, GParamSpec * pspec)
 
 	switch (id) {
 	case PROP_ID:
-		if (priv->id == 0) {
-			priv->id = menuitem_next_id++;
-		}
 		g_value_set_uint(value, priv->id);
 		break;
 	}
