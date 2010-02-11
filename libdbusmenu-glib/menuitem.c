@@ -26,11 +26,13 @@ License version 3 and version 2.1 along with this program.  If not, see
 <http://www.gnu.org/licenses/>
 */
 
+#include <stdlib.h>
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 #include "menuitem.h"
 #include "menuitem-marshal.h"
+#include "menuitem-private.h"
 
 #ifdef MASSIVEDEBUGGING
 #define LABEL(x)  dbusmenu_menuitem_property_get(DBUSMENU_MENUITEM(x), DBUSMENU_MENUITEM_PROP_LABEL)
@@ -53,7 +55,7 @@ License version 3 and version 2.1 along with this program.  If not, see
 typedef struct _DbusmenuMenuitemPrivate DbusmenuMenuitemPrivate;
 struct _DbusmenuMenuitemPrivate
 {
-	guint id;
+	gint id;
 	GList * children;
 	GHashTable * properties;
 	gboolean root;
@@ -78,6 +80,8 @@ enum {
 	PROP_ID,
 };
 
+#define PROP_ID_S  "id"
+
 #define DBUSMENU_MENUITEM_GET_PRIVATE(o) \
 (G_TYPE_INSTANCE_GET_PRIVATE ((o), DBUSMENU_TYPE_MENUITEM, DbusmenuMenuitemPrivate))
 
@@ -88,6 +92,9 @@ static void dbusmenu_menuitem_dispose    (GObject *object);
 static void dbusmenu_menuitem_finalize   (GObject *object);
 static void set_property (GObject * obj, guint id, const GValue * value, GParamSpec * pspec);
 static void get_property (GObject * obj, guint id, GValue * value, GParamSpec * pspec);
+static void g_value_transform_STRING_BOOLEAN (const GValue * in, GValue * out);
+static void g_value_transform_STRING_INT (const GValue * in, GValue * out);
+static void handle_event (DbusmenuMenuitem * mi, const gchar * name, const GValue * value, guint timestamp);
 
 /* GObject stuff */
 G_DEFINE_TYPE (DbusmenuMenuitem, dbusmenu_menuitem, G_TYPE_OBJECT);
@@ -104,6 +111,8 @@ dbusmenu_menuitem_class_init (DbusmenuMenuitemClass *klass)
 	object_class->set_property = set_property;
 	object_class->get_property = get_property;
 
+	klass->handle_event = handle_event;
+
 	/**
 		DbusmenuMenuitem::property-changed:
 		@arg0: The #DbusmenuMenuitem object.
@@ -118,11 +127,12 @@ dbusmenu_menuitem_class_init (DbusmenuMenuitemClass *klass)
 	                                           G_SIGNAL_RUN_LAST,
 	                                           G_STRUCT_OFFSET(DbusmenuMenuitemClass, property_changed),
 	                                           NULL, NULL,
-	                                           _dbusmenu_menuitem_marshal_VOID__STRING_STRING,
-	                                           G_TYPE_NONE, 2, G_TYPE_STRING, G_TYPE_STRING);
+	                                           _dbusmenu_menuitem_marshal_VOID__STRING_POINTER,
+	                                           G_TYPE_NONE, 2, G_TYPE_STRING, G_TYPE_POINTER);
 	/**
 		DbusmenuMenuitem::item-activated:
 		@arg0: The #DbusmenuMenuitem object.
+		@arg1: The timestamp of when it was activated
 
 		Emitted on the objects on the server side when
 		they are signaled on the client side.
@@ -132,8 +142,8 @@ dbusmenu_menuitem_class_init (DbusmenuMenuitemClass *klass)
 	                                           G_SIGNAL_RUN_LAST,
 	                                           G_STRUCT_OFFSET(DbusmenuMenuitemClass, item_activated),
 	                                           NULL, NULL,
-	                                           _dbusmenu_menuitem_marshal_VOID__VOID,
-	                                           G_TYPE_NONE, 0, G_TYPE_NONE);
+	                                           _dbusmenu_menuitem_marshal_VOID__UINT,
+	                                           G_TYPE_NONE, 1, G_TYPE_UINT, G_TYPE_NONE);
 	/**
 		DbusmenuMenuitem::child-added:
 		@arg0: The #DbusmenuMenuitem which is the parent.
@@ -202,25 +212,70 @@ dbusmenu_menuitem_class_init (DbusmenuMenuitemClass *klass)
 	                                           G_TYPE_NONE, 0, G_TYPE_NONE);
 
 	g_object_class_install_property (object_class, PROP_ID,
-	                                 g_param_spec_uint("id", "ID for the menu item",
+	                                 g_param_spec_int(PROP_ID_S, "ID for the menu item",
 	                                              "This is a unique indentifier for the menu item.",
-												  0, 30000, 0,
+												  -1, 30000, -1,
 	                                              G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
+
+	/* Check transfer functions for GValue */
+	if (!g_value_type_transformable(G_TYPE_STRING, G_TYPE_BOOLEAN)) {
+		g_value_register_transform_func(G_TYPE_STRING, G_TYPE_BOOLEAN, g_value_transform_STRING_BOOLEAN);
+	}
+	if (!g_value_type_transformable(G_TYPE_STRING, G_TYPE_INT)) {
+		g_value_register_transform_func(G_TYPE_STRING, G_TYPE_INT, g_value_transform_STRING_INT);
+	}
 
 	return;
 }
 
-static guint menuitem_next_id = 1;
+/* A little helper function to translate a string into
+   a boolean value */
+static void
+g_value_transform_STRING_BOOLEAN (const GValue * in, GValue * out)
+{
+	const gchar * string = g_value_get_string(in);
+	if (!g_strcmp0(string, "TRUE") || !g_strcmp0(string, "true") || !g_strcmp0(string, "True")) {
+		g_value_set_boolean(out, TRUE);
+	} else {
+		g_value_set_boolean(out, FALSE);
+	}
+	return;
+}
 
+/* A little helper function to translate a string into
+   a integer value */
+static void
+g_value_transform_STRING_INT (const GValue * in, GValue * out)
+{
+	g_value_set_int(out, atoi(g_value_get_string(in)));
+	return;
+}
+
+static gint menuitem_next_id = 1;
+
+/* A small little function to both clear the insides of a 
+   value as well as the memory it itself uses. */
+static void
+_g_value_free (gpointer data)
+{
+	if (data == NULL) return;
+	GValue * value = (GValue*)data;
+	g_value_unset(value);
+	g_free(data);
+	return;
+}
+
+/* Initialize the values of the in the object, and build the
+   properties hash table. */
 static void
 dbusmenu_menuitem_init (DbusmenuMenuitem *self)
 {
 	DbusmenuMenuitemPrivate * priv = DBUSMENU_MENUITEM_GET_PRIVATE(self);
 
-	priv->id = 0; 
+	priv->id = -1; 
 	priv->children = NULL;
 
-	priv->properties = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+	priv->properties = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, _g_value_free);
 
 	priv->root = FALSE;
 	
@@ -265,10 +320,13 @@ set_property (GObject * obj, guint id, const GValue * value, GParamSpec * pspec)
 
 	switch (id) {
 	case PROP_ID:
-		priv->id = g_value_get_uint(value);
+		priv->id = g_value_get_int(value);
 		if (priv->id > menuitem_next_id) {
-			menuitem_next_id = priv->id;
+			menuitem_next_id = priv->id + 1;
 		}
+		break;
+	default:
+		G_OBJECT_WARN_INVALID_PROPERTY_ID(obj, id, pspec);
 		break;
 	}
 
@@ -282,16 +340,33 @@ get_property (GObject * obj, guint id, GValue * value, GParamSpec * pspec)
 
 	switch (id) {
 	case PROP_ID:
-		if (priv->id == 0) {
+		if (priv->id == -1) {
 			priv->id = menuitem_next_id++;
 		}
-		g_value_set_uint(value, priv->id);
+		if (dbusmenu_menuitem_get_root(DBUSMENU_MENUITEM(obj))) {
+			g_value_set_int(value, 0);
+		} else {
+			g_value_set_int(value, priv->id);
+		}
+		break;
+	default:
+		G_OBJECT_WARN_INVALID_PROPERTY_ID(obj, id, pspec);
 		break;
 	}
 
 	return;
 }
 
+/* Handles the activate event if it is sent. */
+static void
+handle_event (DbusmenuMenuitem * mi, const gchar * name, const GValue * value, guint timestamp)
+{
+	if (g_strcmp0(name, "clicked") == 0) {
+		g_signal_emit(G_OBJECT(mi), signals[ITEM_ACTIVATED], 0, timestamp, TRUE);
+	}
+
+	return;
+}
 
 /* Public interface */
 
@@ -317,9 +392,9 @@ dbusmenu_menuitem_new (void)
 	Return value: A newly allocated #DbusmenuMenuitem.
 */
 DbusmenuMenuitem *
-dbusmenu_menuitem_new_with_id (guint id)
+dbusmenu_menuitem_new_with_id (gint id)
 {
-	DbusmenuMenuitem * mi = g_object_new(DBUSMENU_TYPE_MENUITEM, "id", id, NULL);
+	DbusmenuMenuitem * mi = g_object_new(DBUSMENU_TYPE_MENUITEM, PROP_ID_S, id, NULL);
 	/* g_debug("New Menuitem id %d goal id %d", dbusmenu_menuitem_get_id(mi), id); */
 	return mi;
 }
@@ -332,15 +407,19 @@ dbusmenu_menuitem_new_with_id (guint id)
 
 	Return value: The ID of the @mi.
 */
-guint
+gint
 dbusmenu_menuitem_get_id (DbusmenuMenuitem * mi)
 {
-	g_return_val_if_fail(DBUSMENU_IS_MENUITEM(mi), 0);
+	g_return_val_if_fail(DBUSMENU_IS_MENUITEM(mi), -1);
 
 	GValue retval = {0};
-	g_value_init(&retval, G_TYPE_UINT);
-	g_object_get_property(G_OBJECT(mi), "id", &retval);
-	return g_value_get_uint(&retval);
+	g_value_init(&retval, G_TYPE_INT);
+	g_object_get_property(G_OBJECT(mi), PROP_ID_S, &retval);
+	gint ret = g_value_get_int(&retval);
+	#ifdef MASSIVEDEBUGGING
+	g_debug("Getting menuitem ID: %d", ret);
+	#endif
+	return ret;
 }
 
 /**
@@ -592,7 +671,7 @@ dbusmenu_menuitem_child_reorder(DbusmenuMenuitem * mi, DbusmenuMenuitem * child,
 	   can't be found.
 */
 DbusmenuMenuitem *
-dbusmenu_menuitem_child_find (DbusmenuMenuitem * mi, guint id)
+dbusmenu_menuitem_child_find (DbusmenuMenuitem * mi, gint id)
 {
 	g_return_val_if_fail(DBUSMENU_IS_MENUITEM(mi), NULL);
 
@@ -611,7 +690,7 @@ dbusmenu_menuitem_child_find (DbusmenuMenuitem * mi, guint id)
 
 typedef struct {
 	DbusmenuMenuitem * mi;
-	guint id;
+	gint id;
 } find_id_t;
 
 /* Basically the heart of the find_id that matches the
@@ -647,9 +726,15 @@ find_id_helper (gpointer in_mi, gpointer in_find_id)
 		represented by @mi.
 */
 DbusmenuMenuitem *
-dbusmenu_menuitem_find_id (DbusmenuMenuitem * mi, guint id)
+dbusmenu_menuitem_find_id (DbusmenuMenuitem * mi, gint id)
 {
 	g_return_val_if_fail(DBUSMENU_IS_MENUITEM(mi), NULL);
+	if (id == 0) {
+		if (dbusmenu_menuitem_get_root(mi) == FALSE) {
+			g_warning("Getting a menuitem with id zero, but it's not set as root.");
+		}
+		return mi;
+	}
 	find_id_t find_id = {mi: NULL, id: id};
 	find_id_helper(mi, &find_id);
 	return find_id.mi;
@@ -673,27 +758,107 @@ dbusmenu_menuitem_find_id (DbusmenuMenuitem * mi, guint id)
 gboolean
 dbusmenu_menuitem_property_set (DbusmenuMenuitem * mi, const gchar * property, const gchar * value)
 {
+	GValue val = {0};
+	g_value_init(&val, G_TYPE_STRING);
+	g_value_set_static_string(&val, value);
+	return dbusmenu_menuitem_property_set_value(mi, property, &val);
+}
+
+/**
+	dbusmenu_menuitem_property_set_bool:
+	@mi: The #DbusmenuMenuitem to set the property on.
+	@property: Name of the property to set.
+	@value: The value of the property.
+
+	Takes a boolean @value and sets it on @property as a
+	property on @mi.  If a property already exists by that name,
+	then the value is set to the new value.  If not, the property
+	is added.  If the value is changed or the property was previously
+	unset then the signal #DbusmenuMenuitem::prop-changed will be
+	emitted by this function.
+
+	Return value:  A boolean representing if the property value was set.
+*/
+gboolean
+dbusmenu_menuitem_property_set_bool (DbusmenuMenuitem * mi, const gchar * property, const gboolean value)
+{
+	GValue val = {0};
+	g_value_init(&val, G_TYPE_BOOLEAN);
+	g_value_set_boolean(&val, value);
+	return dbusmenu_menuitem_property_set_value(mi, property, &val);
+}
+
+/**
+	dbusmenu_menuitem_property_set_int:
+	@mi: The #DbusmenuMenuitem to set the property on.
+	@property: Name of the property to set.
+	@value: The value of the property.
+
+	Takes a boolean @value and sets it on @property as a
+	property on @mi.  If a property already exists by that name,
+	then the value is set to the new value.  If not, the property
+	is added.  If the value is changed or the property was previously
+	unset then the signal #DbusmenuMenuitem::prop-changed will be
+	emitted by this function.
+
+	Return value:  A boolean representing if the property value was set.
+*/
+gboolean
+dbusmenu_menuitem_property_set_int (DbusmenuMenuitem * mi, const gchar * property, const gint value)
+{
+	GValue val = {0};
+	g_value_init(&val, G_TYPE_INT);
+	g_value_set_int(&val, value);
+	return dbusmenu_menuitem_property_set_value(mi, property, &val);
+}
+
+/**
+	dbusmenu_menuitem_property_set:
+	@mi: The #DbusmenuMenuitem to set the property on.
+	@property: Name of the property to set.
+	@value: The value of the property.
+
+	Takes the pair of @property and @value and places them as a
+	property on @mi.  If a property already exists by that name,
+	then the value is set to the new value.  If not, the property
+	is added.  If the value is changed or the property was previously
+	unset then the signal #DbusmenuMenuitem::prop-changed will be
+	emitted by this function.
+
+	Return value:  A boolean representing if the property value was set.
+*/
+gboolean
+dbusmenu_menuitem_property_set_value (DbusmenuMenuitem * mi, const gchar * property, const GValue * value)
+{
 	g_return_val_if_fail(DBUSMENU_IS_MENUITEM(mi), FALSE);
 	g_return_val_if_fail(property != NULL, FALSE);
+	g_return_val_if_fail(G_IS_VALUE(value), FALSE);
 
 	DbusmenuMenuitemPrivate * priv = DBUSMENU_MENUITEM_GET_PRIVATE(mi);
 	/* g_debug("Setting a property.  ID: %d  Prop: %s  Value: %s", priv->id, property, value); */
 
+	#if 0
 	gpointer lookup = g_hash_table_lookup(priv->properties, property);
 	if (g_strcmp0((gchar *)lookup, value) == 0) {
 		/* The value is the same as the value currently in the
 		   table so we don't really care.  Just say everything's okay */
 		return TRUE;
 	}
+	#endif
 
 	gchar * lprop = g_strdup(property);
-	gchar * lval = g_strdup(value);
+	GValue * lval = g_new0(GValue, 1);
+	g_value_init(lval, G_VALUE_TYPE(value));
+	g_value_copy(value, lval);
 
-	g_hash_table_insert(priv->properties, lprop, lval);
+	g_hash_table_replace(priv->properties, lprop, lval);
 	#ifdef MASSIVEDEBUGGING
-	g_debug("Menuitem %d (%s) signalling property '%s' changed to '%s'", ID(mi), LABEL(mi), property, g_utf8_strlen(value, 50) < 25 ? value : "<too long>");
+	gchar * valstr = g_strdup_value_contents(lval);
+	g_debug("Menuitem %d (%s) signalling property '%s' changed to '%s'", ID(mi), LABEL(mi), property, g_utf8_strlen(valstr, 50) < 25 ? valstr : "<too long>");
+	g_free(valstr);
 	#endif
-	g_signal_emit(G_OBJECT(mi), signals[PROPERTY_CHANGED], 0, property, value, TRUE);
+
+	g_signal_emit(G_OBJECT(mi), signals[PROPERTY_CHANGED], 0, lprop, lval, TRUE);
 
 	return TRUE;
 }
@@ -709,18 +874,95 @@ dbusmenu_menuitem_property_set (DbusmenuMenuitem * mi, const gchar * property, c
 
 	Return value: A string with the value of the property
 		that shouldn't be free'd.  Or #NULL if the property
-		is not set.
+		is not set or is not a string.
 */
 const gchar *
 dbusmenu_menuitem_property_get (DbusmenuMenuitem * mi, const gchar * property)
+{
+	const GValue * value = dbusmenu_menuitem_property_get_value(mi, property);
+	if (value == NULL) return NULL;
+	if (G_VALUE_TYPE(value) != G_TYPE_STRING) return NULL;
+	return g_value_get_string(value);
+}
+
+/**
+	dbusmenu_menuitem_property_get_value:
+	@mi: The #DbusmenuMenuitem to look for the property on.
+	@property: The property to grab.
+
+	Look up a property on @mi and return the value of it if
+	it exits.  #NULL will be returned if the property doesn't
+	exist.
+
+	Return value: A GValue for the property.
+*/
+const GValue *
+dbusmenu_menuitem_property_get_value (DbusmenuMenuitem * mi, const gchar * property)
 {
 	g_return_val_if_fail(DBUSMENU_IS_MENUITEM(mi), NULL);
 	g_return_val_if_fail(property != NULL, NULL);
 
 	DbusmenuMenuitemPrivate * priv = DBUSMENU_MENUITEM_GET_PRIVATE(mi);
 
-	return (const gchar *)g_hash_table_lookup(priv->properties, property);
+	return (const GValue *)g_hash_table_lookup(priv->properties, property);
 }
+
+/**
+	dbusmenu_menuitem_property_get_bool:
+	@mi: The #DbusmenuMenuitem to look for the property on.
+	@property: The property to grab.
+
+	Look up a property on @mi and return the value of it if
+	it exits.  Returns #FALSE if the property doesn't exist.
+
+	Return value: The value of the property or #FALSE.
+*/
+gboolean
+dbusmenu_menuitem_property_get_bool (DbusmenuMenuitem * mi, const gchar * property)
+{
+	const GValue * value = dbusmenu_menuitem_property_get_value(mi, property);
+	if (value == NULL) return FALSE;
+	if (G_VALUE_TYPE(value) != G_TYPE_BOOLEAN) {
+		if (g_value_type_transformable(G_VALUE_TYPE(value), G_TYPE_BOOLEAN)) {
+			GValue boolval = {0};
+			g_value_init(&boolval, G_TYPE_BOOLEAN);
+			g_value_transform(value, &boolval);
+			return g_value_get_boolean(&boolval);
+		} else {
+			return FALSE;
+		}
+	}
+	return g_value_get_boolean(value);
+}
+
+/**
+	dbusmenu_menuitem_property_get_int:
+	@mi: The #DbusmenuMenuitem to look for the property on.
+	@property: The property to grab.
+
+	Look up a property on @mi and return the value of it if
+	it exits.  Returns zero if the property doesn't exist.
+
+	Return value: The value of the property or zero.
+*/
+gint
+dbusmenu_menuitem_property_get_int (DbusmenuMenuitem * mi, const gchar * property)
+{
+	const GValue * value = dbusmenu_menuitem_property_get_value(mi, property);
+	if (value == NULL) return 0;
+	if (G_VALUE_TYPE(value) != G_TYPE_INT) {
+		if (g_value_type_transformable(G_VALUE_TYPE(value), G_TYPE_INT)) {
+			GValue intval = {0};
+			g_value_init(&intval, G_TYPE_INT);
+			g_value_transform(value, &intval);
+			return g_value_get_int(&intval);
+		} else {
+			return 0;
+		}
+	}
+	return g_value_get_int(value);
+}
+
 
 /**
 	dbusmenu_menuitem_property_exit:
@@ -743,6 +985,26 @@ dbusmenu_menuitem_property_exist (DbusmenuMenuitem * mi, const gchar * property)
 	gpointer value = g_hash_table_lookup(priv->properties, property);
 
 	return value != NULL;
+}
+
+/**
+	dbusmenu_menuitem_property_remove:
+	@mi: The #DbusmenuMenuitem to remove the property on.
+	@property: The property to look for.
+
+	Removes a property from the menuitem.
+*/
+void
+dbusmenu_menuitem_property_remove (DbusmenuMenuitem * mi, const gchar * property)
+{
+	g_return_if_fail(DBUSMENU_IS_MENUITEM(mi));
+	g_return_if_fail(property != NULL);
+
+	DbusmenuMenuitemPrivate * priv = DBUSMENU_MENUITEM_GET_PRIVATE(mi);
+
+	g_hash_table_remove(priv->properties, property);
+
+	return;
 }
 
 /**
@@ -841,7 +1103,6 @@ dbusmenu_menuitem_get_root (DbusmenuMenuitem * mi)
 	dbusmenu_menuitem_buildxml:
 	@mi: #DbusmenuMenuitem to represent in XML
 	@array: A list of string that will be turned into an XML file
-	@revision: The revision of the layout to embed in the XML
 
 	This function will add strings to the array @array.  It will put
 	at least one entry if this menu item has no children.  If it has
@@ -850,18 +1111,22 @@ dbusmenu_menuitem_get_root (DbusmenuMenuitem * mi)
 	children to place their own tags in the array in between those two.
 */
 void
-dbusmenu_menuitem_buildxml (DbusmenuMenuitem * mi, GPtrArray * array, gint revision)
+dbusmenu_menuitem_buildxml (DbusmenuMenuitem * mi, GPtrArray * array)
 {
 	g_return_if_fail(DBUSMENU_IS_MENUITEM(mi));
 
+	gint id = 0;
+	if (!dbusmenu_menuitem_get_root(mi)) {
+		id = dbusmenu_menuitem_get_id(mi);
+	}
+
 	GList * children = dbusmenu_menuitem_get_children(mi);
-	/* TODO: Only put revision info in the root node.  Save some bandwidth. */
 	if (children == NULL) {
-		g_ptr_array_add(array, g_strdup_printf("<menu id=\"%d\" revision=\"%d\" />", dbusmenu_menuitem_get_id(mi), revision));
+		g_ptr_array_add(array, g_strdup_printf("<menu id=\"%d\"/>", id));
 	} else {
-		g_ptr_array_add(array, g_strdup_printf("<menu id=\"%d\" revision=\"%d\">", dbusmenu_menuitem_get_id(mi), revision));
+		g_ptr_array_add(array, g_strdup_printf("<menu id=\"%d\">", id));
 		for ( ; children != NULL; children = children->next) {
-			dbusmenu_menuitem_buildxml(DBUSMENU_MENUITEM(children->data), array, revision);
+			dbusmenu_menuitem_buildxml(DBUSMENU_MENUITEM(children->data), array);
 		}
 		g_ptr_array_add(array, g_strdup("</menu>"));
 	}
@@ -906,20 +1171,35 @@ dbusmenu_menuitem_foreach (DbusmenuMenuitem * mi, void (*func) (DbusmenuMenuitem
 }
 
 /**
-	dbusmenu_menuitem_activate:
+	dbusmenu_menuitem_handle_event:
 	@mi: The #DbusmenuMenuitem to send the signal on.
+	@name: The name of the signal
+	@value: A value that could be set for the event
+	@timestamp: The timestamp of when the event happened
+
+	This function is called to create an event.  It is likely
+	to be overrided by subclasses.  The default menu item
+	will respond to the activate signal and do:
 
 	Emits the #DbusmenuMenuitem::item-activate signal on this
 	menu item.  Called by server objects when they get the
 	appropriate DBus signals from the client.
+
+	If you subclass this function you should really think
+	about calling the parent function unless you have a good
+	reason not to.
 */
 void
-dbusmenu_menuitem_activate (DbusmenuMenuitem * mi)
+dbusmenu_menuitem_handle_event (DbusmenuMenuitem * mi, const gchar * name, const GValue * value, guint timestamp)
 {
 	g_return_if_fail(DBUSMENU_IS_MENUITEM(mi));
 	#ifdef MASSIVEDEBUGGING
-	g_debug("Menuitem %d (%s) activated", ID(mi), LABEL(mi));
+	g_debug("Menuitem %d (%s) is getting event '%s'", ID(mi), LABEL(mi), name);
 	#endif
-	g_signal_emit(G_OBJECT(mi), signals[ITEM_ACTIVATED], 0, TRUE);
+	DbusmenuMenuitemClass * class = DBUSMENU_MENUITEM_GET_CLASS(mi);
+
+	if (class->handle_event != NULL) {
+		return class->handle_event(mi, name, value, timestamp);
+	}
 	return;
 }

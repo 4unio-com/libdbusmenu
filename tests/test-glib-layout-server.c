@@ -24,6 +24,7 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <dbus/dbus.h>
 #include <dbus/dbus-glib.h>
 #include <dbus/dbus-glib-lowlevel.h>
+#include <dbus/dbus-glib-bindings.h>
 
 #include <libdbusmenu-glib/server.h>
 #include <libdbusmenu-glib/menuitem.h>
@@ -40,7 +41,7 @@ layout2menuitem (layout_t * layout)
 	
 	if (layout->submenu != NULL) {
 		guint count;
-		for (count = 0; layout->submenu[count].id != 0; count++) {
+		for (count = 0; layout->submenu[count].id != -1; count++) {
 			DbusmenuMenuitem * child = layout2menuitem(&layout->submenu[count]);
 			if (child != NULL) {
 				dbusmenu_menuitem_child_append(local, child);
@@ -59,7 +60,7 @@ static GMainLoop * mainloop = NULL;
 static gboolean
 timer_func (gpointer data)
 {
-	if (layouts[layouton].id == 0) {
+	if (layouts[layouton].id == -1) {
 		g_main_loop_quit(mainloop);
 		return FALSE;
 	}
@@ -74,9 +75,25 @@ timer_func (gpointer data)
 int
 main (int argc, char ** argv)
 {
+	GError * error = NULL;
+
 	g_type_init();
 
+	DBusGConnection * connection = dbus_g_bus_get(DBUS_BUS_SESSION, NULL);
 	g_debug("DBus ID: %s", dbus_connection_get_server_id(dbus_g_connection_get_connection(dbus_g_bus_get(DBUS_BUS_SESSION, NULL))));
+
+	DBusGProxy * bus_proxy = dbus_g_proxy_new_for_name(connection, DBUS_SERVICE_DBUS, DBUS_PATH_DBUS, DBUS_INTERFACE_DBUS);
+	guint nameret = 0;
+
+	if (!org_freedesktop_DBus_request_name(bus_proxy, "org.dbusmenu.test", 0, &nameret, &error)) {
+		g_error("Unable to call to request name");
+		return 1;
+	}
+
+	if (nameret != DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER) {
+		g_error("Unable to get name");
+		return 1;
+	}
 
 	server = dbusmenu_server_new("/org/test");
 

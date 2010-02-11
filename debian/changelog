@@ -1,4 +1,112 @@
-libdbusmenu (0.1.8-0ubuntu1) karmic; urgency=low
+libdbusmenu (0.2.3-0ubuntu3~karmic1) karmic; urgency=low
+
+  * merged for karmic
+
+ -- Ken VanDine <ken.vandine@canonical.com>  Thu, 11 Feb 2010 08:14:08 -0500
+
+libdbusmenu (0.2.3-0ubuntu3) lucid; urgency=low
+
+  * Backported lp:~ted/dbusmenu/dbus-error-handling to fix the 
+    indicator-applet crashing sometime on softwares close 
+    (lp: #518900, #519019)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 10 Feb 2010 00:12:35 +0100
+
+libdbusmenu (0.2.3-0ubuntu2) lucid; urgency=low
+
+  * Upstream Merge
+    * Removing the ref to root and a setting of root
+
+ -- Ted Gould <ted@ubuntu.com>  Tue, 09 Feb 2010 08:53:00 -0600
+
+libdbusmenu (0.2.3-0ubuntu1) lucid; urgency=low
+
+  * Upstream release 0.2.3
+    * Fixing handing of root IDs being zero
+    * Handling syncing of properties when reusing items
+    * Shipping new JSON files and READMEs for testing.
+  * libdbusmenu-tools.install: Add in json file and README so
+    that they're put in the right directories.
+
+ -- Ted Gould <ted@ubuntu.com>  Fri, 05 Feb 2010 11:24:58 -0800
+
+libdbusmenu (0.2.2-0ubuntu3) lucid; urgency=low
+
+  * debian/control: 
+    - let libdbusmenu-glib1 breaks libdbusmenu-glib0 since they are create
+      issues at runtime if both got loaded
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Thu, 04 Feb 2010 18:10:56 -0800
+
+libdbusmenu (0.2.2-0ubuntu2) lucid; urgency=low
+
+  * debian/control: fix a typo in the tools depends
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Thu, 04 Feb 2010 14:18:47 -0800
+
+libdbusmenu (0.2.2-0ubuntu1) lucid; urgency=low
+
+  * Updated for the soname changes
+  
+  [ Ted Gould ]
+  * Upstream Release 0.2.2
+    * Interoperability fixes
+    * Adding timestamps to events
+    * Better handling of XML
+    * Adding tools for timing dbusmenu
+  * debian/libdbusmenu-tools.install: Adding a wildcard to get
+    all of the tools in libexec
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Thu, 04 Feb 2010 13:56:49 -0800
+
+libdbusmenu (0.2.1-0ubuntu1) lucid; urgency=low
+
+  * Upstream release 0.2.1
+    - Fix to not destroy the image if we're still using it.
+    - Adding code to support icon names that have an implied direction in them.
+    - Fix to put a small amount of padding between the icon and the label.
+
+ -- Ken VanDine <ken.vandine@canonical.com>  Tue, 12 Jan 2010 11:03:39 -0500
+
+libdbusmenu (0.2.0-0ubuntu3) lucid; urgency=low
+
+  * debian/rules:
+    - updated shlibs version (lp: #505258)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 11 Jan 2010 16:04:11 +0100
+
+libdbusmenu (0.2.0-0ubuntu2) lucid; urgency=low
+
+  * Added debian/libdbusmenu-tools.install
+  * debian/control
+    - improved description for libdbusmenu-tools
+
+ -- Ken VanDine <ken.vandine@canonical.com>  Sat, 09 Jan 2010 09:05:47 -0500
+
+libdbusmenu (0.2.0-0ubuntu1) lucid; urgency=low
+
+  * Upstream release 0.2.0
+    - Remove unused libdbusmenu-qt
+    - Changing API to be V0.2 for reals
+    - Adding underline support
+    - Test suite fixes and automation support
+    - dbus-dumper tool
+    - Switch to org.ayatana
+    - Fixing the handling of typed properties, especially bools.
+    - Adding GetChildren function for getting a single submenu
+    - Starting to watch DBus if the proxy builds fail.
+    - Test suite fixes
+    - Fixing the consistency between the #defines and what
+      was used in the code.
+  * debian/control, debian/libdbusmenu-tools.install: Setting
+    up a package for the new dbusmenu-dumper tool.
+  * debian/control: Mentioning nicely that this will cause
+    indicator-messages << 0.3 and indicator-session << 0.2 to
+    break.
+
+ -- Ted Gould <ted@ubuntu.com>  Fri, 08 Jan 2010 08:42:59 -0600
+
+libdbusmenu (0.1.8-0ubuntu1) lucid; urgency=low
 
   * Upstream release 0.1.8
     * Changing the name to org.ayatana
