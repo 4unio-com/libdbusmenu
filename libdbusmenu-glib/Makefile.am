@@ -139,7 +139,12 @@ vapidir = $(datadir)/vala/vapi
 vapi_DATA = Dbusmenu-Glib-0.2.vapi
 
 Dbusmenu-Glib-0.2.vapi: Dbusmenu-Glib-0.2.gir
-	$(VALA_API_GEN) --library=Dbusmenu-Glib-0.2 $<
+	mv Dbusmenu-Glib-0.2.gir Dbusmenu-Glib-0.2.gir.generated && \
+	sed -e "s|<array name=|<type name=|" \
+		-e "s|</array|</type|" \
+		$< Dbusmenu-Glib-0.2.gir.generated > Dbusmenu-Glib-0.2.gir && \
+	$(VALA_API_GEN) --library=Dbusmenu-Glib-0.2 $< && \
+        mv Dbusmenu-Glib-0.2.gir.generated Dbusmenu-Glib-0.2.gir
 
 CLEANFILES += $(vapi_DATA)
 
