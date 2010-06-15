@@ -178,6 +178,11 @@ void dbusmenu_menuitem_foreach (DbusmenuMenuitem * mi, void (*func) (DbusmenuMen
 void dbusmenu_menuitem_handle_event (DbusmenuMenuitem * mi, const gchar * name, const GValue * value, guint timestamp);
 void dbusmenu_menuitem_send_about_to_show (DbusmenuMenuitem * mi, dbusmenu_menuitem_about_to_show_cb cb, gpointer cb_data);
 
+/* Convenience functions */
+gboolean dbusmenu_menuitem_is_visible (DbusmenuMenuitem * mi);
+gboolean dbusmenu_menuitem_is_enabled (DbusmenuMenuitem * mi);
+DbusmenuMenuitem * dbusmenu_menuitem_child_append_separator (DbusmenuMenuitem *mi);
+
 /**
 	SECTION:menuitem
 	@short_description: A lowlevel represenation of a menuitem

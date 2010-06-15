@@ -33,6 +33,7 @@ License version 3 and version 2.1 along with this program.  If not, see
 #include "menuitem.h"
 #include "menuitem-marshal.h"
 #include "menuitem-private.h"
+#include "client.h" /* for the DBUSMENU_CLIENT_TYPES_SEPARATOR definition */
 
 #ifdef MASSIVEDEBUGGING
 #define LABEL(x)  dbusmenu_menuitem_property_get(DBUSMENU_MENUITEM(x), DBUSMENU_MENUITEM_PROP_LABEL)
@@ -1328,4 +1329,66 @@ dbusmenu_menuitem_send_about_to_show (DbusmenuMenuitem * mi, dbusmenu_menuitem_a
 	}
 
 	return;
+}
+
+/* Convenience functions */
+/**
+	dbusmenu_menuitem_is_visible:
+	@mi: The #DbusmenuMenuitem to look for the property on.
+
+	Look up the well-known 'visible' property on @mi and
+	return whether the item is considered visible or not.
+
+	Return TRUE if the property doesn't exist.
+
+	Return value: The value of the 'visible' property or TRUE.
+*/
+gboolean dbusmenu_menuitem_is_visible (DbusmenuMenuitem * mi)
+{
+	if (dbusmenu_menuitem_property_get_value (mi, DBUSMENU_MENUITEM_PROP_VISIBLE) != NULL)
+		return dbusmenu_menuitem_property_get_bool (mi, DBUSMENU_MENUITEM_PROP_VISIBLE);
+	else
+		return TRUE; /* visible by default */
+}
+
+/**
+	dbusmenu_menuitem_is_enabled:
+	@mi: The #DbusmenuMenuitem to look for the property on.
+
+	Look up the well-known 'enabled' property on @mi and
+	return whether the item is considered enabled or not.
+
+	Return TRUE if the property doesn't exist.
+
+	Return value: The value of the 'enabled' property or TRUE.
+*/
+gboolean dbusmenu_menuitem_is_enabled (DbusmenuMenuitem * mi)
+{
+	if (dbusmenu_menuitem_property_get_value (mi, DBUSMENU_MENUITEM_PROP_ENABLED) != NULL)
+		return dbusmenu_menuitem_property_get_bool (mi, DBUSMENU_MENUITEM_PROP_ENABLED);
+	else
+		return TRUE; /* enabled by default */
+}
+
+/**
+	dbusmenu_menuitem_child_append_separator:
+	@mi: The #DbusmenuMenuitem which will become a new parent
+
+	This is a convenience function that creates a separator
+	item and adds it to the list of children on @mi at the end
+	of that list.
+
+	Return value: the separator #DbusmenuMenuitem
+*/
+DbusmenuMenuitem * dbusmenu_menuitem_child_append_separator (DbusmenuMenuitem *mi)
+{
+	DbusmenuMenuitem *separator = dbusmenu_menuitem_new ();
+
+	if (separator != NULL) {
+		dbusmenu_menuitem_property_set (separator, DBUSMENU_MENUITEM_PROP_TYPE,
+										DBUSMENU_CLIENT_TYPES_SEPARATOR);
+		dbusmenu_menuitem_child_append (mi, separator);
+	}
+
+	return separator;
 }
