@@ -498,6 +498,7 @@ test-gtk-submenu: test-gtk-submenu-client test-gtk-submenu-server Makefile.am
 	@echo "#!/bin/bash" > $@
 	@echo $(XVFB_RUN) >> $@
 	@echo $(DBUS_RUNNER) --task ./test-gtk-submenu-client --task-name Client --task ./test-gtk-submenu-server --task-name Server --ignore-return >> $@
+	@echo $(DBUS_RUNNER) --task /bin/false --task-name Failure >> $@
 	@chmod +x $@
 
 test_gtk_submenu_server_SOURCES = \
