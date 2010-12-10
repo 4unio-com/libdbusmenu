@@ -1,4 +1,4 @@
-libdbusmenu (0.3.90+r175-0ubuntu1) UNRELEASED; urgency=low
+libdbusmenu (0.3.90+r175-0ubuntu1) natty; urgency=low
 
   * New upstream snapshot, r175 
   * debian/control
