@@ -3,10 +3,11 @@ libdbusmenu (0.3.90+r175-0ubuntu1) UNRELEASED; urgency=low
   * New upstream snapshot, r175 
   * debian/control
     - New binaries libdbusmenu-gtk3-3, libdbusmenu-jsonloader3, 
-      libdbusmenu-gtk3, libdbusmenu-glib3, and gir1.0-dbusmenu-gtk3-0.4
+      libdbusmenu-gtk3, libdbusmenu-glib3, gir1.0-dbusmenu-glib-0.4, 
+      gir1.0-dbusmenu-gtk-0.4 and gir1.0-dbusmenu-gtk3-0.4
     - Added new build depends for xsltproc
 
- -- Ken VanDine <ken.vandine@canonical.com>  Fri, 10 Dec 2010 10:10:21 -0500
+ -- Ken VanDine <ken.vandine@canonical.com>  Fri, 10 Dec 2010 16:46:02 -0500
 
 libdbusmenu (0.3.90-0ubuntu2) natty; urgency=low
 
