@@ -1,3 +1,9 @@
+libdbusmenu (0.3.90+r175-0ubuntu2) natty; urgency=low
+
+  * Merged in ted's variant-removal branch
+
+ -- Ken VanDine <ken.vandine@canonical.com>  Thu, 06 Jan 2011 09:42:35 -0500
+
 libdbusmenu (0.3.90+r175-0ubuntu1) natty; urgency=low
 
   * New upstream snapshot, r175 
