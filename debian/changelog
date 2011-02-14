@@ -1,3 +1,11 @@
+libdbusmenu (0.3.97-0ubuntu2) natty; urgency=low
+
+  * debian/libdbusmenu-glib-dev.install, debian/libdbusmenu-gtk-dev.install,
+    debian/libdbusmenu-gtk3-dev.install
+    - Don't include the static library
+
+ -- Ken VanDine <ken.vandine@canonical.com>  Mon, 14 Feb 2011 10:27:35 -0500
+
 libdbusmenu (0.3.97-0ubuntu1) natty; urgency=low
 
   [Ted Gould]
