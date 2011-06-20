@@ -1,3 +1,12 @@
+libdbusmenu (0.4.5-0ubuntu1~ppa1) UNRELEASED; urgency=low
+
+  * New upstream release.
+    * Fixing visibility for Eclipse (LP: #770263 and LP: #618587)
+    * Unseting a GValue properly (LP: #785828)
+    * Memory leaks for GVariant usage (LP: #784890)
+
+ -- Ted Gould <ted@ubuntu.com>  Mon, 20 Jun 2011 16:30:28 -0500
+
 libdbusmenu (0.4.4-0ubuntu1~ppa1) natty; urgency=low
 
   * New upstream release.
