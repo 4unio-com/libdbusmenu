@@ -1,3 +1,9 @@
+libdbusmenu (0.5.93-0ubuntu2) UNRELEASED; urgency=low
+
+  * Backport fix for signal warnings displayed on close (lp: #950762)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 09 Mar 2012 16:37:23 +0100
+
 libdbusmenu (0.5.93-0ubuntu1) precise; urgency=low
 
   * New upstream release.
