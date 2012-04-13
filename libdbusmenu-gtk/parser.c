@@ -880,23 +880,15 @@ find_menu_label (GtkWidget *widget)
   GtkWidget *label = NULL;
 
   if (GTK_IS_LABEL (widget))
-    return widget;
-
-  if (GTK_IS_CONTAINER (widget))
     {
-      GList *children;
+      label = widget;
+    }
+  else if (GTK_IS_CONTAINER (widget))
+    {
       GList *l;
-
-      children = gtk_container_get_children (GTK_CONTAINER (widget));
-
-      for (l = children; l; l = l->next)
-        {
+      GList *children = gtk_container_get_children (GTK_CONTAINER (widget));
+      for (l=children; l && !label; l=l->next)
           label = find_menu_label (l->data);
-
-          if (label)
-            break;
-        }
-
       g_list_free (children);
     }
 
