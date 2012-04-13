@@ -326,26 +326,15 @@ parser_data_free (ParserData * pdata)
 static gint
 get_child_position (GtkWidget * child)
 {
+	gint position = -1;
 	GtkWidget * parent = gtk_widget_get_parent (child);
-	if (parent == NULL || !GTK_IS_CONTAINER (parent))
-		return -1;
-
-	GList * children = gtk_container_get_children (GTK_CONTAINER (parent));
-	GList * iter;
-	gint position = 0;
-
-	for (iter = children; iter != NULL; iter = iter->next) {
-		if (iter->data == child)
-			break;
-		++position;
+	if (parent != NULL || GTK_IS_CONTAINER (parent))
+	{
+		GList * children = gtk_container_get_children (GTK_CONTAINER (parent));
+		position = g_list_index (children, child);
+		g_list_free (children);
 	}
-
-	g_list_free (children);
-
-	if (iter == NULL)
-		return -1;
-	else
-		return position;
+	return position;
 }
 
 /* Creates a new menu item that is attached to the widget and has
