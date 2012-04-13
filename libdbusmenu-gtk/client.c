@@ -74,6 +74,12 @@ static void image_property_handle (DbusmenuMenuitem * item, const gchar * proper
 /* GObject Stuff */
 G_DEFINE_TYPE (DbusmenuGtkClient, dbusmenu_gtkclient, DBUSMENU_TYPE_CLIENT);
 
+static GQuark data_menuitem      = 0;
+static GQuark data_menu          = 0;
+static GQuark data_activating    = 0;
+static GQuark data_idle_close_id = 0;
+static GQuark data_delayed_close = 0;
+
 /* Basic build for the class.  Only a finalize and dispose handler. */
 static void
 dbusmenu_gtkclient_class_init (DbusmenuGtkClientClass *klass)
@@ -84,6 +90,12 @@ dbusmenu_gtkclient_class_init (DbusmenuGtkClientClass *klass)
 
 	object_class->dispose = dbusmenu_gtkclient_dispose;
 	object_class->finalize = dbusmenu_gtkclient_finalize;
+
+	data_menuitem      = g_quark_from_static_string("dbusmenugtk-data-gtkmenuitem");
+	data_menu          = g_quark_from_static_string("dbusmenugtk-data-gtkmenu");
+	data_activating    = g_quark_from_static_string("dbusmenugtk-data-activating");
+	data_idle_close_id = g_quark_from_static_string("dbusmenugtk-data-idle-close-id");
+	data_delayed_close = g_quark_from_static_string("dbusmenugtk-data-delayed-close");
 
 	return;
 }
@@ -447,20 +459,14 @@ dbusmenu_gtkclient_get_accel_group (DbusmenuGtkClient * client)
 
 /* Internal Functions */
 
-static const gchar * data_menuitem =      "dbusmenugtk-data-gtkmenuitem";
-static const gchar * data_menu =          "dbusmenugtk-data-gtkmenu";
-static const gchar * data_activating =    "dbusmenugtk-data-activating";
-static const gchar * data_idle_close_id = "dbusmenugtk-data-idle-close-id";
-static const gchar * data_delayed_close = "dbusmenugtk-data-delayed-close";
-
 static void
 menu_item_start_activating(DbusmenuMenuitem * mi)
 {
 	/* Mark this item and all it's parents as activating */
 	DbusmenuMenuitem * parent = mi;
 	do {
-		g_object_set_data(G_OBJECT(parent), data_activating,
-		                  GINT_TO_POINTER(TRUE));
+		g_object_set_qdata(G_OBJECT(parent), data_activating,
+		                   GINT_TO_POINTER(TRUE));
 	} while ((parent = dbusmenu_menuitem_get_parent (parent)) != NULL);
 
 	GVariant * variant = g_variant_new("i", 0);
@@ -470,7 +476,7 @@ menu_item_start_activating(DbusmenuMenuitem * mi)
 static gboolean
 menu_item_is_activating(DbusmenuMenuitem * mi)
 {
-	return GPOINTER_TO_INT(g_object_get_data(G_OBJECT(mi), data_activating));
+	return GPOINTER_TO_INT(g_object_get_qdata(G_OBJECT(mi), data_activating));
 }
 
 static void
@@ -481,7 +487,7 @@ menu_item_stop_activating(DbusmenuMenuitem * mi)
 
 	/* Mark this item and all it's parents as not activating and finally
 	   send their queued close event. */
-	g_object_set_data(G_OBJECT(mi), data_activating, GINT_TO_POINTER(FALSE));
+	g_object_set_qdata(G_OBJECT(mi), data_activating, GINT_TO_POINTER(FALSE));
 
 	/* There is one master root parent that we don't care about, so stop
 	   right before it */
@@ -489,27 +495,27 @@ menu_item_stop_activating(DbusmenuMenuitem * mi)
 	while (dbusmenu_menuitem_get_parent (parent) != NULL &&
 	       menu_item_is_activating(parent)) {
 		/* Now clean up the activating flag */
-		g_object_set_data(G_OBJECT(parent), data_activating,
-		                  GINT_TO_POINTER(FALSE));
+		g_object_set_qdata(G_OBJECT(parent), data_activating,
+		                   GINT_TO_POINTER(FALSE));
 
 		gboolean should_close = FALSE;
 
 		/* Note that dbus might be fast enough to have already
 		   processed the app's reply before close_in_idle() is called.
 		   So to avoid that, we shut down any pending close_in_idle call */
-		guint id = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(parent),
+		guint id = GPOINTER_TO_INT(g_object_get_qdata(G_OBJECT(parent),
 		                           data_idle_close_id));
 		if (id > 0) {
-			g_object_set_data(G_OBJECT(parent), data_idle_close_id,
-			                  GINT_TO_POINTER(0));
+			g_object_set_qdata(G_OBJECT(parent), data_idle_close_id,
+			                   GINT_TO_POINTER(0));
 			should_close = TRUE;
 		}
 
-		gboolean delayed = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(mi),
-		                                                     data_delayed_close));
+		gboolean delayed = GPOINTER_TO_INT(g_object_get_qdata(G_OBJECT(mi),
+		                                                      data_delayed_close));
 		if (delayed) {
-			g_object_set_data(G_OBJECT(mi), data_delayed_close,
-			                  GINT_TO_POINTER(FALSE));
+			g_object_set_qdata(G_OBJECT(mi), data_delayed_close,
+			                   GINT_TO_POINTER(FALSE));
 			should_close = TRUE;
 		}
 
@@ -562,9 +568,9 @@ close_in_idle (DbusmenuMenuitem * mi)
 	if (!menu_item_is_activating(mi))
 		dbusmenu_menuitem_handle_event(mi, DBUSMENU_MENUITEM_EVENT_CLOSED, NULL, gtk_get_current_event_time());
 	else
-		g_object_set_data(G_OBJECT(mi), data_delayed_close, GINT_TO_POINTER(TRUE));
+		g_object_set_qdata(G_OBJECT(mi), data_delayed_close, GINT_TO_POINTER(TRUE));
 
-	g_object_set_data(G_OBJECT(mi), data_idle_close_id, GINT_TO_POINTER(0));
+	g_object_set_qdata(G_OBJECT(mi), data_idle_close_id, GINT_TO_POINTER(0));
 	return FALSE;
 }
 
@@ -589,12 +595,12 @@ submenu_notify_visible_cb (GtkWidget * menu, GParamSpec * pspec, DbusmenuMenuite
 		   time, so we wait until all queued signals are handled before
 		   continuing.  (our handling of the closed signal depends on
 		   whether the user clicked an item or not) */
-		guint id = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(mi),
+		guint id = GPOINTER_TO_INT(g_object_get_qdata(G_OBJECT(mi),
 		                           data_idle_close_id));
 		if (id == 0) {
 			id = g_idle_add((GSourceFunc)close_in_idle, mi);
-			g_object_set_data_full(G_OBJECT(mi), data_idle_close_id,
-			                       GINT_TO_POINTER(id), cancel_idle_close_id);
+			g_object_set_qdata_full(G_OBJECT(mi), data_idle_close_id,
+			                        GINT_TO_POINTER(id), cancel_idle_close_id);
 		}
 	}
 }
@@ -683,7 +689,7 @@ process_submenu (DbusmenuMenuitem * mi, GtkMenuItem * gmi, GVariant * variant, D
 		/* This is the only case we're really supporting right now,
 		   so if it's not this, we want to clean up. */
 		/* We're just going to warn for now. */
-		gpointer pmenu = g_object_get_data(G_OBJECT(mi), data_menu);
+		gpointer pmenu = g_object_get_qdata(G_OBJECT(mi), data_menu);
 		if (pmenu != NULL) {
 			g_warning("The child-display variable is set to '%s' but there's a menu, odd?", submenu);
 		}
@@ -691,7 +697,7 @@ process_submenu (DbusmenuMenuitem * mi, GtkMenuItem * gmi, GVariant * variant, D
 		/* We need to build a menu for these guys to live in. */
 		GtkMenu * menu = GTK_MENU(gtk_menu_new());
 		g_object_ref_sink(menu);
-		g_object_set_data_full(G_OBJECT(mi), data_menu, menu, g_object_unref);
+		g_object_set_qdata_full(G_OBJECT(mi), data_menu, menu, g_object_unref);
 
 		gtk_menu_item_set_submenu(gmi, GTK_WIDGET(menu));
 
@@ -841,7 +847,7 @@ activate_helper (GtkMenuShell * shell)
 static void
 item_activate (DbusmenuClient * client, DbusmenuMenuitem * mi, guint timestamp, gpointer userdata)
 {
-	gpointer pmenu = g_object_get_data(G_OBJECT(mi), data_menu);
+	gpointer pmenu = g_object_get_qdata(G_OBJECT(mi), data_menu);
 	if (pmenu == NULL) {
 		g_warning("Activated menu item doesn't have a menu?  ID: %d", dbusmenu_menuitem_get_id(mi));
 		return;
@@ -895,7 +901,7 @@ dbusmenu_gtkclient_newitem_base (DbusmenuGtkClient * client, DbusmenuMenuitem * 
 
 	/* Attach these two */
 	g_object_ref_sink(G_OBJECT(gmi));
-	g_object_set_data_full(G_OBJECT(item), data_menuitem, gmi, (GDestroyNotify)destroy_gmi);
+	g_object_set_qdata_full(G_OBJECT(item), data_menuitem, gmi, (GDestroyNotify)destroy_gmi);
 
 	/* DbusmenuMenuitem signals */
 	g_signal_connect(G_OBJECT(item), DBUSMENU_MENUITEM_SIGNAL_PROPERTY_CHANGED, G_CALLBACK(menu_prop_change_cb), client);
@@ -938,7 +944,7 @@ new_child (DbusmenuMenuitem * mi, DbusmenuMenuitem * child, guint position, Dbus
 	if (dbusmenu_menuitem_get_root(mi)) { return; }
 	if (g_strcmp0(dbusmenu_menuitem_property_get(mi, DBUSMENU_MENUITEM_PROP_TYPE), DBUSMENU_CLIENT_TYPES_SEPARATOR) == 0) { return; }
 
-	gpointer ann_menu = g_object_get_data(G_OBJECT(mi), data_menu);
+	gpointer ann_menu = g_object_get_qdata(G_OBJECT(mi), data_menu);
 	if (ann_menu == NULL) {
 		g_warning("Children but no menu, someone's been naughty with their '" DBUSMENU_MENUITEM_PROP_CHILD_DISPLAY "' property: '%s'", dbusmenu_menuitem_property_get(mi, DBUSMENU_MENUITEM_PROP_CHILD_DISPLAY));
 		return;
@@ -959,12 +965,12 @@ delete_child (DbusmenuMenuitem * mi, DbusmenuMenuitem * child, DbusmenuGtkClient
 	if (dbusmenu_menuitem_get_root(mi)) { return; }
 
 	if (g_list_length(dbusmenu_menuitem_get_children(mi)) == 0) {
-		gpointer ann_menu = g_object_get_data(G_OBJECT(mi), data_menu);
+		gpointer ann_menu = g_object_get_qdata(G_OBJECT(mi), data_menu);
 		GtkMenu * menu = GTK_MENU(ann_menu);
 
 		if (menu != NULL) {
 			gtk_widget_destroy(GTK_WIDGET(menu));
-			g_object_steal_data(G_OBJECT(mi), data_menu);
+			g_object_steal_qdata(G_OBJECT(mi), data_menu);
 		}
 	}
 
@@ -977,7 +983,7 @@ move_child (DbusmenuMenuitem * mi, DbusmenuMenuitem * child, guint new, guint ol
 	/* If it's a root item, we shouldn't be dealing with it here. */
 	if (dbusmenu_menuitem_get_root(mi)) { return; }
 
-	gpointer ann_menu = g_object_get_data(G_OBJECT(mi), data_menu);
+	gpointer ann_menu = g_object_get_qdata(G_OBJECT(mi), data_menu);
 	if (ann_menu == NULL) {
 		g_warning("Moving a child when we don't have a submenu!");
 		return;
@@ -1026,7 +1032,7 @@ dbusmenu_gtkclient_menuitem_get (DbusmenuGtkClient * client, DbusmenuMenuitem * 
 	g_return_val_if_fail(DBUSMENU_IS_GTKCLIENT(client), NULL);
 	g_return_val_if_fail(DBUSMENU_IS_MENUITEM(item), NULL);
 
-	gpointer data = g_object_get_data(G_OBJECT(item), data_menuitem);
+	gpointer data = g_object_get_qdata(G_OBJECT(item), data_menuitem);
 	if (data == NULL) {
 		return NULL;
 	}
@@ -1049,7 +1055,7 @@ dbusmenu_gtkclient_menuitem_get_submenu (DbusmenuGtkClient * client, DbusmenuMen
 	g_return_val_if_fail(DBUSMENU_IS_GTKCLIENT(client), NULL);
 	g_return_val_if_fail(DBUSMENU_IS_MENUITEM(item), NULL);
 
-	gpointer data = g_object_get_data(G_OBJECT(item), data_menu);
+	gpointer data = g_object_get_qdata(G_OBJECT(item), data_menu);
 	if (data == NULL) {
 		return NULL;
 	}

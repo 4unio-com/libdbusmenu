@@ -33,9 +33,6 @@ License version 3 and version 2.1 along with this program.  If not, see
 #include "client.h"
 #include "config.h"
 
-#define CACHED_MENUITEM  "dbusmenu-gtk-parser-cached-item"
-#define PARSER_DATA      "dbusmenu-gtk-parser-data"
-
 typedef struct _ParserData
 {
   GtkWidget *label;
@@ -124,6 +121,9 @@ static void           menuitem_notify_cb       (GtkWidget *         widget,
 ****
 ***/
 
+static GQuark quark_cached_item = 0;
+static GQuark quark_parser_data = 0;
+
 static const char * interned_str_accessible_name   = NULL;
 static const char * interned_str_active            = NULL;   
 static const char * interned_str_always_show_image = NULL;
@@ -145,7 +145,7 @@ static const char * interned_str_submenu           = NULL;
 static const char * interned_str_visible           = NULL;    
 
 static void
-ensure_interned_strings_loaded (void)
+ensure_static_vars_inited (void)
 {
   if (G_UNLIKELY(interned_str_file == NULL))
   {
@@ -168,6 +168,9 @@ ensure_interned_strings_loaded (void)
     interned_str_storage_type       = g_intern_static_string ("storage-type");
     interned_str_submenu            = g_intern_static_string ("submenu");
     interned_str_visible            = g_intern_static_string ("visible");
+
+    quark_cached_item = g_quark_from_static_string ("dbusmenu-gtk-parser-cached-item");
+    quark_parser_data = g_quark_from_static_string ("dbusmenu-gtk-parser-data");
   }
 }
 
@@ -195,7 +198,7 @@ dbusmenu_gtk_clear_signal_handler (gpointer instance, gulong *handler_id)
 static ParserData*
 parser_data_get_from_menuitem (DbusmenuMenuitem * item)
 {
-      return (ParserData *) g_object_get_data(G_OBJECT(item), PARSER_DATA);
+      return (ParserData *) g_object_get_qdata(G_OBJECT(item), quark_parser_data);
 }
 
 /* get the ParserData associated with the specified widget */
@@ -227,6 +230,8 @@ DbusmenuMenuitem *
 dbusmenu_gtk_parse_menu_structure (GtkWidget * widget)
 {
 	g_return_val_if_fail(GTK_IS_MENU_ITEM(widget) || GTK_IS_MENU_SHELL(widget), NULL);
+
+	ensure_static_vars_inited();
 
 	DbusmenuMenuitem * returnval = dbusmenu_gtk_parse_get_cached_item (widget);
 
@@ -260,7 +265,7 @@ dbusmenu_gtk_parse_get_cached_item (GtkWidget * widget)
 	if (!GTK_IS_MENU_ITEM(widget)) {
 		return NULL;
 	}
-	return DBUSMENU_MENUITEM(g_object_get_data(G_OBJECT(widget), CACHED_MENUITEM));
+	return DBUSMENU_MENUITEM(g_object_get_qdata(G_OBJECT(widget), quark_cached_item));
 }
 
 static void
@@ -290,7 +295,7 @@ parser_data_free (ParserData * pdata)
 		g_object_remove_weak_pointer(o, (gpointer*)&pdata->widget);
 
 		/* since the DbusmenuMenuitem is being destroyed, uncache it from the GtkWidget */
-		g_object_steal_data(o, CACHED_MENUITEM);
+		g_object_steal_qdata(o, quark_cached_item);
 	}
 
 	if (pdata->shell != NULL) {
@@ -341,11 +346,11 @@ new_menuitem (GtkWidget * widget)
 	DbusmenuMenuitem * item = dbusmenu_menuitem_new();
 
 	ParserData *pdata = g_new0 (ParserData, 1);
-	g_object_set_data_full(G_OBJECT(item), PARSER_DATA, pdata, (GDestroyNotify)parser_data_free);
+	g_object_set_qdata_full(G_OBJECT(item), quark_parser_data, pdata, (GDestroyNotify)parser_data_free);
 
 	pdata->widget = widget;
 	g_object_add_weak_pointer(G_OBJECT (widget), (gpointer*)&pdata->widget);
-	g_object_set_data(G_OBJECT(widget), CACHED_MENUITEM, item);
+	g_object_set_qdata(G_OBJECT(widget), quark_cached_item, item);
 
 	return item;
 }
@@ -735,8 +740,6 @@ menuitem_notify_cb (GtkWidget  *widget,
                     GParamSpec *pspec,
                     gpointer    data)
 {
-  ensure_interned_strings_loaded ();
-
   if (pspec->name == interned_str_visible)
     {
       GtkWidget * new_toplevel = gtk_widget_get_toplevel (widget);
@@ -936,8 +939,6 @@ label_notify_cb (GtkWidget  *widget,
   DbusmenuMenuitem *child = (DbusmenuMenuitem *)data;
   GValue prop_value = {0};
 
-  ensure_interned_strings_loaded ();
-
   g_value_init (&prop_value, pspec->value_type); 
   g_object_get_property (G_OBJECT (widget), pspec->name, &prop_value);
 
@@ -975,8 +976,6 @@ label_notify_cb (GtkWidget  *widget,
 static void
 image_notify_cb (GtkWidget * image, GParamSpec * pspec, gpointer data)
 {
-  ensure_interned_strings_loaded();
-
   if (pspec->name == interned_str_file ||
       pspec->name == interned_str_gicon ||
       pspec->name == interned_str_icon_name ||
@@ -997,7 +996,6 @@ static void
 action_notify_cb (GtkAction *action, GParamSpec * pspec, gpointer data)
 {
   DbusmenuMenuitem * mi = DBUSMENU_MENUITEM(data);
-  ensure_interned_strings_loaded ();
 
   if (pspec->name == interned_str_sensitive)
     {
@@ -1030,8 +1028,6 @@ action_notify_cb (GtkAction *action, GParamSpec * pspec, gpointer data)
 static void
 a11y_name_notify_cb (AtkObject * accessible, GParamSpec * pspec, gpointer data)
 {
-  ensure_interned_strings_loaded ();
-
   /* If an application sets the accessible name to NULL, then a subsequent
    * call to get the accessible name from the Atk object should return the same
    * string as the text of the menu item label, in which case, we want to clear
@@ -1130,8 +1126,6 @@ widget_notify_cb (GtkWidget * widget, GParamSpec * pspec, gpointer data)
   GValue prop_value = {0};
   DbusmenuMenuitem * child = DBUSMENU_MENUITEM(data);
   g_return_if_fail (child != NULL);
-
-  ensure_interned_strings_loaded ();
 
   g_value_init (&prop_value, pspec->value_type); 
   g_object_get_property (G_OBJECT (widget), pspec->name, &prop_value);
