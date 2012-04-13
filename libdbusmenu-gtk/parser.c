@@ -227,20 +227,15 @@ dbusmenu_gtk_parse_menu_structure (GtkWidget * widget)
 {
 	g_return_val_if_fail(GTK_IS_MENU_ITEM(widget) || GTK_IS_MENU_SHELL(widget), NULL);
 
-	DbusmenuMenuitem * returnval = NULL;
-	gpointer data = g_object_get_data(G_OBJECT(widget), CACHED_MENUITEM);
+	DbusmenuMenuitem * returnval = dbusmenu_gtk_parse_get_cached_item (widget);
 
-	if (data == NULL) {
-		RecurseContext recurse = {0};
-
-		recurse.toplevel = gtk_widget_get_toplevel(widget);
-
-		parse_menu_structure_helper(widget, &recurse);
-
-		returnval = recurse.parent;
+	if (returnval != NULL) {
+		g_object_ref(returnval);
 	} else {
-		returnval = DBUSMENU_MENUITEM(data);
-		g_object_ref(G_OBJECT(returnval));
+		RecurseContext recurse = {0};
+		recurse.toplevel = gtk_widget_get_toplevel(widget);
+		parse_menu_structure_helper(widget, &recurse);
+		returnval = recurse.parent;
 	}
 
 	return returnval;
@@ -456,17 +451,14 @@ parse_menu_structure_helper (GtkWidget * widget, RecurseContext * recurse)
 	}
 
 	if (GTK_IS_MENU_ITEM(widget)) {
-		DbusmenuMenuitem * thisitem = NULL;
+		DbusmenuMenuitem * thisitem;
 
 		/* Check to see if we're cached already */
-		gpointer pmi = g_object_get_data(G_OBJECT(widget), CACHED_MENUITEM);
-		if (pmi != NULL) {
-			thisitem = DBUSMENU_MENUITEM(pmi);
-			g_object_ref(G_OBJECT(thisitem));
-		}
-
-		/* We don't have one, so we'll need to build it */
-		if (thisitem == NULL) {
+ 		thisitem = dbusmenu_gtk_parse_get_cached_item (widget);
+		if (thisitem != NULL) {
+			g_object_ref(thisitem);
+		} else {
+			/* We don't have one, so we'll need to build it */
 			thisitem = construct_dbusmenu_for_widget (widget);
 
 			if (!gtk_widget_get_visible (widget)) {
@@ -1231,7 +1223,7 @@ widget_notify_cb (GtkWidget * widget, GParamSpec * pspec, gpointer data)
     {
       /* The underlying submenu got swapped out.  Let's see what it is now. */
       /* First, delete any children that may exist currently. */
-      DbusmenuMenuitem * item = DBUSMENU_MENUITEM(g_object_get_data(G_OBJECT(widget), CACHED_MENUITEM));
+      DbusmenuMenuitem * item = dbusmenu_gtk_parse_get_cached_item (widget);
       if (item != NULL)
         {
           GList * children = dbusmenu_menuitem_take_children(item);
@@ -1293,21 +1285,13 @@ item_inserted_cb (GtkContainer *menu,
 static void
 item_removed_cb (GtkContainer *menu, GtkWidget *widget, gpointer data)
 {
-	gpointer pmi = g_object_get_data(G_OBJECT(widget), CACHED_MENUITEM);
-	if (pmi == NULL) {
-		return;
+	DbusmenuMenuitem * parent = dbusmenu_gtk_parse_get_cached_item (GTK_WIDGET(menu));
+	DbusmenuMenuitem * child = dbusmenu_gtk_parse_get_cached_item (widget);
+
+	if (parent && child) {
+		dbusmenu_menuitem_child_delete(parent, child);
 	}
 
-	DbusmenuMenuitem * child = DBUSMENU_MENUITEM(pmi);
-
-	pmi = g_object_get_data(G_OBJECT(menu), CACHED_MENUITEM);
-	if (pmi == NULL) {
-		return;
-	}
-
-	DbusmenuMenuitem * parent = DBUSMENU_MENUITEM(pmi);
-
-	dbusmenu_menuitem_child_delete(parent, child);
 	return;
 }
 
