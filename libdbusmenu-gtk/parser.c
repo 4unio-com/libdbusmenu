@@ -477,18 +477,15 @@ parse_menu_structure_helper (GtkWidget * widget, RecurseContext * recurse)
 			}
 		}
 
+
 		/* Check to see if we're in our parents list of children, if we have
 		   a parent. */
 		if (recurse->parent != NULL) {
-			GList * children = dbusmenu_menuitem_get_children (recurse->parent);
-			GList * peek = NULL;
 
-			if (children != NULL) {
-				peek = g_list_find (children, thisitem);
-			}
+			const gboolean recurse_parent_is_thisitems_parent = dbusmenu_menuitem_get_position (thisitem, recurse->parent) > 0;
 
 			/* Oops, let's tell our parents about us */
-			if (peek == NULL) {
+			if (!recurse_parent_is_thisitems_parent) {
 				g_object_ref(thisitem);
 
 				DbusmenuMenuitem * parent = dbusmenu_menuitem_get_parent(thisitem);
