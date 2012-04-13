@@ -631,8 +631,8 @@ construct_dbusmenu_for_widget (GtkWidget * widget)
 
           GtkWidget *label = find_menu_label (widget);
 
-          // Sometimes, an app will directly find and modify the label
-          // (like empathy), so watch the label especially for that.
+          /* Sometimes apps (like empathy) will directly modify a menu's label.
+             So let's listen for label changes */
           gchar * text = sanitize_label (GTK_LABEL (label));
           dbusmenu_menuitem_property_set (mi, DBUSMENU_MENUITEM_PROP_LABEL, text);
           g_free (text);
@@ -644,16 +644,13 @@ construct_dbusmenu_for_widget (GtkWidget * widget)
           AtkObject *accessible = gtk_widget_get_accessible (widget);
           if (accessible)
             {
-              // Getting the accessible name of the Atk object retrieves the text
-              // of the menu item label, unless the application has set an alternate
-              // accessible name.
+              /* Set the accessible name if it differs from the label */
               const gchar * label_text = gtk_label_get_text (GTK_LABEL (label));
               const gchar * a11y_name = atk_object_get_name (accessible);
               if (g_strcmp0 (a11y_name, label_text))
                 dbusmenu_menuitem_property_set (mi, DBUSMENU_MENUITEM_PROP_ACCESSIBLE_DESC, a11y_name);
 
-              // An application may set an alternate accessible name in the future,
-              // so we had better watch out for it.
+              /* Listen for changes to the accessible name */
               pdata->accessible = accessible;
               pdata->a11y_handler_id = g_signal_connect (G_OBJECT (accessible),
                                                          "notify::accessible-name",
@@ -785,7 +782,7 @@ update_icon (DbusmenuMenuitem *menuitem, GtkImage *image)
   gint width;
   ParserData *pdata = parser_data_get_from_menuitem (menuitem);
 
-  /* Check to see if we're changing the image.  If so, we need to track that little bugger */
+  /* if it's a different image, track it */
   if (image != GTK_IMAGE(pdata->image)) {
 
     if (pdata->image != NULL) {
@@ -838,7 +835,7 @@ update_icon (DbusmenuMenuitem *menuitem, GtkImage *image)
          between icon-name gicons and pixbuf gicons because even when given a
          icon-name gicon, there's no easy way to lookup which icon-name among
          its set is present and should be used among the icon themes available.
-         So instead, we render to a pixbuf and watch icon theme changes. */
+         So instead, we render to a pixbuf and watch icon changes. */
       gtk_image_get_gicon (image, &gicon, NULL);
 		  gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, &width, NULL);
       info = gtk_icon_theme_lookup_by_gicon (gtk_icon_theme_get_default (),
