@@ -726,24 +726,8 @@ dbusmenu_menuitem_child_append (DbusmenuMenuitem * mi, DbusmenuMenuitem * child)
 	g_return_val_if_fail(DBUSMENU_IS_MENUITEM(mi), FALSE);
 	g_return_val_if_fail(DBUSMENU_IS_MENUITEM(child), FALSE);
 
-	DbusmenuMenuitemPrivate * priv = DBUSMENU_MENUITEM_GET_PRIVATE(mi);
-	g_return_val_if_fail(g_list_find(priv->children, child) == NULL, FALSE);
-
-	if (!dbusmenu_menuitem_set_parent(child, mi)) {
-		return FALSE;
-	}
-
-	if (priv->children == NULL && !dbusmenu_menuitem_property_exist(mi, DBUSMENU_MENUITEM_PROP_CHILD_DISPLAY)) {
-		dbusmenu_menuitem_property_set(mi, DBUSMENU_MENUITEM_PROP_CHILD_DISPLAY, DBUSMENU_MENUITEM_CHILD_DISPLAY_SUBMENU);
-	}
-
-	priv->children = g_list_append(priv->children, child);
-	#ifdef MASSIVEDEBUGGING
-	g_debug("Menuitem %d (%s) signalling child added %d (%s) at %d", ID(mi), LABEL(mi), ID(child), LABEL(child), g_list_length(priv->children) - 1);
-	#endif
-	g_object_ref(G_OBJECT(child));
-	g_signal_emit(G_OBJECT(mi), signals[CHILD_ADDED], 0, child, g_list_length(priv->children) - 1, TRUE);
-	return TRUE;
+	const int position = g_list_length (DBUSMENU_MENUITEM_GET_PRIVATE(mi)->children);
+	return dbusmenu_menuitem_child_add_position (mi, child, position);
 }
 
 /**
@@ -759,27 +743,7 @@ dbusmenu_menuitem_child_append (DbusmenuMenuitem * mi, DbusmenuMenuitem * child)
 gboolean
 dbusmenu_menuitem_child_prepend (DbusmenuMenuitem * mi, DbusmenuMenuitem * child)
 {
-	g_return_val_if_fail(DBUSMENU_IS_MENUITEM(mi), FALSE);
-	g_return_val_if_fail(DBUSMENU_IS_MENUITEM(child), FALSE);
-
-	DbusmenuMenuitemPrivate * priv = DBUSMENU_MENUITEM_GET_PRIVATE(mi);
-	g_return_val_if_fail(g_list_find(priv->children, child) == NULL, FALSE);
-
-	if (!dbusmenu_menuitem_set_parent(child, mi)) {
-		return FALSE;
-	}
-
-	if (priv->children == NULL && !dbusmenu_menuitem_property_exist(mi, DBUSMENU_MENUITEM_PROP_CHILD_DISPLAY)) {
-		dbusmenu_menuitem_property_set(mi, DBUSMENU_MENUITEM_PROP_CHILD_DISPLAY, DBUSMENU_MENUITEM_CHILD_DISPLAY_SUBMENU);
-	}
-
-	priv->children = g_list_prepend(priv->children, child);
-	#ifdef MASSIVEDEBUGGING
-	g_debug("Menuitem %d (%s) signalling child added %d (%s) at %d", ID(mi), LABEL(mi), ID(child), LABEL(child), 0);
-	#endif
-	g_object_ref(G_OBJECT(child));
-	g_signal_emit(G_OBJECT(mi), signals[CHILD_ADDED], 0, child, 0, TRUE);
-	return TRUE;
+        return dbusmenu_menuitem_child_add_position (mi, child, 0);
 }
 
 /**
