@@ -643,14 +643,8 @@ dbusmenu_menuitem_get_position (DbusmenuMenuitem * mi, DbusmenuMenuitem * parent
 	g_return_val_if_fail(DBUSMENU_IS_MENUITEM(mi), 0);
 	g_return_val_if_fail(DBUSMENU_IS_MENUITEM(parent), 0);
 
-	GList * childs = dbusmenu_menuitem_get_children(parent);
-	if (childs == NULL) return 0;
-	guint count = 0;
-	for ( ; childs != NULL; childs = childs->next, count++) {
-		if (childs->data == mi) break;
-	}
-
-	if (childs == NULL) return 0;
+	/* +1 because g_list_index() is 0-based and we're 1-based */
+	const guint count = g_list_index (dbusmenu_menuitem_get_children(parent), mi) + 1;
 
 	#ifdef MASSIVEDEBUGGING
 	g_debug("Getting position of %d (%s), it's at: %d", ID(mi), LABEL(mi), count);
