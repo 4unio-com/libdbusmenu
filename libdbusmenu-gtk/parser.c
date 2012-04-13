@@ -1234,12 +1234,8 @@ widget_notify_cb (GtkWidget * widget, GParamSpec * pspec, gpointer data)
       DbusmenuMenuitem * item = DBUSMENU_MENUITEM(g_object_get_data(G_OBJECT(widget), CACHED_MENUITEM));
       if (item != NULL)
         {
-          GList * children = dbusmenu_menuitem_take_children (item);
-          GList * child = children;
-          while (child != NULL) {
-            g_object_unref (G_OBJECT(child->data));
-            child = child->next;
-          }
+          GList * children = dbusmenu_menuitem_take_children(item);
+          g_list_free_full(children, g_object_unref);
           g_list_free(children);
         }
 
