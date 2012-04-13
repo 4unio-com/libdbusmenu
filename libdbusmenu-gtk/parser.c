@@ -323,7 +323,7 @@ get_child_position (GtkWidget * child)
 {
 	gint position = -1;
 	GtkWidget * parent = gtk_widget_get_parent (child);
-	if (parent != NULL || GTK_IS_CONTAINER (parent))
+	if ((parent != NULL) && GTK_IS_CONTAINER (parent))
 	{
 		GList * children = gtk_container_get_children (GTK_CONTAINER (parent));
 		position = g_list_index (children, child);
@@ -1228,7 +1228,6 @@ widget_notify_cb (GtkWidget * widget, GParamSpec * pspec, gpointer data)
         {
           GList * children = dbusmenu_menuitem_take_children(item);
           g_list_free_full(children, g_object_unref);
-          g_list_free(children);
         }
 
       /* Now parse new submenu. */
