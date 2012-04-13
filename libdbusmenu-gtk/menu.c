@@ -136,10 +136,7 @@ dbusmenu_gtkmenu_dispose (GObject *object)
 		root_changed(priv->client, NULL, DBUSMENU_GTKMENU(object));
 	}
 
-	if (priv->client != NULL) {
-		g_object_unref(G_OBJECT(priv->client));
-		priv->client = NULL;
-	}
+	g_clear_object (&priv->client);
 
 	G_OBJECT_CLASS (dbusmenu_gtkmenu_parent_class)->dispose (object);
 	return;
@@ -358,8 +355,7 @@ root_changed (DbusmenuGtkClient * client, DbusmenuMenuitem * newroot, DbusmenuGt
 
 		dbusmenu_menuitem_foreach(priv->root, popdown_all, client);
 
-		g_object_unref(priv->root);
-		priv->root = NULL;
+		g_clear_object(&priv->root);
 	}
 
 	if (newroot == NULL) {

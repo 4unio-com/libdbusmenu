@@ -136,10 +136,7 @@ dbusmenu_gtkclient_dispose (GObject *object)
 {
 	DbusmenuGtkClientPrivate * priv = DBUSMENU_GTKCLIENT_GET_PRIVATE(object);
 
-	if (priv->agroup != NULL) {
-		g_object_unref(priv->agroup);
-		priv->agroup = NULL;
-	}
+	g_clear_object (&priv->agroup);
 
 	if (priv->old_themedirs) {
 		remove_theme_dirs(gtk_icon_theme_get_default(), priv->old_themedirs);
@@ -421,10 +418,7 @@ dbusmenu_gtkclient_set_accel_group (DbusmenuGtkClient * client, GtkAccelGroup * 
 		dbusmenu_menuitem_foreach(root, swap_agroup, &data);
 	}
 
-	if (priv->agroup != NULL) {
-		g_object_unref(priv->agroup);
-		priv->agroup = NULL;
-	}
+	g_clear_object (&priv->agroup);
 
 	priv->agroup = agroup;
 	g_object_ref(priv->agroup);
@@ -1246,9 +1240,7 @@ image_property_handle (DbusmenuMenuitem * item, const gchar * property, GVariant
 			} else {
 				gtk_image_set_from_pixbuf(GTK_IMAGE(gtkimage), image);
 			}
-			if (image) {
-				g_object_unref(image);
-			}
+			g_clear_object (&image);
 		}
 
 	}

@@ -874,9 +874,7 @@ update_icon (DbusmenuMenuitem *menuitem, GtkImage *image)
                                        DBUSMENU_MENUITEM_PROP_ICON_DATA);
   }
 
-  if (pixbuf != NULL) {
-    g_object_unref (pixbuf);
-  }
+  g_clear_object (&pixbuf);
 }
 
 static GtkWidget *

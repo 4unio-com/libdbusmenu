@@ -346,17 +346,10 @@ dbusmenu_menuitem_dispose (GObject *object)
 {
 	DbusmenuMenuitemPrivate * priv = DBUSMENU_MENUITEM_GET_PRIVATE(object);
 
-	GList * child = NULL;
-	for (child = priv->children; child != NULL; child = g_list_next(child)) {
-		g_object_unref(G_OBJECT(child->data));
-	}
-	g_list_free(priv->children);
+	g_list_free_full(priv->children, g_object_unref);
 	priv->children = NULL;
 
-	if (priv->defaults != NULL) {
-		g_object_unref(priv->defaults);
-		priv->defaults = NULL;
-	}
+	g_clear_object(&priv->defaults);
 
 	if (priv->parent) {
 		g_object_remove_weak_pointer(G_OBJECT(priv->parent), (gpointer *)&priv->parent);

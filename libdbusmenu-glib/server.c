@@ -438,10 +438,7 @@ dbusmenu_server_dispose (GObject *object)
 		priv->find_server_signal = 0;
 	}
 
-	if (priv->bus != NULL) {
-		g_object_unref(priv->bus);
-		priv->bus = NULL;
-	}
+	g_clear_object (&priv->bus);
 
 	if (priv->bus_lookup != NULL) {
 		if (!g_cancellable_is_cancelled(priv->bus_lookup)) {
@@ -450,8 +447,7 @@ dbusmenu_server_dispose (GObject *object)
 			   error, but just FYI */
 			g_cancellable_cancel(priv->bus_lookup);
 		}
-		g_object_unref(priv->bus_lookup);
-		priv->bus_lookup = NULL;
+		g_clear_object(&priv->bus_lookup);
 	}
 
 	G_OBJECT_CLASS (dbusmenu_server_parent_class)->dispose (object);
@@ -548,8 +544,7 @@ set_property (GObject * obj, guint id, const GValue * value, GParamSpec * pspec)
 			}
 			g_list_free(properties);
 
-			g_object_unref(G_OBJECT(priv->root));
-			priv->root = NULL;
+			g_clear_object(&priv->root);
 		}
 		priv->root = DBUSMENU_MENUITEM(g_value_get_object(value));
 		if (priv->root != NULL) {

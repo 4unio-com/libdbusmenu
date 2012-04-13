@@ -482,8 +482,7 @@ dbusmenu_client_dispose (GObject *object)
 
 	if (priv->layoutcall != NULL) {
 		g_cancellable_cancel(priv->layoutcall);
-		g_object_unref(priv->layoutcall);
-		priv->layoutcall = NULL;
+		g_clear_object(&priv->layoutcall);
 	}
 
 	if (priv->layout_props != NULL) {
@@ -495,15 +494,13 @@ dbusmenu_client_dispose (GObject *object)
 	   looking for one at the same time. */
 	if (priv->menuproxy_cancel != NULL) {
 		g_cancellable_cancel(priv->menuproxy_cancel);
-		g_object_unref(priv->menuproxy_cancel);
-		priv->menuproxy_cancel = NULL;
+		g_clear_object(&priv->menuproxy_cancel);
 	}
 	if (priv->menuproxy != NULL) {
 		g_signal_handlers_disconnect_matched(priv->menuproxy,
 		                                     G_SIGNAL_MATCH_DATA,
 		                                     0, 0, NULL, NULL, object);
-		g_object_unref(G_OBJECT(priv->menuproxy));
-		priv->menuproxy = NULL;
+		g_clear_object(&priv->menuproxy);
 	}
 
 	if (priv->dbusproxy != 0) {
@@ -515,18 +512,11 @@ dbusmenu_client_dispose (GObject *object)
 	   looking for one at the same time. */
 	if (priv->session_bus_cancel != NULL) {
 		g_cancellable_cancel(priv->session_bus_cancel);
-		g_object_unref(priv->session_bus_cancel);
-		priv->session_bus_cancel = NULL;
+		g_clear_object(&priv->session_bus_cancel);
 	}
-	if (priv->session_bus != NULL) {
-		g_object_unref(priv->session_bus);
-		priv->session_bus = NULL;
-	}
+	g_clear_object(&priv->session_bus);
 
-	if (priv->root != NULL) {
-		g_object_unref(G_OBJECT(priv->root));
-		priv->root = NULL;
-	}
+	g_clear_object(&priv->root);
 
 	G_OBJECT_CLASS (dbusmenu_client_parent_class)->dispose (object);
 	return;
@@ -997,8 +987,7 @@ proxy_destroyed (GObject * gobj_proxy, gpointer userdata)
 	DbusmenuClientPrivate * priv = DBUSMENU_CLIENT_GET_PRIVATE(userdata);
 
 	if (priv->root != NULL) {
-		g_object_unref(G_OBJECT(priv->root));
-		priv->root = NULL;
+		g_clear_object(&priv->root);
 		#ifdef MASSIVEDEBUGGING
 		g_debug("Proxies destroyed, signaling a root change and a layout update.");
 		#endif
@@ -1009,8 +998,7 @@ proxy_destroyed (GObject * gobj_proxy, gpointer userdata)
 	if ((gpointer)priv->menuproxy == (gpointer)gobj_proxy) {
 		if (priv->layoutcall != NULL) {
 			g_cancellable_cancel(priv->layoutcall);
-			g_object_unref(priv->layoutcall);
-			priv->layoutcall = NULL;
+			g_clear_object(&priv->layoutcall);
 		}
 	}
 
@@ -1042,10 +1030,7 @@ session_bus_cb (GObject * object, GAsyncResult * res, gpointer user_data)
 	DbusmenuClientPrivate * priv = DBUSMENU_CLIENT_GET_PRIVATE(client);
 	priv->session_bus = bus;
 
-	if (priv->session_bus_cancel != NULL) {
-		g_object_unref(priv->session_bus_cancel);
-		priv->session_bus_cancel = NULL;
-	}
+	g_clear_object(&priv->session_bus_cancel);
 
 	/* Retry to build the proxies now that we have a bus */
 	build_proxies(DBUSMENU_CLIENT(user_data));
@@ -1128,10 +1113,7 @@ menuproxy_build_cb (GObject * object, GAsyncResult * res, gpointer user_data)
 
 	priv->menuproxy = proxy;
 
-	if (priv->menuproxy_cancel != NULL) {
-		g_object_unref(priv->menuproxy_cancel);
-		priv->menuproxy_cancel = NULL;
-	}
+	g_clear_object(&priv->menuproxy_cancel);
 
 	/* Check the text direction if available */
 	GVariant * textdir = g_dbus_proxy_get_cached_property(priv->menuproxy, "TextDirection");
@@ -2313,8 +2295,7 @@ parse_layout (DbusmenuClient * client, GVariant * layout)
 		   clean up that old root */
 		if (oldroot != NULL) {
 			dbusmenu_menuitem_set_root(oldroot, FALSE);
-			g_object_unref(oldroot);
-			oldroot = NULL;
+			g_clear_object(&oldroot);
 		}
 
 		/* If the root changed we can signal that */
@@ -2370,10 +2351,7 @@ update_layout_cb (GObject * proxy, GAsyncResult * res, gpointer data)
 	}
 
 out:
-	if (priv->layoutcall != NULL) {
-		g_object_unref(priv->layoutcall);
-		priv->layoutcall = NULL;
-	}
+	g_clear_object(&priv->layoutcall);
 
 	if (layout != NULL) {
 		g_variant_unref(layout);
