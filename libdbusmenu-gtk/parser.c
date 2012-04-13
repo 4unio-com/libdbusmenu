@@ -1275,25 +1275,18 @@ item_removed_cb (GtkContainer *menu, GtkWidget *widget, gpointer data)
 static gboolean
 should_show_image (GtkImage *image)
 {
-  GtkWidget *item;
+  gboolean should_show = FALSE;
 
-  item = gtk_widget_get_ancestor (GTK_WIDGET (image),
-                                  GTK_TYPE_IMAGE_MENU_ITEM);
-
-  if (item)
+  GtkWidget * item = gtk_widget_get_ancestor (GTK_WIDGET(image), GTK_TYPE_IMAGE_MENU_ITEM);
+  if (item != NULL)
     {
-      GtkSettings *settings;
-      gboolean gtk_menu_images;
+      should_show = gtk_image_menu_item_get_always_show_image (GTK_IMAGE_MENU_ITEM (item));
 
-      settings = gtk_widget_get_settings (item);
-
-      g_object_get (settings, "gtk-menu-images", &gtk_menu_images, NULL);
-
-      if (gtk_menu_images)
-        return TRUE;
-
-      return gtk_image_menu_item_get_always_show_image (GTK_IMAGE_MENU_ITEM (item));
+      if (!should_show)
+        {
+          g_object_get (gtk_widget_get_settings(item), "gtk-menu-images", &should_show, NULL);
+        }
     }
 
-  return FALSE;
+  return should_show;
 }
