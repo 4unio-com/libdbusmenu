@@ -1064,38 +1064,24 @@ a11y_name_notify_cb (AtkObject * accessible, GParamSpec * pspec, gpointer data)
 }
 
 static void
-item_activated (DbusmenuMenuitem *item, guint timestamp, gpointer user_data)
+item_activated (DbusmenuMenuitem *item, guint timestamp, gpointer child)
 {
-  GtkWidget *child;
-
-  if (user_data != NULL)
+  if (GTK_IS_MENU_ITEM (child))
     {
-      child = (GtkWidget *)user_data;
-
-      if (GTK_IS_MENU_ITEM (child))
-        {
-          gdk_threads_enter ();
-          gtk_menu_item_activate (GTK_MENU_ITEM (child));
-          gdk_threads_leave ();
-        }
+      gdk_threads_enter ();
+      gtk_menu_item_activate (GTK_MENU_ITEM (child));
+      gdk_threads_leave ();
     }
 }
 
 static gboolean
-item_about_to_show (DbusmenuMenuitem *item, gpointer user_data)
+item_about_to_show (DbusmenuMenuitem *item, gpointer child)
 {
-  GtkWidget *child;
-
-  if (user_data != NULL)
+  if (GTK_IS_MENU_ITEM (child))
     {
-      child = (GtkWidget *)user_data;
-
-      if (GTK_IS_MENU_ITEM (child))
-        {
-          // Only called for items with submens.  So we activate it here in
-          // case the program dynamically creates menus (like empathy does)
-          gtk_menu_item_activate (GTK_MENU_ITEM (child));
-        }
+      // Only called for items with submens.  So we activate it here in
+      // case the program dynamically creates menus (like empathy does)
+      gtk_menu_item_activate (GTK_MENU_ITEM (child));
     }
 
   return TRUE;
