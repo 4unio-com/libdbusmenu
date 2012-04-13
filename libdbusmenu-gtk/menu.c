@@ -382,11 +382,7 @@ root_changed (DbusmenuGtkClient * client, DbusmenuMenuitem * newroot, DbusmenuGt
 		count++;
 	}
 
-	if (count > 0) {
-		gtk_widget_show(GTK_WIDGET(menu));
-	} else {
-		gtk_widget_hide(GTK_WIDGET(menu));
-	}
+	gtk_widget_set_visible (GTK_WIDGET(menu), count>0);
 
 	return;
 }
