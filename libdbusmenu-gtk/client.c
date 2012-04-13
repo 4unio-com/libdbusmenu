@@ -614,11 +614,7 @@ process_visible (DbusmenuMenuitem * mi, GtkMenuItem * gmi, GVariant * value)
 		val = dbusmenu_menuitem_property_get_bool(mi, DBUSMENU_MENUITEM_PROP_VISIBLE);
 	}
 
-	if (val) {
-		gtk_widget_show(GTK_WIDGET(gmi));
-	} else {
-		gtk_widget_hide(GTK_WIDGET(gmi));
-	}
+	gtk_widget_set_visible (GTK_WIDGET(gmi), val);
 	return;
 }
 
