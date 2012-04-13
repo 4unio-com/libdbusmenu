@@ -76,7 +76,6 @@ static void           accel_changed            (GtkWidget *         widget,
 static void           checkbox_toggled         (GtkWidget *         widget,
                                                 DbusmenuMenuitem *  mi);
 static void           update_icon              (DbusmenuMenuitem *  menuitem,
-                                                ParserData *        pdata,
                                                 GtkImage *          image);
 static GtkWidget *    find_menu_label          (GtkWidget *         widget);
 static void           label_notify_cb          (GtkWidget *         widget,
@@ -587,7 +586,7 @@ construct_dbusmenu_for_widget (GtkWidget * widget)
     {
       DbusmenuMenuitem *mi = new_menuitem(widget);
 
-      ParserData *pdata = (ParserData *)g_object_get_data(G_OBJECT(mi), PARSER_DATA);
+      ParserData *pdata = parser_data_get_from_menuitem (mi);
 
       gboolean visible = FALSE;
       gboolean sensitive = FALSE;
@@ -626,7 +625,7 @@ construct_dbusmenu_for_widget (GtkWidget * widget)
 
               if (GTK_IS_IMAGE (image))
                 {
-                  update_icon (mi, pdata, GTK_IMAGE (image));
+                  update_icon (mi, GTK_IMAGE (image));
                 }
             }
 
@@ -776,7 +775,7 @@ checkbox_toggled (GtkWidget *widget, DbusmenuMenuitem *mi)
 }
 
 static void
-update_icon (DbusmenuMenuitem *menuitem, ParserData * pdata, GtkImage *image)
+update_icon (DbusmenuMenuitem *menuitem, GtkImage *image)
 {
   GdkPixbuf * pixbuf = NULL;
   const gchar * icon_name = NULL;
@@ -784,6 +783,7 @@ update_icon (DbusmenuMenuitem *menuitem, ParserData * pdata, GtkImage *image)
   GIcon * gicon;
   GtkIconInfo * info;
   gint width;
+  ParserData *pdata = parser_data_get_from_menuitem (menuitem);
 
   /* Check to see if we're changing the image.  If so, we need to track that little bugger */
   if (image != GTK_IMAGE(pdata->image)) {
@@ -919,7 +919,7 @@ recreate_menu_item (DbusmenuMenuitem * parent, DbusmenuMenuitem * child)
       /* We need a parent */
       return;
     }
-  ParserData * pdata = g_object_get_data (G_OBJECT (child), PARSER_DATA);
+  ParserData * pdata = parser_data_get_from_menuitem (child);
   /* Keep a pointer to the GtkMenuItem, as pdata->widget might be
    * invalidated when we delete the DbusmenuMenuitem
    */
@@ -1005,9 +1005,7 @@ image_notify_cb (GtkWidget * image, GParamSpec * pspec, gpointer data)
       pspec->name == interned_str_stock ||
       pspec->name == interned_str_storage_type)
     {
-      DbusmenuMenuitem * mi = DBUSMENU_MENUITEM(data);
-      ParserData *pdata = (ParserData *)g_object_get_data(G_OBJECT(mi), PARSER_DATA);
-      update_icon (mi, pdata, GTK_IMAGE (image));
+      update_icon (DBUSMENU_MENUITEM(data), GTK_IMAGE(image));
     }
 }
 
@@ -1139,7 +1137,7 @@ item_handle_event (DbusmenuMenuitem *item, const gchar *name,
 static gboolean
 handle_first_label (DbusmenuMenuitem *mi)
 {
-  ParserData *pdata = g_object_get_data (G_OBJECT (mi), PARSER_DATA);
+  ParserData *pdata = parser_data_get_from_menuitem (mi);
   if (!pdata->label)
     {
       /* GtkMenuItem's can start life as a separator if they have no child
@@ -1193,14 +1191,11 @@ widget_notify_cb (GtkWidget * widget, GParamSpec * pspec, gpointer data)
     {
       GtkWidget *image = NULL;
       g_object_get(widget, "image", &image, NULL);
-      ParserData *pdata = (ParserData *)g_object_get_data(G_OBJECT(child), PARSER_DATA);
-      update_icon (child, pdata, GTK_IMAGE(image));
+      update_icon (child, GTK_IMAGE(image));
     }
   else if (pspec->name == interned_str_image)
     {
-      GtkWidget * image = GTK_WIDGET (g_value_get_object (&prop_value));
-      ParserData *pdata = (ParserData *)g_object_get_data(G_OBJECT(child), PARSER_DATA);
-      update_icon (child, pdata, GTK_IMAGE (image));
+      update_icon (child, GTK_IMAGE (g_value_get_object(&prop_value)));
     }
   else if (pspec->name == interned_str_parent)
     {
