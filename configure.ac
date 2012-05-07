@@ -35,7 +35,6 @@ GNOME_DOC_INIT
 ###########################
 
 GLIB_REQUIRED_VERSION=2.26
-
 PKG_CHECK_MODULES(DBUSMENUGLIB, glib-2.0 >= $GLIB_REQUIRED_VERSION
                                 gio-2.0 >= $GLIB_REQUIRED_VERSION)
 
@@ -46,42 +45,30 @@ AC_SUBST(DBUSMENUGLIB_LIBS)
 # Dependencies - GTK
 ###########################
 
-GTK_REQUIRED_VERSION=2.16
-GTK3_REQUIRED_VERSION=2.91
-
-AC_ARG_ENABLE([gtk],
-	AC_HELP_STRING([--disable-gtk], [Disable libdbusmenu-gtk library]),
-	[enable_gtk=$enableval], [enable_gtk=auto])
-AM_CONDITIONAL([WANT_LIBDBUSMENUGTK], [test "x$enable_gtk" != "xno"])
-
+GTK_REQUIRED_VERSION=3.4.0
+PKG_CHECK_EXISTS([gtk+-3.0 >= $GTK_REQUIRED_VERSION
+                  atk
+                  glib-2.0 >= $GLIB_REQUIRED_VERSION],
+                 [have_gtk=yes],[have_gtk=no])
+have_gtk=yes
+PKG_CHECK_MODULES([DBUSMENUGTK],[gtk+-3.0 >= $GTK_REQUIRED_VERSION
+                                 atk
+                                 glib-2.0 >= $GLIB_REQUIRED_VERSION],,[have_gtk=no])
 AC_ARG_WITH([gtk],
-  [AS_HELP_STRING([--with-gtk],
-    [Which version of gtk to use @<:@default=3@:>@])],
-  [],
-  [with_gtk=3])
-AM_CONDITIONAL([USE_GTK3], [test "x$with_gtk" = "x3"])
-
-AS_IF([test "x$enable_gtk" != "xno"],[
-AS_IF([test "x$with_gtk" = x3],
-        [PKG_CHECK_MODULES(DBUSMENUGTK,  gtk+-3.0 >= $GTK3_REQUIRED_VERSION
-                                         atk
-                                         glib-2.0 >= $GLIB_REQUIRED_VERSION,
-                                         [have_gtk=yes]
-)
-         AC_DEFINE(HAVE_GTK3, 1, [whether gtk3 is available])
-        ],
-      [test "x$with_gtk" = x2],
-        [PKG_CHECK_MODULES(DBUSMENUGTK,  gtk+-2.0 >= $GTK_REQUIRED_VERSION
-                                         atk
-                                         glib-2.0 >= $GLIB_REQUIRED_VERSION,
-                                         [have_gtk=yes]
-)
-        ],
-      [AC_MSG_FAILURE([Value for --with-gtk was neither 2 nor 3])]
-)
-])
-AC_SUBST(DBUSMENUGTK_CFLAGS)
-AC_SUBST(DBUSMENUGTK_LIBS)
+            [AS_HELP_STRING([--with-gtk],[build libdbusmenu-gtk (default: auto)])],
+            [want_gtk=${withval}],
+            [want_gtk=${have_gtk}])
+with_gtk=no
+if test "x$want_gtk" = "xyes"; then
+  if test "x$have_gtk" != "xyes"; then
+    AC_MSG_ERROR([building libdbusmenu-gtk was requested but gtk was not found])
+  else
+    AC_SUBST(DBUSMENUGTK_CFLAGS)
+    AC_SUBST(DBUSMENUGTK_LIBS)
+    with_gtk=yes  
+  fi
+fi
+AM_CONDITIONAL([WANT_LIBDBUSMENUGTK], [test "x$with_gtk" != "xno"])
 
 ###########################
 # Dependencies - dumper
@@ -94,8 +81,9 @@ AC_ARG_ENABLE([dumper],
 	[enable_dumper=$enableval], [enable_dumper=auto])
 AM_CONDITIONAL([WANT_DBUSMENUDUMPER], [test "x$enable_dumper" != "xno"])
 
+have_dumper=no
 AS_IF([test "x$enable_dumper" != "xno"],[
-PKG_CHECK_MODULES(DBUSMENUDUMPER, gtk+-2.0 >= $GTK_REQUIRED_VERSION
+PKG_CHECK_MODULES(DBUSMENUDUMPER, gtk+-3.0 >= $GTK_REQUIRED_VERSION
                                   x11 >= $X11_REQUIRED_VERSION,
                                   [have_dumper=yes]
 )
@@ -116,6 +104,7 @@ AC_ARG_ENABLE([tests],
 	[enable_tests=$enableval], [enable_tests=auto])
 AM_CONDITIONAL([WANT_TESTS], [test "x$enable_tests" != "xno"])
 
+have_tests=no
 AS_IF([test "x$enable_tests" != "xno"],[
 PKG_CHECK_MODULES(DBUSMENUTESTS,  json-glib-1.0 >= $JSON_GLIB_REQUIRED_VERSION
                                   gio-unix-2.0  >= $GIO_UNIX_REQUIRED_VERSION,
@@ -154,6 +143,7 @@ AS_IF([test "x$enable_vala" != "xno"],[
 AC_PATH_PROG([VALA_API_GEN], [vapigen])
 ])
 AM_CONDITIONAL([HAVE_VALA], [test -n "$VALA_API_GEN"])
+AM_COND_IF([HAVE_VALA],[have_vala=yes],[have_vala=no])
 
 ###########################
 # XSLT Processor
@@ -238,32 +228,11 @@ AC_MSG_NOTICE([
 
 libdbusmenu Configuration:
 
-	Prefix:                 $prefix
-	Massive Debugging:      $with_massivedebugging
-	GTK+ Version:           $with_gtk
+    Prefix:                  $prefix
+    Build libdbusmenu-gtk:   $with_gtk
+    Build dbusmenu-dumper:   $have_dumper
+    Generate Vala Bindings:  $have_vala
+    Unit Tests:              $have_tests
+    Coverage reporting:      $use_gcov
+    Massive Debugging:       $with_massivedebugging
 ])
-
-AS_IF([test "x$have_tests" = "xyes"],
-	AC_MSG_NOTICE([	Tests:                  yes]),
-	AC_MSG_NOTICE([	Tests:                  no])
-)
-
-AS_IF([test "x$enable_gtk" = "xno"],
-	AC_MSG_NOTICE([	Gtk:                    no]),
-	AC_MSG_NOTICE([	Gtk:                    yes (gtk$with_gtk)])
-)
-
-AM_COND_IF([HAVE_VALA],
-	AC_MSG_NOTICE([	Vala bindings:          yes]),
-	AC_MSG_NOTICE([	Vala bindings           no])
-)
-
-AS_IF([test "x$have_dumper" = "xyes"],
-   AC_MSG_NOTICE([	Dumper:                 yes]),
-   AC_MSG_NOTICE([	Dumper:                 no])
-)
-
-AS_IF([test "x$use_gcov" = "xyes"],
-	AC_MSG_NOTICE([	Coverage reporting:     yes]),
-	AC_MSG_NOTICE([	Coverage reporting:     no])
-)

@@ -1,12 +1,6 @@
 
 ## Process this file with automake to produce Makefile.in
 
-if USE_GTK3
-VER=3
-else
-VER=
-endif
-
 # We require automake 1.6 at least.
 AUTOMAKE_OPTIONS = 1.6
 
@@ -75,7 +69,7 @@ expand_content_files=
 # e.g. INCLUDES=-I$(top_srcdir) -I$(top_builddir) $(GTK_DEBUG_FLAGS)
 # e.g. GTKDOC_LIBS=$(top_builddir)/gtk/$(gtktargetlib)
 INCLUDES=-I$(top_srcdir) $(DBUSMENUGLIB_CFLAGS) $(DBUSMENUGTK_CFLAGS)
-GTKDOC_LIBS=$(top_builddir)/libdbusmenu-gtk/libdbusmenu-gtk$(VER).la $(DBUSMENUGLIB_LIBS) $(DBUSMENUGTK_LIBS)
+GTKDOC_LIBS=$(top_builddir)/libdbusmenu-gtk/libdbusmenu-gtk3.la $(DBUSMENUGLIB_LIBS) $(DBUSMENUGTK_LIBS)
 
 # This includes the standard gtk-doc make rules, copied by gtkdocize.
 include $(top_srcdir)/gtk-doc.local.make
