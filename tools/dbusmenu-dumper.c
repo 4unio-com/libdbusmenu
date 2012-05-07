@@ -33,6 +33,11 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <X11/Xlib.h>
 
 static GMainLoop * mainloop = NULL;
+static GdkDevice * keyboard_device = NULL;
+static GdkDevice * mouse_device = NULL;
+static GtkWidget * grab_widget = NULL;
+
+static void stop_grabbing();
 
 static gint
 list_str_cmp (gconstpointer a, gconstpointer b)
@@ -156,10 +161,6 @@ new_root_cb (DbusmenuClient * client, DbusmenuMenuitem * newroot)
 }
 
 /* Window clicking ***************************************************/
-static GdkFilterReturn
-click_filter (GdkXEvent *gdk_xevent,
-              GdkEvent  *event,
-              gpointer   data);
 
 static Window
 find_real_window (Window w, int depth)
@@ -167,12 +168,14 @@ find_real_window (Window w, int depth)
 	if (depth > 5) {
 		return None;
 	}
-	/*static*/ Atom wm_state = XInternAtom(gdk_display, "WM_STATE", False);
+
+	Display * display = GDK_DISPLAY_XDISPLAY (gdk_display_get_default());
+	/*static*/ Atom wm_state = XInternAtom(display, "WM_STATE", False);
 	Atom type;
 	int format;
 	unsigned long nitems, after;
 	unsigned char* prop;
-	if (XGetWindowProperty(gdk_display, w, wm_state, 0, 0, False, AnyPropertyType,
+	if (XGetWindowProperty(display, w, wm_state, 0, 0, False, AnyPropertyType,
 				&type, &format, &nitems, &after, &prop) == Success) {
 		if (prop != NULL) {
 			XFree(prop);
@@ -185,7 +188,7 @@ find_real_window (Window w, int depth)
 	Window* children;
 	unsigned int nchildren;
 	Window ret = None;
-	if (XQueryTree(gdk_display, w, &root, &parent, &children, &nchildren) != 0) {
+	if (XQueryTree(display, w, &root, &parent, &children, &nchildren) != 0) {
 		unsigned int i;
 		for(i = 0; i < nchildren && ret == None; ++i) {
 			ret = find_real_window(children[ i ], depth + 1);
@@ -204,7 +207,8 @@ get_window_under_cursor (void)
 	Window child;
 	uint mask;
 	int rootX, rootY, winX, winY;
-	XQueryPointer(gdk_display, gdk_x11_get_default_root_xwindow(), &root, &child, &rootX, &rootY, &winX, &winY, &mask);
+	Display * display = GDK_DISPLAY_XDISPLAY (gdk_display_get_default());
+	XQueryPointer(display, gdk_x11_get_default_root_xwindow(), &root, &child, &rootX, &rootY, &winX, &winY, &mask);
 	if (child == None) {
 		return None;
 	}
@@ -212,87 +216,83 @@ get_window_under_cursor (void)
 }
 
 static void
-uninstall_click_filter (void)
+on_key_pressed (GtkWidget * w, GdkEventKey * e, gpointer user_data)
 {
-	GdkWindow *root;
-
-	root = gdk_get_default_root_window ();
-	gdk_window_remove_filter (root, (GdkFilterFunc) click_filter, NULL);
-
-	gdk_pointer_ungrab (GDK_CURRENT_TIME);
-	gdk_keyboard_ungrab (GDK_CURRENT_TIME);
-
+	stop_grabbing();
 	gtk_main_quit ();
 }
 
-static GdkFilterReturn
-click_filter (GdkXEvent *gdk_xevent,
-              GdkEvent  *event,
-              gpointer   data)
-
+static void
+on_button_clicked (GtkWidget * w, GdkEventButton * e, gpointer user_data)
 {
-	XEvent *xevent = (XEvent *) gdk_xevent;
-	gboolean *success = (gboolean *)data;
+	stop_grabbing ();
+	Window * window = user_data;
+	*window = get_window_under_cursor ();
+	gtk_main_quit ();
+}
 
-	switch (xevent->type) {
-	case ButtonPress:
-		uninstall_click_filter();
-		*success = TRUE;
-		return GDK_FILTER_REMOVE;
-	case KeyPress:
-		if (xevent->xkey.keycode == XKeysymToKeycode(gdk_display, XK_Escape)) {
-			uninstall_click_filter();
-			*success = FALSE;
-			return GDK_FILTER_REMOVE;
-		}
-		break;
-	default:
-		break;
-	}
+static void
+stop_grabbing (void)
+{
+	g_return_if_fail (GTK_IS_WIDGET(grab_widget));
+	g_return_if_fail (mouse_device != NULL);
 
-	return GDK_FILTER_CONTINUE;
+	gtk_device_grab_remove (grab_widget, mouse_device);
+	gdk_device_ungrab (mouse_device, GDK_CURRENT_TIME);
+	gdk_device_ungrab (keyboard_device, GDK_CURRENT_TIME);
 }
 
 static gboolean
-install_click_filter (gpointer data)
+start_grabbing (gpointer user_data)
 {
-	GdkGrabStatus  status;
-	GdkCursor     *cross;
-	GdkWindow     *root;
+	GdkCursor  * cross;
+	GdkDisplay * display = gdk_display_get_default ();
+	GdkWindow  * grab_window;
 
-	root = gdk_get_default_root_window();
+	// find the keyboard & mouse devices
+	GdkDeviceManager * device_manager = gdk_display_get_device_manager (display);
+	mouse_device = gdk_device_manager_get_client_pointer (device_manager);
+	keyboard_device = gdk_device_get_associated_device (mouse_device);
+	g_return_val_if_fail (mouse_device != NULL, FALSE);
+	g_return_val_if_fail (gdk_device_get_source(mouse_device) == GDK_SOURCE_MOUSE, FALSE);
+	g_return_val_if_fail (keyboard_device != NULL, FALSE);
+	g_return_val_if_fail (gdk_device_get_source(keyboard_device) == GDK_SOURCE_KEYBOARD, FALSE);
 
-	gdk_window_add_filter(root, (GdkFilterFunc) click_filter, data);
+	// create the widget that receieves the events
+	grab_widget = gtk_window_new (GTK_WINDOW_POPUP);
+	gtk_window_set_screen (GTK_WINDOW (grab_widget), gdk_display_get_default_screen (display));
+	gtk_window_resize (GTK_WINDOW (grab_widget), 1, 1);
+	gtk_window_move (GTK_WINDOW (grab_widget), 0, 0);
+	gtk_widget_add_events (grab_widget, GDK_KEY_PRESS_MASK | GDK_BUTTON_PRESS_MASK);
+	gtk_widget_show (grab_widget);
+	g_signal_connect (grab_widget, "button-press-event", G_CALLBACK(on_button_clicked), user_data);
+	g_signal_connect (grab_widget, "key-press-event", G_CALLBACK(on_key_pressed), NULL);
+	gtk_device_grab_add (grab_widget, mouse_device, FALSE);
 
-	cross = gdk_cursor_new(GDK_CROSS);
-	status = gdk_pointer_grab(root, FALSE, GDK_BUTTON_PRESS_MASK,
-	                          NULL, cross, GDK_CURRENT_TIME);
-	gdk_cursor_unref(cross);
+	// grab the mouse click & keypresses
+	cross = gdk_cursor_new (GDK_CROSS);
+	grab_window = gtk_widget_get_window (grab_widget);
+	gdk_device_grab (mouse_device, grab_window,
+	                 GDK_OWNERSHIP_WINDOW, FALSE,
+	                 GDK_BUTTON_PRESS_MASK | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK,
+	                 cross, GDK_CURRENT_TIME);
+	gdk_device_grab (keyboard_device, grab_window,
+	                 GDK_OWNERSHIP_WINDOW, FALSE,
+	                 GDK_BUTTON_PRESS_MASK | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK,
+	                 NULL, GDK_CURRENT_TIME);
+	g_clear_object (&cross);
+	g_message ("click on a window, or press any key to exit");
 
-	if (status != GDK_GRAB_SUCCESS) {
-		g_warning("Pointer grab failed.\n");
-		uninstall_click_filter();
-		return FALSE;
-	}
-
-	status = gdk_keyboard_grab(root, FALSE, GDK_CURRENT_TIME);
-	if (status != GDK_GRAB_SUCCESS) {
-		g_warning("Keyboard grab failed.\n");
-		uninstall_click_filter();
-		return FALSE;
-	}
-
-	gdk_flush();
 	return FALSE;
 }
 
-static gboolean
+static Window
 wait_for_click (void)
 {
-	gboolean success;
-	g_idle_add (install_click_filter, (gpointer)(&success));
+	Window window = None;
+	g_idle_add (start_grabbing, &window);
 	gtk_main ();
-	return success;
+	return window;
 }
 
 static gchar * dbusname = NULL;
@@ -404,10 +404,7 @@ main (int argc, char ** argv)
 
 	if (dbusname == NULL && dbusobject == NULL) {
 		gtk_init(&argc, &argv);
-		if (!wait_for_click()) {
-			return 1;
-		}
-		Window window = get_window_under_cursor();
+		Window window = wait_for_click();
 		if (window == None) {
 			g_printerr("ERROR: could not get the id for the pointed window\n");
 			return 1;
