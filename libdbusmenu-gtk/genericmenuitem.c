@@ -62,13 +62,8 @@ static void activate (GtkMenuItem * menu_item);
 /* GObject stuff */
 G_DEFINE_TYPE (Genericmenuitem, genericmenuitem, GTK_TYPE_CHECK_MENU_ITEM);
 
-#if HAVE_GTK3
 static void draw_indicator (GtkCheckMenuItem *check_menu_item, cairo_t *cr);
 static void (*parent_draw_indicator) (GtkCheckMenuItem *check_menu_item, cairo_t *cr) = NULL;
-#else
-static void draw_indicator (GtkCheckMenuItem *check_menu_item, GdkRectangle *area);
-static void (*parent_draw_indicator) (GtkCheckMenuItem *check_menu_item, GdkRectangle *area) = NULL;
-#endif
 static void (*parent_menuitem_activate) (GtkMenuItem * mi) = NULL;
 
 /* Initializing all of the classes.  Most notably we're
@@ -83,11 +78,9 @@ genericmenuitem_class_init (GenericmenuitemClass *klass)
 	object_class->dispose = genericmenuitem_dispose;
 	object_class->finalize = genericmenuitem_finalize;
 
-#ifdef HAVE_GTK3
 	GtkWidgetClass * widget_class = GTK_WIDGET_CLASS(klass);
 
 	gtk_widget_class_set_accessible_role(widget_class, ATK_ROLE_MENU_ITEM);
-#endif
 
 	GtkCheckMenuItemClass * check_class = GTK_CHECK_MENU_ITEM_CLASS (klass);
 
@@ -115,13 +108,6 @@ genericmenuitem_init (Genericmenuitem *self)
 	self->priv->disposition = GENERICMENUITEM_DISPOSITION_NORMAL;
 	self->priv->label_text = NULL;
 
-#ifndef HAVE_GTK3
-	AtkObject * aobj = gtk_widget_get_accessible(GTK_WIDGET(self));
-	if (aobj != NULL) {
-		atk_object_set_role(aobj, ATK_ROLE_MENU_ITEM);
-	}
-#endif
-
 	return;
 }
 
@@ -148,7 +134,6 @@ genericmenuitem_finalize (GObject *object)
 /* Checks to see if we should be drawing a little box at
    all.  If we should be, let's do that, otherwise we're
    going suppress the box drawing. */
-#if HAVE_GTK3
 static void
 draw_indicator (GtkCheckMenuItem *check_menu_item, cairo_t *cr)
 {
@@ -158,17 +143,6 @@ draw_indicator (GtkCheckMenuItem *check_menu_item, cairo_t *cr)
 	}
 	return;
 }
-#else
-static void
-draw_indicator (GtkCheckMenuItem *check_menu_item, GdkRectangle *area)
-{
-	Genericmenuitem * self = GENERICMENUITEM(check_menu_item);
-	if (self->priv->check_type != GENERICMENUITEM_CHECK_TYPE_NONE) {
-		parent_draw_indicator(check_menu_item, area);
-	}
-	return;
-}
-#endif
 
 /* A small helper to look through the widgets in the
    box and find the one that is the label. */
@@ -204,14 +178,12 @@ get_text_color (GenericmenuitemDisposition disposition, GtkWidget * widget)
 		/* ALERT  */ { "error-color", "red"}
 	};
 
-#if GTK_CHECK_VERSION(3, 0, 0)
 	GtkStyleContext * context = gtk_widget_get_style_context(widget);
 	GdkRGBA color;
 
 	if (gtk_style_context_lookup_color(context, values[disposition].color_name, &color)) {
 		return g_strdup_printf("rgb(%d, %d, %d)", (gint)(color.red * 255), (gint)(color.green * 255), (gint)(color.blue * 255));
 	}
-#endif
 
 	return g_strdup(values[disposition].default_color);
 }
@@ -310,12 +282,8 @@ set_label (GtkMenuItem * menu_item, const gchar * in_label)
 			/* We need to put the child into a new box and
 			   make the box the child of the menu item.  Basically
 			   we're inserting a box in the middle. */
-			#ifdef HAVE_GTK3
 			GtkWidget * hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL,
 			                               get_toggle_space(GTK_WIDGET(menu_item)));
-			#else
-			GtkWidget * hbox = gtk_hbox_new(FALSE, get_toggle_space(GTK_WIDGET(menu_item)));
-			#endif
 			g_object_ref(child);
 			gtk_container_remove(GTK_CONTAINER(menu_item), child);
 			gtk_box_pack_start(GTK_BOX(hbox), child, FALSE, FALSE, 0);
@@ -541,12 +509,8 @@ genericmenuitem_set_image (Genericmenuitem * menu_item, GtkWidget * image)
 			/* We need to put the child into a new box and
 			   make the box the child of the menu item.  Basically
 			   we're inserting a box in the middle. */
-			#ifdef HAVE_GTK3
 			GtkWidget * hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL,
 			                               get_toggle_space(GTK_WIDGET(menu_item)));
-			#else
-			GtkWidget * hbox = gtk_hbox_new(FALSE, get_toggle_space(GTK_WIDGET(menu_item)));
-			#endif
 			g_object_ref(child);
 			gtk_container_remove(GTK_CONTAINER(menu_item), child);
 			gtk_box_pack_end(GTK_BOX(hbox), child, TRUE, TRUE, 0);
