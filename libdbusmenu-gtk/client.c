@@ -830,7 +830,7 @@ activate_helper (GtkMenuShell * shell)
 				   doesn't expose the right variables.  We need to figure
 				   this out as menus won't get grabs properly.
 				   TODO FIXME HELP ARGHHHHHHHH */
-#if (HAVE_GTK3 == 0)
+#if !GTK_CHECK_VERSION(3,0,0)
 				if (!GTK_MENU_SHELL (parent)->active) {
 					gtk_grab_add (parent);
 					GTK_MENU_SHELL (parent)->have_grab = TRUE;
