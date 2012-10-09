@@ -446,10 +446,13 @@ send_about_to_show (DbusmenuMenuitem * mi, void (*cb) (DbusmenuMenuitem * mi, gp
 {
 	g_return_if_fail(DBUSMENU_IS_MENUITEM(mi));
 
+    gboolean dummy;
+    /* If the menu item doesn't have children, then assume it's a childless menu item
+     * and it needs to be activated when the user has clicked on it. Otherwise, it has
+     * children and the menu should be shown to the user. */
 	if (dbusmenu_menuitem_get_children(mi) == NULL && g_strcmp0(DBUSMENU_MENUITEM_CHILD_DISPLAY_SUBMENU, dbusmenu_menuitem_property_get(mi, DBUSMENU_MENUITEM_PROP_CHILD_DISPLAY)) != 0) {
-		g_warning("About to Show called on an item wihtout submenus.  We're ignoring it.");
+        g_signal_emit(G_OBJECT(mi), signals[ITEM_ACTIVATED], 0, &dummy);
 	} else {
-		gboolean dummy;
 		g_signal_emit(G_OBJECT(mi), signals[ABOUT_TO_SHOW], 0, &dummy);
 	}
 
