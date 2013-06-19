@@ -1,3 +1,15 @@
+libdbusmenu (12.10.3daily13.06.19~13.04-0ubuntu1) raring; urgency=low
+
+  [ Mathieu Trudel-Lapierre ]
+  * Bump maximum value for menuitem ID from 30000 to MAXINT; which
+    should help nm-applet have usable menus. Fix is a cherry pick from
+    revision 445 on lp:dbusmenu; from Chris Coulson. (LP: #1011073)
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 442
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 19 Jun 2013 02:04:01 +0000
+
 libdbusmenu (12.10.3daily13.02.01-0ubuntu1) raring; urgency=low
 
   [ Mathieu Trudel-Lapierre ]
