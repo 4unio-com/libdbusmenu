@@ -29,8 +29,7 @@ License version 3 and version 2.1 along with this program.  If not, see
 #ifndef __DBUSMENU_GMENU_TRANSLATOR_H__
 #define __DBUSMENU_GMENU_TRANSLATOR_H__
 
-#include <glib.h>
-#include <glib-object.h>
+#include <gio/gio.h>
 
 G_BEGIN_DECLS
 
@@ -46,11 +45,11 @@ typedef struct _DbusmenuGmenuTranslatorClass     DbusmenuGmenuTranslatorClass;
 typedef struct _DbusmenuGmenuTranslatorPrivate   DbusmenuGmenuTranslatorPrivate;
 
 struct _DbusmenuGmenuTranslatorClass {
-	GObjectClass parent_class;
+	GMenuModelClass parent_class;
 };
 
 struct _DbusmenuGmenuTranslator {
-	GObject parent;
+	GMenuModel parent;
 };
 
 GType dbusmenu_gmenu_translator_get_type (void);

@@ -44,7 +44,7 @@ static void dbusmenu_gmenu_translator_init       (DbusmenuGmenuTranslator *self)
 static void dbusmenu_gmenu_translator_dispose    (GObject *object);
 static void dbusmenu_gmenu_translator_finalize   (GObject *object);
 
-G_DEFINE_TYPE (DbusmenuGmenuTranslator, dbusmenu_gmenu_translator, G_TYPE_OBJECT);
+G_DEFINE_TYPE (DbusmenuGmenuTranslator, dbusmenu_gmenu_translator, G_TYPE_MENU_MODEL);
 
 static void
 dbusmenu_gmenu_translator_class_init (DbusmenuGmenuTranslatorClass *klass)
