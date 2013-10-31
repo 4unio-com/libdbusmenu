@@ -259,3 +259,4 @@ genericmenuitem-enum-types.h
 libdbusmenu_gtk3_la-genericmenuitem-enum-types.lo
 test-glib-events-nogroup
 test-glib-events-nogroup-client
+libdbusmenu_glib_la-gmenu-translator.lo
