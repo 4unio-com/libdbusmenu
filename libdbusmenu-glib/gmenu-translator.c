@@ -43,8 +43,10 @@ static void dbusmenu_gmenu_translator_class_init (DbusmenuGmenuTranslatorClass *
 static void dbusmenu_gmenu_translator_init       (DbusmenuGmenuTranslator *self);
 static void dbusmenu_gmenu_translator_dispose    (GObject *object);
 static void dbusmenu_gmenu_translator_finalize   (GObject *object);
+static void ag_init                              (GObject *object);
 
-G_DEFINE_TYPE (DbusmenuGmenuTranslator, dbusmenu_gmenu_translator, G_TYPE_MENU_MODEL);
+G_DEFINE_TYPE_WITH_CODE (DbusmenuGmenuTranslator, dbusmenu_gmenu_translator, G_TYPE_MENU_MODEL,
+                         G_IMPLEMENT_INTERFACE(G_TYPE_ACTION_GROUP, ag_init));
 
 static void
 dbusmenu_gmenu_translator_class_init (DbusmenuGmenuTranslatorClass *klass)
@@ -59,6 +61,11 @@ dbusmenu_gmenu_translator_class_init (DbusmenuGmenuTranslatorClass *klass)
 
 static void
 dbusmenu_gmenu_translator_init (DbusmenuGmenuTranslator *self)
+{
+}
+
+static void
+ag_init (GObject * object)
 {
 }
 
