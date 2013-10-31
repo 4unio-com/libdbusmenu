@@ -38,6 +38,8 @@ libdbusmenu_glib_la_SOURCES = \
 	defaults.c \
 	enum-types.h \
 	enum-types.c \
+	gmenu-translator.h \
+	gmenu-translator.c \
 	menuitem.h \
 	menuitem.c \
 	menuitem-marshal.h \
