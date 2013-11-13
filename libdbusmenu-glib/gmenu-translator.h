@@ -50,6 +50,7 @@ struct _DbusmenuGmenuTranslatorClass {
 
 struct _DbusmenuGmenuTranslator {
 	GMenuModel parent;
+	DbusmenuGmenuTranslatorPrivate * priv;
 };
 
 GType dbusmenu_gmenu_translator_get_type (void);

@@ -31,9 +31,17 @@ License version 3 and version 2.1 along with this program.  If not, see
 #endif
 
 #include "gmenu-translator.h"
+#include "menuitem.h"
 
 struct _DbusmenuGmenuTranslatorPrivate {
-	int dummy;
+	DbusmenuMenuitem * root;
+};
+
+/* Properties */
+enum {
+	PROP_0,
+	PROP_ROOT,
+	PROP_COUNT
 };
 
 #define DBUSMENU_GMENU_TRANSLATOR_GET_PRIVATE(o) \
@@ -44,6 +52,8 @@ static void dbusmenu_gmenu_translator_init       (DbusmenuGmenuTranslator *self)
 static void dbusmenu_gmenu_translator_dispose    (GObject *object);
 static void dbusmenu_gmenu_translator_finalize   (GObject *object);
 static void ag_init                              (GObject *object);
+static void set_property (GObject * obj, guint id, const GValue * value, GParamSpec * pspec);
+static void get_property (GObject * obj, guint id, GValue * value, GParamSpec * pspec);
 
 G_DEFINE_TYPE_WITH_CODE (DbusmenuGmenuTranslator, dbusmenu_gmenu_translator, G_TYPE_MENU_MODEL,
                          G_IMPLEMENT_INTERFACE(G_TYPE_ACTION_GROUP, ag_init));
@@ -57,16 +67,56 @@ dbusmenu_gmenu_translator_class_init (DbusmenuGmenuTranslatorClass *klass)
 
 	object_class->dispose = dbusmenu_gmenu_translator_dispose;
 	object_class->finalize = dbusmenu_gmenu_translator_finalize;
+	object_class->set_property = set_property;
+	object_class->get_property = get_property;
+
+	g_object_class_install_property(object_class, PROP_ROOT,
+	                                g_param_spec_object("root", "Root DBusmenu Menuitem",
+	                                                    "The root of the menu structure being translated",
+	                                                    DBUSMENU_TYPE_MENUITEM,
+	                                                    G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 }
 
 static void
 dbusmenu_gmenu_translator_init (DbusmenuGmenuTranslator *self)
 {
+	self->priv = DBUSMENU_GMENU_TRANSLATOR_GET_PRIVATE(self);
 }
 
 static void
 ag_init (GObject * object)
 {
+}
+
+static void
+set_property (GObject * obj, guint id, const GValue * value, GParamSpec * pspec)
+{
+	DbusmenuGmenuTranslator * self = DBUSMENU_GMENU_TRANSLATOR(obj);
+
+	switch (id) {
+	case PROP_ROOT:
+		g_clear_object(&self->priv->root);
+		self->priv->root = g_value_dup_object(value);
+		break;
+	default:
+		G_OBJECT_WARN_INVALID_PROPERTY_ID(obj, id, pspec);
+		break;
+	}
+}
+
+static void
+get_property (GObject * obj, guint id, GValue * value, GParamSpec * pspec)
+{
+	DbusmenuGmenuTranslator * self = DBUSMENU_GMENU_TRANSLATOR(obj);
+
+	switch (id) {
+	case PROP_ROOT:
+		g_value_set_object(value, self->priv->root);
+		break;
+	default:
+		G_OBJECT_WARN_INVALID_PROPERTY_ID(obj, id, pspec);
+		break;
+	}
 }
 
 static void
