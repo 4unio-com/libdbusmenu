@@ -56,6 +56,7 @@ static void constructed                          (GObject * obj);
 static void ag_init                              (GObject *object);
 static void set_property (GObject * obj, guint id, const GValue * value, GParamSpec * pspec);
 static void get_property (GObject * obj, guint id, GValue * value, GParamSpec * pspec);
+static void add_menuitem (DbusmenuGmenuTranslator * self, DbusmenuMenuitem * item);
 
 G_DEFINE_TYPE_WITH_CODE (DbusmenuGmenuTranslator, dbusmenu_gmenu_translator, G_TYPE_MENU_MODEL,
                          G_IMPLEMENT_INTERFACE(G_TYPE_ACTION_GROUP, ag_init));
@@ -100,9 +101,13 @@ constructed (GObject * obj)
 
 	if (self->priv->root == NULL) {
 		g_critical("No Root item!");
+		return;
 	}
 
-
+	GList * child;
+	for (child = dbusmenu_menuitem_get_children(self->priv->root); child != NULL; child = g_list_next(child)) {
+		add_menuitem(self, DBUSMENU_MENUITEM(child->data));
+	}
 }
 
 static void
@@ -157,3 +162,11 @@ dbusmenu_gmenu_translator_finalize (GObject *object)
 	G_OBJECT_CLASS (dbusmenu_gmenu_translator_parent_class)->finalize (object);
 }
 
+/* Adds a menu item, signaling it's menus being created as well as actions */
+static void
+add_menuitem (DbusmenuGmenuTranslator * self, DbusmenuMenuitem * item)
+{
+
+
+
+}
