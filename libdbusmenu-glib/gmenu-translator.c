@@ -30,6 +30,8 @@ License version 3 and version 2.1 along with this program.  If not, see
 #include "config.h"
 #endif
 
+#include <string.h> // strlen
+
 #include "gmenu-translator.h"
 #include "menuitem.h"
 
@@ -55,10 +57,14 @@ static void dbusmenu_gmenu_translator_init       (DbusmenuGmenuTranslator *self)
 static void dbusmenu_gmenu_translator_dispose    (GObject *object);
 static void dbusmenu_gmenu_translator_finalize   (GObject *object);
 static void constructed                          (GObject * obj);
-static void ag_init                              (GObject *object);
+static void ag_init                              (GActionGroupInterface * iface);
 static void set_property (GObject * obj, guint id, const GValue * value, GParamSpec * pspec);
 static void get_property (GObject * obj, guint id, GValue * value, GParamSpec * pspec);
 static void add_menuitem (DbusmenuGmenuTranslator * self, DbusmenuMenuitem * item);
+static inline gint action_name_to_id (const gchar * action_name);
+static inline gchar * action_id_to_name (gint item_id);
+static gboolean ag_has_action (GActionGroup * ag, const gchar * action_name);
+static gchar ** ag_list_actions (GActionGroup * ag);
 
 G_DEFINE_TYPE_WITH_CODE (DbusmenuGmenuTranslator, dbusmenu_gmenu_translator, G_TYPE_MENU_MODEL,
                          G_IMPLEMENT_INTERFACE(G_TYPE_ACTION_GROUP, ag_init));
@@ -92,8 +98,10 @@ dbusmenu_gmenu_translator_init (DbusmenuGmenuTranslator *self)
 }
 
 static void
-ag_init (GObject * object)
+ag_init (GActionGroupInterface * iface)
 {
+	iface->has_action = ag_has_action;
+	iface->list_actions = ag_list_actions;
 }
 
 static void
@@ -161,6 +169,59 @@ dbusmenu_gmenu_translator_finalize (GObject *object)
 	G_OBJECT_CLASS (dbusmenu_gmenu_translator_parent_class)->finalize (object);
 }
 
+/*********************************
+  Action Group Interface
+ *********************************/
+
+static inline gint
+action_name_to_id (const gchar * action_name)
+{
+	if (!g_str_has_prefix(action_name, ACTION_PREFIX)) {
+		return 0;
+	}
+
+	const gchar * actionnum = action_name + strlen(ACTION_PREFIX);
+	return g_ascii_strtoll(actionnum, NULL, 10);
+}
+
+static inline gchar *
+action_id_to_name (gint item_id)
+{
+	return g_strdup_printf(ACTION_PREFIX "%d", item_id);
+}
+
+static gboolean
+ag_has_action (GActionGroup * ag, const gchar * action_name)
+{
+	DbusmenuGmenuTranslator * self = DBUSMENU_GMENU_TRANSLATOR(ag);
+	gint id = action_name_to_id(action_name);
+
+	return g_hash_table_contains(self->priv->item_lookup, GINT_TO_POINTER(id));
+}
+
+static void
+list_actions_helper (gpointer key, gpointer value, gpointer user_data)
+{
+	gint item_id = GPOINTER_TO_INT(key);
+	GArray * strlist = (GArray *)user_data;
+	gchar * action_name = action_id_to_name(item_id);
+	g_array_append_val(strlist, action_name);
+}
+
+static gchar **
+ag_list_actions (GActionGroup * ag)
+{
+	DbusmenuGmenuTranslator * self = DBUSMENU_GMENU_TRANSLATOR(ag);
+
+	GArray * strlist = g_array_new(TRUE, TRUE, sizeof(gchar *));
+	g_hash_table_foreach(self->priv->item_lookup, list_actions_helper, strlist);
+	return (gchar **)g_array_free(strlist, FALSE);
+}
+
+/*********************************
+  Helper functions
+ *********************************/
+
 /* Adds a menu item, signaling it's menus being created as well as actions */
 static void
 add_menuitem (DbusmenuGmenuTranslator * self, DbusmenuMenuitem * item)
@@ -189,7 +250,7 @@ add_menuitem (DbusmenuGmenuTranslator * self, DbusmenuMenuitem * item)
 		return;
 	}
 
-	gchar * action_name = g_strdup_printf(ACTION_PREFIX "%d", item_id);
+	gchar * action_name = action_id_to_name(item_id);
 	g_signal_emit_by_name(self, "action-added", action_name);
 	g_free(action_name);
 }
