@@ -33,6 +33,8 @@ License version 3 and version 2.1 along with this program.  If not, see
 #include "gmenu-translator.h"
 #include "menuitem.h"
 
+#define ACTION_PREFIX "dbusmenu-translator-"
+
 struct _DbusmenuGmenuTranslatorPrivate {
 	GHashTable * item_lookup;
 	DbusmenuMenuitem * root;
@@ -104,10 +106,7 @@ constructed (GObject * obj)
 		return;
 	}
 
-	GList * child;
-	for (child = dbusmenu_menuitem_get_children(self->priv->root); child != NULL; child = g_list_next(child)) {
-		add_menuitem(self, DBUSMENU_MENUITEM(child->data));
-	}
+	add_menuitem(self, self->priv->root);
 }
 
 static void
@@ -166,7 +165,31 @@ dbusmenu_gmenu_translator_finalize (GObject *object)
 static void
 add_menuitem (DbusmenuGmenuTranslator * self, DbusmenuMenuitem * item)
 {
+	gint item_id = dbusmenu_menuitem_get_id(item);
 
+	/* Look at the hash table, but not for the root item */
+	if (item_id != 0) {
+		if (g_hash_table_contains(self->priv->item_lookup, GINT_TO_POINTER(item_id))) {
+			/* we already have this one */
+			return;
+		}
 
+		/* Okay, we're keeping this one */
+		g_hash_table_insert(self->priv->item_lookup, GINT_TO_POINTER(item_id), g_object_ref(item));
+	}
 
+	/* Recurse through the children first */
+	GList * child;
+	for (child = dbusmenu_menuitem_get_children(item); child != NULL; child = g_list_next(child)) {
+		add_menuitem(self, DBUSMENU_MENUITEM(child->data));
+	}
+
+	/* For root we don't need to do anything else */
+	if (dbusmenu_menuitem_get_root(item)) {
+		return;
+	}
+
+	gchar * action_name = g_strdup_printf(ACTION_PREFIX "%d", item_id);
+	g_signal_emit_by_name(self, "action-added", action_name);
+	g_free(action_name);
 }
