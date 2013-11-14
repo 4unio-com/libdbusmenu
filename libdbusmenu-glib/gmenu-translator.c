@@ -34,6 +34,7 @@ License version 3 and version 2.1 along with this program.  If not, see
 #include "menuitem.h"
 
 struct _DbusmenuGmenuTranslatorPrivate {
+	GHashTable * item_lookup;
 	DbusmenuMenuitem * root;
 };
 
@@ -81,6 +82,8 @@ static void
 dbusmenu_gmenu_translator_init (DbusmenuGmenuTranslator *self)
 {
 	self->priv = DBUSMENU_GMENU_TRANSLATOR_GET_PRIVATE(self);
+
+	self->priv->item_lookup = g_hash_table_new_full(g_int_hash, g_int_equal, NULL, g_object_unref);
 }
 
 static void
@@ -122,6 +125,10 @@ get_property (GObject * obj, guint id, GValue * value, GParamSpec * pspec)
 static void
 dbusmenu_gmenu_translator_dispose (GObject *object)
 {
+	DbusmenuGmenuTranslator * self = DBUSMENU_GMENU_TRANSLATOR(object);
+
+	g_hash_table_remove_all(self->priv->item_lookup);
+	g_clear_object(&self->priv->root);
 
 	G_OBJECT_CLASS (dbusmenu_gmenu_translator_parent_class)->dispose (object);
 }
@@ -129,6 +136,9 @@ dbusmenu_gmenu_translator_dispose (GObject *object)
 static void
 dbusmenu_gmenu_translator_finalize (GObject *object)
 {
+	DbusmenuGmenuTranslator * self = DBUSMENU_GMENU_TRANSLATOR(object);
+
+	g_hash_table_destroy(self->priv->item_lookup);
 
 	G_OBJECT_CLASS (dbusmenu_gmenu_translator_parent_class)->finalize (object);
 }
