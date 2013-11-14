@@ -52,6 +52,7 @@ static void dbusmenu_gmenu_translator_class_init (DbusmenuGmenuTranslatorClass *
 static void dbusmenu_gmenu_translator_init       (DbusmenuGmenuTranslator *self);
 static void dbusmenu_gmenu_translator_dispose    (GObject *object);
 static void dbusmenu_gmenu_translator_finalize   (GObject *object);
+static void constructed                          (GObject * obj);
 static void ag_init                              (GObject *object);
 static void set_property (GObject * obj, guint id, const GValue * value, GParamSpec * pspec);
 static void get_property (GObject * obj, guint id, GValue * value, GParamSpec * pspec);
@@ -70,6 +71,7 @@ dbusmenu_gmenu_translator_class_init (DbusmenuGmenuTranslatorClass *klass)
 	object_class->finalize = dbusmenu_gmenu_translator_finalize;
 	object_class->set_property = set_property;
 	object_class->get_property = get_property;
+	object_class->constructed = constructed;
 
 	g_object_class_install_property(object_class, PROP_ROOT,
 	                                g_param_spec_object("root", "Root DBusmenu Menuitem",
@@ -89,6 +91,18 @@ dbusmenu_gmenu_translator_init (DbusmenuGmenuTranslator *self)
 static void
 ag_init (GObject * object)
 {
+}
+
+static void
+constructed (GObject * obj)
+{
+	DbusmenuGmenuTranslator * self = DBUSMENU_GMENU_TRANSLATOR(obj);
+
+	if (self->priv->root == NULL) {
+		g_critical("No Root item!");
+	}
+
+
 }
 
 static void
@@ -142,3 +156,4 @@ dbusmenu_gmenu_translator_finalize (GObject *object)
 
 	G_OBJECT_CLASS (dbusmenu_gmenu_translator_parent_class)->finalize (object);
 }
+
