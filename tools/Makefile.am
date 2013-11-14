@@ -25,6 +25,21 @@ dbusmenu_dumper_LDADD = \
 
 doc_DATA = README.dbusmenu-bench
 
+noinst_PROGRAMS = \
+	dbusmenu-gmenu-bridge
+
+dbusmenu_gmenu_bridge_SOURCES = \
+	dbusmenu-gmenu-bridge.c
+
+dbusmenu_gmenu_bridge_CFLAGS = \
+	-I $(srcdir)/.. \
+	$(DBUSMENUGLIB_CFLAGS) \
+	-Wall -Werror
+
+dbusmenu_gmenu_bridge_LDADD = \
+	../libdbusmenu-glib/libdbusmenu-glib.la \
+	$(DBUSMENUGLIB_LIBS)
+
 EXTRA_DIST = \
 	$(doc_DATA) \
 	dbusmenu-bench
