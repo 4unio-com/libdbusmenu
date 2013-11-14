@@ -30,6 +30,7 @@ License version 3 and version 2.1 along with this program.  If not, see
 #define __DBUSMENU_GMENU_TRANSLATOR_H__
 
 #include <gio/gio.h>
+#include "menuitem.h"
 
 G_BEGIN_DECLS
 
@@ -54,6 +55,7 @@ struct _DbusmenuGmenuTranslator {
 };
 
 GType dbusmenu_gmenu_translator_get_type (void);
+DbusmenuGmenuTranslator * dbusmenu_gmenu_translator_new (DbusmenuMenuitem * root);
 
 G_END_DECLS
 

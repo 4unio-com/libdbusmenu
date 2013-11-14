@@ -30,6 +30,7 @@ License version 3 and version 2.1 along with this program.  If not, see
 #define __DBUSMENU_GLIB_H__
 
 #include <libdbusmenu-glib/client.h>
+#include <libdbusmenu-glib/gmenu-translator.h>
 #include <libdbusmenu-glib/menuitem.h>
 #include <libdbusmenu-glib/menuitem-proxy.h>
 #include <libdbusmenu-glib/server.h>

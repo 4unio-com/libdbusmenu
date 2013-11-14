@@ -94,7 +94,7 @@ dbusmenu_gmenu_translator_init (DbusmenuGmenuTranslator *self)
 {
 	self->priv = DBUSMENU_GMENU_TRANSLATOR_GET_PRIVATE(self);
 
-	self->priv->item_lookup = g_hash_table_new_full(g_int_hash, g_int_equal, NULL, g_object_unref);
+	self->priv->item_lookup = g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL, g_object_unref);
 }
 
 static void
@@ -253,4 +253,18 @@ add_menuitem (DbusmenuGmenuTranslator * self, DbusmenuMenuitem * item)
 	gchar * action_name = action_id_to_name(item_id);
 	g_signal_emit_by_name(self, "action-added", action_name);
 	g_free(action_name);
+}
+
+/*********************************
+  Public functions
+ *********************************/
+
+DbusmenuGmenuTranslator *
+dbusmenu_gmenu_translator_new (DbusmenuMenuitem * root)
+{
+	g_return_val_if_fail(DBUSMENU_IS_MENUITEM(root), NULL);
+	g_return_val_if_fail(dbusmenu_menuitem_get_root(root), NULL);
+
+	return g_object_new(DBUSMENU_TYPE_GMENU_TRANSLATOR, "root", root, NULL);
+
 }
