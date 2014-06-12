@@ -1,3 +1,11 @@
+libdbusmenu (12.10.3+14.04.20140612-0ubuntu1) trusty; urgency=low
+
+  [ Marco Trevisan (Treviño) ]
+  * Backporting lp:~3v1n0/libdbusmenu/really-recreate-menu/+merge/222419
+    (LP: #1086563)
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Thu, 12 Jun 2014 16:36:28 +0000
+
 libdbusmenu (12.10.3+14.04.20140319-0ubuntu1) trusty; urgency=low
 
   [ Charles Kerr ]
