@@ -29,8 +29,8 @@ Homepage: https://launchpad.net/dbusmenu
 # If you aren't a member of ~dbusmenu-team but need to upload
 # packaging changes, just go ahead.  ~dbusmenu-team will notice
 # and sync up the code again.
-Vcs-Bzr: https://code.launchpad.net/~dbusmenu-team/dbusmenu/trunk.13.04
-Vcs-Browser: https://bazaar.launchpad.net/~dbusmenu-team/dbusmenu/trunk.13.04/files
+Vcs-Bzr: https://code.launchpad.net/~dbusmenu-team/dbusmenu/trunk.15.10
+Vcs-Browser: https://bazaar.launchpad.net/~dbusmenu-team/dbusmenu/trunk.15.10/files
 
 Package: libdbusmenu-glib4
 Section: libs
